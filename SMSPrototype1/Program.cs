@@ -1,6 +1,11 @@
 //Radhe Radhe Anu 
 namespace SMSPrototype1
 {
+    //jisme change kiya h use stage kru?
+    // jse ki prgrm.cs
+    // jese hi change kregi vo autometically change me aa jayegiok
+    // jb bhi daily kam pura ho jaye ya task pura ho jaye or teko lge ab merge krnah
+    // tb ye sb krna dekh
     public class Program
     {
         public static void Main(string[] args)
