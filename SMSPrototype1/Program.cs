@@ -1,4 +1,4 @@
-// Radha Krishna
+
 namespace SMSPrototype1
 {
     public class Program
