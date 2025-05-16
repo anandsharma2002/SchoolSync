@@ -8,6 +8,7 @@ using SMSDataContext.Data;
 
 namespace SMSPrototype1
 {
+    
     public class Program
     {
         public static void Main(string[] args)
