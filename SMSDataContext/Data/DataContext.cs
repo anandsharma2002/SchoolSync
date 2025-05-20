@@ -15,6 +15,7 @@ namespace SMSDataContext.Data
     {
         public DataContext (DbContextOptions<DataContext> options ) : base (options) { }
 
+        public DbSet<School> Schools { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
