@@ -39,7 +39,6 @@ namespace SMSPrototype1
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();
