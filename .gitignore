@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ignore this file 
+d:\D\study\SMSPrototype1\SMSDataContext\Migrations/

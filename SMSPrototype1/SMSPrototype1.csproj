@@ -31,6 +31,10 @@
     <ProjectReference Include="..\SMSServices\SMSServices.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Home\" />
+  </ItemGroup>
+
 
 
 

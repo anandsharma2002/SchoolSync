@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SMSPrototype1.Controllers
@@ -19,6 +20,7 @@ namespace SMSPrototype1.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
+        [Authorize(Roles = "Role")]
         public IEnumerable<WeatherForecast> Get()
         {
             

@@ -27,4 +27,9 @@
     <ProjectReference Include="..\SMSRepository\SMSRepository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="IServices\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
