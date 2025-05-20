@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ServiceInterface\" />
+    <Folder Include="ServicesInterfaces\" />
     <Folder Include="Services\" />
   </ItemGroup>
 
