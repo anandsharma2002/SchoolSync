@@ -5,10 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SMSDataContext.Data;
+using SMSRepository.Repository;
+//using SMS
+using SMSRepository.RepositoryInterfaces;
 
 namespace SMSPrototype1
 {
-    
+
     public class Program
     {
         public static void Main(string[] args)
@@ -17,6 +20,9 @@ namespace SMSPrototype1
 
 
             builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+
+            builder.Services.AddTransient<ISchoolRepository, SchoolRepository>();
+            //builder.Services.AddTransient<ISchoolSe, SchoolRepository>();
 
 
             // Add services to the container.

@@ -32,8 +32,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ServicesInterfaces\" />
-    <Folder Include="Services\" />
+    <Reference Include="SMSDataModel">
+      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSDataModel.dll</HintPath>
+    </Reference>
+    <Reference Include="SMSRepository">
+      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSRepository.dll</HintPath>
+    </Reference>
+    <Reference Include="SMSServices">
+      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSServices.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
