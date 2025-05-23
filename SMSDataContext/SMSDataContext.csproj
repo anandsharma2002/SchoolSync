@@ -28,8 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SMSRepository\SMSRepository.csproj" />
-    <ProjectReference Include="..\SMSServices\SMSServices.csproj" />
+    <ProjectReference Include="..\SMSDataModel\SMSDataModel.csproj" />
   </ItemGroup>
 
 </Project>
