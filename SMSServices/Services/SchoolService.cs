@@ -8,7 +8,7 @@ using SMSServices.ServicesInterfaces;
 
 namespace SMSServices.Services
 {
-    internal class SchoolService : ISchoolService
+    public class SchoolService : ISchoolService
     {
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSServices.ServicesInterfaces
+namespace SMSRepository.RepositoryInterfaces
 {
-    public class ISchoolService
+    public class IClassRepository
     {
     }
 }
