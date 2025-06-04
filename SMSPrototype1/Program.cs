@@ -22,7 +22,7 @@ namespace SMSPrototype1
             builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
 
             builder.Services.AddTransient<ISchoolRepository, SchoolRepository>();
-            //builder.Services.AddTransient<ISchoolSe, SchoolRepository>();
+            builder.Services.AddTransient<IClassRepository, ClassRepository>();
 
 
             // Add services to the container.

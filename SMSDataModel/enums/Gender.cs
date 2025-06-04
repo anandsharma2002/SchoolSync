@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSServices.ServicesInterfaces
+namespace SMSDataModel.enums
 {
-    public class ISchoolService
+    public enum Gender
     {
+        Male,
+        Female,
+        Other
     }
 }

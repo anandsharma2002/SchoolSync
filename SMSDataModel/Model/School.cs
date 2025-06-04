@@ -11,17 +11,22 @@ namespace SMSDataModel.Model
     {
         public Guid SchoolId { get; set; }
         public string SchoolName { get; set; }
-        [AllowNull]
+       
         public string SchoolEmail { get; set; }
-        [AllowNull]
-        public double PhoneNumber { get; set; }
-        [AllowNull]
+        
+        public string PhoneNumber { get; set; }
+        
         public string Address { get; set; }
-        [AllowNull]
+        
         public string City { get; set; }
-        [AllowNull]
+       
         public string State { get; set; }
-        [AllowNull]
+        
         public int PinCode { get; set; }
+
+        //Navigation
+        //public ICollection<Class> Classes { get; set; }
+        //public 
+
     }
 }
