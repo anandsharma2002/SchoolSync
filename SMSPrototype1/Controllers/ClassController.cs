@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model;
 using SMSDataModel.Model.RequestDtos;
+using SMSRepository.Repository;
 using SMSRepository.RepositoryInterfaces;
 
 namespace SMSPrototype1.Controllers
@@ -50,6 +51,19 @@ namespace SMSPrototype1.Controllers
             };
             var result = await _classRepository.UpdateClass(id, updatedClas);
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteClass(Guid id)
+        {
+            var exist = await _classRepository.GetClassById(id);
+            if (exist != null)
+            {
+                await _classRepository.DeleteClass(exist);
+                return Ok("Class Deleted Successfully");
+            }
+            return NotFound("Class with id not found");
+
         }
 
     }
