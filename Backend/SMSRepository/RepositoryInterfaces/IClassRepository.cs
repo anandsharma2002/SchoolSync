@@ -1,4 +1,5 @@
 ﻿using SMSDataModel.Model;
+using SMSDataModel.Model.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace SMSRepository.RepositoryInterfaces
 {
     public interface IClassRepository
     {
-        Task<Class> CreateClass(Class newClass);
-        Task<List<Class>> GetAllClasses();
-        Task<Class> GetClassById(Guid id);
-        Task<Class> UpdateClass(Guid id, Class updatedClass);
-        Task DeleteClass(Class existingClass);
+        Task<List<Class>> GetAllClassesAsync();
+        Task<Class> GetClassByIdAsync(Guid id);
+        Task<Class> CreateClassAsync(Class newClass);
+        Task<Class> UpdateClassAsync(Class updatedClass);
+        Task<Class> DeleteClassAsync(Class existingClass);
 
 
     }

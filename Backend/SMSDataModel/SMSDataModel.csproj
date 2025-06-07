@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Model\ResponseDtos\**" />
+    <EmbeddedResource Remove="Model\ResponseDtos\**" />
+    <None Remove="Model\ResponseDtos\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="JWT" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
@@ -25,10 +31,6 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Model\ResponseDtos\" />
   </ItemGroup>
 
 </Project>

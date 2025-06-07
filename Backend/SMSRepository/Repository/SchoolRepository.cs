@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SMSRepository.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 using SMSDataModel.Model.RequestDtos;
+using SMSDataModel.Model.Models;
 
 namespace SMSRepository.Repository
 {
@@ -20,45 +21,36 @@ namespace SMSRepository.Repository
         {
             _Context = context;
         }
-        public async Task<School> CreateSchool(School school) {
-            await _Context.Schools.AddAsync(school);
-            await _Context.SaveChangesAsync();
-            return school;
-        }
-
 
         public async Task<IEnumerable<School>> GetAllSchoolsAsync()
         {
             return await _Context.Schools.ToListAsync();
         }
-
-        public async Task<School> GetSchoolById(Guid SchoolId)
+        public async Task<School> GetSchoolById(Guid schoolId)
         {
-            var existingSchool = await _Context.Schools.FindAsync(SchoolId);
-            if(existingSchool != null)
-            {
-                return existingSchool;
-            }
-            return null;
+            var existingSchool = await _Context.Schools.FindAsync(schoolId);
+            return existingSchool;
         }
 
-        public async Task<School> UpdateSchool(School school, CreateSchoolRequestDto schoolReq)
+        public async Task<School> CreateSchool(School school)
         {
-            school.SchoolName = schoolReq.SchoolName;
-            school.SchoolEmail = schoolReq.SchoolEmail;
-            school.Address = schoolReq.Address;
-            school.PhoneNumber = schoolReq.PhoneNumber;
-            school.City = schoolReq.City;
-            school.State = schoolReq.State;
-            school.PinCode = schoolReq.PinCode;
-            var result =  _Context.Schools.Update(school);
+            await _Context.Schools.AddAsync(school);
             await _Context.SaveChangesAsync();
             return school;
         }
-        public async Task DeleteSchool(School school)
+
+        public async Task<School> UpdateSchool(School updatedSchool)
         {
-             _Context.Schools.Remove(school);
+            var result =  _Context.Schools.Update(updatedSchool);
             await _Context.SaveChangesAsync();
+            return result.Entity;
+        }
+
+        public async Task<School> DeleteSchool(School school)
+        {
+            var result = _Context.Schools.Remove(school);
+            await _Context.SaveChangesAsync();
+            return result.Entity;
         }
 
     }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using SMSDataModel.Model;
+using SMSDataModel.Model.Models;
 
 
 namespace SMSDataContext.Data

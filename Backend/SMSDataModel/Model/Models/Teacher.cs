@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSDataModel.Model
+namespace SMSDataModel.Model.Models
 {
     public class Teacher
     {

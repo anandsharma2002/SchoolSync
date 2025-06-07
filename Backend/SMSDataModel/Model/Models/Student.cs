@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSDataModel.Model
+namespace SMSDataModel.Model.Models
 {
     public class Student
     {
@@ -24,7 +24,7 @@ namespace SMSDataModel.Model
         public School School { get; set; }
 
         public Guid ClassId { get; set; }
-        public Class Class { get; set; }             
+        public Class Class { get; set; }
 
     }
 }
