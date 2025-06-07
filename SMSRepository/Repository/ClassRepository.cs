@@ -40,7 +40,14 @@ namespace SMSRepository.Repository
             var existingClass = await _context.Classes.FindAsync(id);
             existingClass.ClassName = updatedClass.ClassName;
             existingClass.SchoolId = updatedClass.SchoolId;
+            _context.Classes.Update(existingClass);
             return existingClass;
+        }
+        public async Task DeleteClass(Class existingClass)
+        {
+            _context.Classes.Remove(existingClass);
+            await _context.SaveChangesAsync();
         }
     }
 }
+

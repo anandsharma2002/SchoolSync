@@ -13,6 +13,8 @@ namespace SMSRepository.RepositoryInterfaces
         Task<List<Class>> GetAllClasses();
         Task<Class> GetClassById(Guid id);
         Task<Class> UpdateClass(Guid id, Class updatedClass);
+        Task DeleteClass(Class existingClass);
+
 
     }
 }
