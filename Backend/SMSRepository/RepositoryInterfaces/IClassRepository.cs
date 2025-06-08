@@ -10,11 +10,11 @@ namespace SMSRepository.RepositoryInterfaces
 {
     public interface IClassRepository
     {
-        Task<List<Class>> GetAllClassesAsync();
-        Task<Class> GetClassByIdAsync(Guid id);
-        Task<Class> CreateClassAsync(Class newClass);
-        Task<Class> UpdateClassAsync(Class updatedClass);
-        Task<Class> DeleteClassAsync(Class existingClass);
+        Task<List<SchoolClass>> GetAllClassesAsync();
+        Task<SchoolClass> GetClassByIdAsync(Guid id);
+        Task<SchoolClass> CreateClassAsync(SchoolClass newClass);
+        Task<SchoolClass> UpdateClassAsync(SchoolClass updatedClass);
+        Task<SchoolClass> DeleteClassAsync(SchoolClass existingClass);
 
 
     }

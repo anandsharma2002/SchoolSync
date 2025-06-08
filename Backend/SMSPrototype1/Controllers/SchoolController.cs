@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model;
+using SMSDataModel.Model.ApiResult;
+using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
+using SMSRepository.Repository;
 using SMSRepository.RepositoryInterfaces;
+using SMSServices.Services;
 using SMSServices.ServicesInterfaces;
 
 
@@ -12,77 +16,118 @@ namespace SMSPrototype1.Controllers
     [ApiController]
     public class SchoolController : ControllerBase
     {
-        private readonly ISchoolRepository _schoolRepository;
-        public SchoolController(ISchoolRepository schoolRepository)
+        private readonly ISchoolService  schoolService;
+        public SchoolController(ISchoolService schoolService)
         {
-            this._schoolRepository = schoolRepository;
-        }
-        [HttpPost]
-        public async Task<ActionResult> CreateSchool(CreateSchoolRequestDto createSchoolRequest)
-        {
-            var newSchool = new School{
-                SchoolId = Guid.NewGuid(),
-                SchoolName= createSchoolRequest.SchoolName,
-                SchoolEmail= createSchoolRequest.SchoolEmail,
-                PhoneNumber = createSchoolRequest.PhoneNumber,
-                Address= createSchoolRequest.Address,
-                City = createSchoolRequest.City,
-                State = createSchoolRequest.State,
-                PinCode = createSchoolRequest.PinCode
-            };
-            var result = await _schoolRepository.CreateSchool(newSchool);
-            return Ok(new
-            {
-                Message = "School Created successfully",
-                Data = newSchool
-            });    
-        }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<School>>> GetAllSchoolsAsync()
-        {
-            var result = await _schoolRepository.GetAllSchoolsAsync();
-            return Ok(result);
+            this.schoolService = schoolService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<School>> GetSchoolById( Guid id)
+        [HttpGet]
+        public async Task<ApiResult<IEnumerable<School>>> GetAllSchoolsAsync()
         {
-            var result = await _schoolRepository.GetSchoolById(id);
-            if(result != null)
+            var apiResult = new ApiResult<IEnumerable<School>>();
+            try
             {
-                return Ok(result);
+                apiResult.Content = await schoolService.GetAllSchoolsAsync();
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
             }
-            return NotFound("School with this id not found");
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
         }
-        [HttpPut("{id}")]
-        public async Task<ActionResult<School>> UpdateSchool(Guid id, CreateSchoolRequestDto school)
+
+
+        [HttpGet("{id}")]
+        public async Task<ApiResult<School>> GetSchoolByIdAsync([FromRoute] Guid id)
         {
-            var exist = await _schoolRepository.GetSchoolById(id);
-            if(exist != null)
+
+            var apiResult = new ApiResult<School>();
+            try
             {
-                var result = await _schoolRepository.UpdateSchool(exist, school);
-                return Ok(new
-                {
-                    Message = "School updated Successfully",
-                    Data= result
-                });
+                apiResult.Content = await schoolService.GetSchoolByIdAsync(id);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
             }
-            else
-            { 
-               return( NotFound("School with this Id not found"));
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
             }
+
+        }
+
+        [HttpPost]
+        public async Task<ApiResult<School>> CreateSchoolAsync([FromBody] CreateSchoolRequestDto createSchoolRequest)
+        {
+
+            var apiResult = new ApiResult<School>();
+            try
+            {
+                apiResult.Content = await schoolService.CreateSchoolAsync(createSchoolRequest);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }   
+        }
+        
+
+        [HttpPut("{id}")]
+        public async Task<ApiResult<School>> UpdateSchool([FromRoute] Guid id, [FromBody] CreateSchoolRequestDto updateSchool)
+        {
+
+            var apiResult = new ApiResult<School>();
+            try
+            {
+                apiResult.Content = await schoolService.UpdateSchoolAsync(id, updateSchool);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+
             
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteSchool(Guid id)
+        public async Task<ApiResult<School>> DeleteSchool([FromRoute] Guid id)
         {
-            var exist = await _schoolRepository.GetSchoolById(id);
-            if (exist != null)
+
+            var apiResult = new ApiResult<School>();
+            try
             {
-                await _schoolRepository.DeleteSchool(exist);
-                return Ok("School Deleted Successfully");
+                apiResult.Content = await schoolService.DeleteSchoolAsync(id);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
             }
-            return NotFound("School with id not found");
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
 
         }
 

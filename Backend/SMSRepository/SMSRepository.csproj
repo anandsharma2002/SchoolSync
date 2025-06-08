@@ -39,9 +39,6 @@
     <Reference Include="SMSDataModel">
       <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSDataModel.dll</HintPath>
     </Reference>
-    <Reference Include="SMSServices">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSServices.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 

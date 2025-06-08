@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model;
+using SMSDataModel.Model.ApiResult;
+using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
 using SMSRepository.Repository;
 using SMSRepository.RepositoryInterfaces;
+using SMSServices.Services;
+using SMSServices.ServicesInterfaces;
 
 namespace SMSPrototype1.Controllers
 {
@@ -11,58 +15,113 @@ namespace SMSPrototype1.Controllers
     [ApiController]
     public class ClassController : ControllerBase
     {
-        private readonly IClassRepository _classRepository;
-        public ClassController(IClassRepository classRepository)
+        private readonly ISchoolClassServices  schoolClassServices;
+        public ClassController(ISchoolClassServices schoolClassServices)
         {
-            this._classRepository = classRepository;
+            this.schoolClassServices = schoolClassServices;
         }
-        [HttpPost]
-        public async Task<ActionResult> CreateClass(CreateClassRequestDto newClass)
-        {
-            var newClas = new Class
-            { 
-                ClassId = Guid.NewGuid(),
-                SchoolId = newClass.SchoolId,
-                ClassName = newClass.ClassName
-            };
-            var result = await _classRepository.CreateClass(newClas);
-            return Ok(result);
-        }
+
+
         [HttpGet]
-        public async Task<ActionResult> GetAllClass()
+        public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync()
         {
-            var result = await _classRepository.GetAllClasses();
-            return Ok(result);
+
+            var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
+            try
+            {
+                apiResult.Content = await schoolClassServices.GetAllClassesAsync();
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex) 
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
 
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetClassById(Guid id)
+        public async Task<ApiResult<SchoolClass>> GetClassByIdAsync([FromRoute]Guid id)
         {
-            var result = await _classRepository.GetClassById(id);
-            return Ok(result);
+            var apiResult = new ApiResult<SchoolClass>();
+            try
+            {
+                apiResult.Content = await schoolClassServices.GetClassByIdAsync(id);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateClass(Guid id, CreateClassRequestDto updatedClass)
+        [HttpPost]
+        public async Task<ApiResult<SchoolClass>> CreateClassAsync([FromBody]CreateClassRequestDto newClass)
         {
-            var updatedClas = new Class { 
-              ClassName = updatedClass.ClassName,
-              SchoolId= updatedClass.SchoolId
-            };
-            var result = await _classRepository.UpdateClass(id, updatedClas);
-            return Ok(result);
+            var apiResult = new ApiResult<SchoolClass>();
+            try
+            {
+                apiResult.Content = await schoolClassServices.CreateClassAsync(newClass);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+        }
+        
+
+        [HttpPut("{id}")]
+        public async Task<ApiResult<SchoolClass>> UpdateClassAsync([FromRoute] Guid id, [FromBody] CreateClassRequestDto updatedClass)
+        {
+            var apiResult = new ApiResult<SchoolClass>();
+            try
+            {
+                apiResult.Content = await schoolClassServices.UpdateClassAsync(id, updatedClass);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteClass(Guid id)
+        public async Task<ApiResult<SchoolClass>> DeleteClassAsync([FromRoute] Guid id)
         {
-            var exist = await _classRepository.GetClassById(id);
-            if (exist != null)
+            var apiResult = new ApiResult<SchoolClass>();
+            try
             {
-                await _classRepository.DeleteClass(exist);
-                return Ok("Class Deleted Successfully");
+                apiResult.Content = await schoolClassServices.DeleteClassAsync(id);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
             }
-            return NotFound("Class with id not found");
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
 
         }
 

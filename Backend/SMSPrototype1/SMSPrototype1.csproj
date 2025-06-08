@@ -39,17 +39,6 @@
     <Folder Include="Controllers\HomeController\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="SMSDataContext">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSDataContext.dll</HintPath>
-    </Reference>
-    <Reference Include="SMSDataModel">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSDataModel.dll</HintPath>
-    </Reference>
-    <Reference Include="SMSServices">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSServices.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 
 

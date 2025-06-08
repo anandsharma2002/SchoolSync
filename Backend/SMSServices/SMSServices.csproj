@@ -26,21 +26,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SMSDataModel\SMSDataModel.csproj" />
+  <ItemGroup>   
+	<ProjectReference Include="..\SMSDataModel\SMSDataModel.csproj" />
     <ProjectReference Include="..\SMSRepository\SMSRepository.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="SMSDataModel">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSDataModel.dll</HintPath>
-    </Reference>
-    <Reference Include="SMSRepository">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSRepository.dll</HintPath>
-    </Reference>
-    <Reference Include="SMSServices">
-      <HintPath>..\SMSDataContext\bin\Debug\net8.0\SMSServices.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 </Project>

@@ -26,27 +26,27 @@ namespace SMSRepository.Repository
         {
             return await _Context.Schools.ToListAsync();
         }
-        public async Task<School> GetSchoolById(Guid schoolId)
+        public async Task<School> GetSchoolByIdAsync(Guid schoolId)
         {
             var existingSchool = await _Context.Schools.FindAsync(schoolId);
             return existingSchool;
         }
 
-        public async Task<School> CreateSchool(School school)
+        public async Task<School> CreateSchoolAsync(School school)
         {
             await _Context.Schools.AddAsync(school);
             await _Context.SaveChangesAsync();
             return school;
         }
 
-        public async Task<School> UpdateSchool(School updatedSchool)
+        public async Task<School> UpdateSchoolAsync(School updatedSchool)
         {
             var result =  _Context.Schools.Update(updatedSchool);
             await _Context.SaveChangesAsync();
             return result.Entity;
         }
 
-        public async Task<School> DeleteSchool(School school)
+        public async Task<School> DeleteSchoolAsync(School school)
         {
             var result = _Context.Schools.Remove(school);
             await _Context.SaveChangesAsync();

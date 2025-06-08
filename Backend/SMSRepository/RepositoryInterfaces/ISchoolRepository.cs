@@ -12,9 +12,9 @@ namespace SMSRepository.RepositoryInterfaces
     public interface ISchoolRepository
     {
         Task<IEnumerable<School>> GetAllSchoolsAsync();
-        Task<School> GetSchoolById(Guid schoolId);
-        Task<School> CreateSchool(School school);
-        Task<School> UpdateSchool(School updatedSchool);
-        Task<School> DeleteSchool(School school);
+        Task<School> GetSchoolByIdAsync(Guid schoolId);
+        Task<School> CreateSchoolAsync(School school);
+        Task<School> UpdateSchoolAsync(School updatedSchool);
+        Task<School> DeleteSchoolAsync(School school);
     }
 }

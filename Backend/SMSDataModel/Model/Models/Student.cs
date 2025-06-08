@@ -24,7 +24,7 @@ namespace SMSDataModel.Model.Models
         public School School { get; set; }
 
         public Guid ClassId { get; set; }
-        public Class Class { get; set; }
+        public SchoolClass Class { get; set; }
 
     }
 }

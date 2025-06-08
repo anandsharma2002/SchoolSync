@@ -8,6 +8,10 @@ using SMSDataContext.Data;
 using SMSRepository.Repository;
 //using SMS
 using SMSRepository.RepositoryInterfaces;
+using SMSDataModel.Model.AutoMapper;
+using SMSServices.ServicesInterfaces;
+using SMSServices.Services;
+//using SMSDataModel.Model.AutoMapper;
 
 namespace SMSPrototype1
 {
@@ -21,8 +25,20 @@ namespace SMSPrototype1
 
             builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
 
+
+            // Services Transient
+            builder.Services.AddTransient<ISchoolService, SchoolService>();
+            builder.Services.AddTransient<ISchoolClassServices, SchoolClassServices>();
+
+
+
+            // Repositories Transient
             builder.Services.AddTransient<ISchoolRepository, SchoolRepository>();
             builder.Services.AddTransient<IClassRepository, ClassRepository>();
+
+            // AutoMapper
+            builder.Services.AddAutoMapper(typeof(SchoolAutoMapper));
+            builder.Services.AddAutoMapper(typeof(SchoolClassAutoMapper));
 
 
             // Add services to the container.
