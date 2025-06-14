@@ -22,7 +22,6 @@ namespace SMSServices.Services
             this.classRepository = classRepository;
             this.mapper = mapper;
         }
-
         public async Task<List<SchoolClass>> GetAllClassesAsync()
         {
             var result = await classRepository.GetAllClassesAsync();
@@ -31,30 +30,35 @@ namespace SMSServices.Services
         public async Task<SchoolClass> GetClassByIdAsync(Guid id)
         {
             var result = await classRepository.GetClassByIdAsync(id);
-            return result;
+            if(result != null)
+            {
+                return result;
+            }
+            throw new Exception("Class with this Id not found");
         }
         public async Task<SchoolClass> CreateClassAsync(CreateClassRequestDto newClass)
         {
-            var schoolClass = new SchoolClass
-            {
-                ClassName = newClass.ClassName,
-                SchoolId = newClass.SchoolId,
-            };
-            var result = await classRepository.CreateClassAsync(schoolClass);
+            var new1Class = mapper.Map<SchoolClass>(newClass);
+            //var schoolClass = new SchoolClass
+            //{
+            //    ClassName = newClass.ClassName,
+            //    SchoolId = newClass.SchoolId,
+            //};
+            var result = await classRepository.CreateClassAsync(new1Class);
             return result;
         }
-
         public async Task<SchoolClass> UpdateClassAsync(Guid id, CreateClassRequestDto updatedClass)
         {
             var schoolClass = await classRepository.GetClassByIdAsync(id);
             if (schoolClass != null)
             {
-                schoolClass.ClassName = updatedClass.ClassName;
-                schoolClass.SchoolId = updatedClass.SchoolId;
+                mapper.Map(updatedClass, schoolClass);
+                //schoolClass.ClassName = updatedClass.ClassName;
+                //schoolClass.SchoolId = updatedClass.SchoolId;
                 var result = await classRepository.UpdateClassAsync(schoolClass);
                 return result;
             }
-            throw new Exception("Try again !");
+            throw new Exception("Class with this Id not found!");
         }
         public async Task<SchoolClass> DeleteClassAsync(Guid id)
         {
@@ -65,7 +69,7 @@ namespace SMSServices.Services
                 var result = await classRepository.DeleteClassAsync(schoolClass);
                 return result;
             }
-            throw new Exception("Try again !");
+            throw new Exception("Class with this Id not found !");
         }
     }
 }

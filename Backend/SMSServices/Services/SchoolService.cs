@@ -31,7 +31,11 @@ namespace SMSServices.Services
         public async Task<School> GetSchoolByIdAsync(Guid schoolId)
         {
             var result = await schoolRepository.GetSchoolByIdAsync(schoolId);
-            return result;
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("School with this ID not found");
         }
 
         public async Task<School> CreateSchoolAsync(CreateSchoolRequestDto createSchool)
@@ -46,18 +50,20 @@ namespace SMSServices.Services
             var school = await schoolRepository.GetSchoolByIdAsync(id);
             if (school != null)
             {
-                school.SchoolName = updatedSchool.SchoolName;
-                school.SchoolEmail = updatedSchool.SchoolEmail;
-                school.PhoneNumber = updatedSchool.PhoneNumber;
-                school.Address = updatedSchool.Address;
-                school.City = updatedSchool.City;
-                school.State = updatedSchool.State;
-                school.PinCode = updatedSchool.PinCode;
+                mapper.Map(updatedSchool, school);
+                // mapping data instead of manually mapping data
+                //school.SchoolName = updatedSchool.SchoolName;
+                //school.SchoolEmail = updatedSchool.SchoolEmail;
+                //school.PhoneNumber = updatedSchool.PhoneNumber;
+                //school.Address = updatedSchool.Address;
+                //school.City = updatedSchool.City;
+                //school.State = updatedSchool.State;
+                //school.PinCode = updatedSchool.PinCode;
 
                 var result = await schoolRepository.UpdateSchoolAsync(school);
                 return result;
             }
-            throw new Exception("Try again !");
+            throw new Exception("School with this ID not found !");
         }
 
         public async Task<School> DeleteSchoolAsync(Guid id)
@@ -68,7 +74,7 @@ namespace SMSServices.Services
                 var result = await schoolRepository.DeleteSchoolAsync(school);
                 return result;
             }
-            throw new Exception("Try again !");
+            throw new Exception("School with this ID not found !");
         }
 
     }
