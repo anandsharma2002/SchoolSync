@@ -55,6 +55,14 @@ namespace SMSPrototype1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
+            // cors
+            builder.Services.AddCors(x => x.AddPolicy("corspolicy", build =>
+            {
+                build.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+            }));
+
+
             var app = builder.Build();                                                                                                                                                                                           
 
             // Configure the HTTP request pipeline.
@@ -63,6 +71,10 @@ namespace SMSPrototype1
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // cors
+            app.UseCors("corspolicy");
+
 
             app.UseHttpsRedirection();
 
