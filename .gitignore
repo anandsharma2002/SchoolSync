@@ -362,5 +362,13 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+
+# By Anand Sharma
 Backend/SMSDataContext/Migrations/
 Backend/SMSPrototype1/appsettings.json
+
+Frontend/SMSFrontend/node_modules/
+Frontend/SMSFrontend/dist/
+Frontend/SMSFrontend/.vite/
+Frontend/SMSFrontend/.env
+Frontend/SMSFrontend/*.log
