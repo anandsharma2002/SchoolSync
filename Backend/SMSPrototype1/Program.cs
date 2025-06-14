@@ -29,12 +29,14 @@ namespace SMSPrototype1
             // Services Transient
             builder.Services.AddTransient<ISchoolService, SchoolService>();
             builder.Services.AddTransient<ISchoolClassServices, SchoolClassServices>();
+            builder.Services.AddTransient<ITeacherService, TeacherService>();
 
 
 
             // Repositories Transient
             builder.Services.AddTransient<ISchoolRepository, SchoolRepository>();
             builder.Services.AddTransient<IClassRepository, ClassRepository>();
+            builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
 
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(SchoolAutoMapper));
