@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import logo from '../assets/Photos/logo.png'
 import SchoolLogo from '../assets/Photos/SchoolLogo.png'
 
@@ -14,7 +15,13 @@ export default function Navbar() {
                     <div className="flex justify-between items-center w-full">
                         <NavLink to="/" className="flex items-center text-xl font-bold">
                             {/* <img src={SchoolLogo} alt="Logo" className=" h-10 mr-2" /> */}
-                            <img src={logo} alt="Logo" className=" h-10 mr-2" />
+                            <motion.img 
+                                src={logo} 
+                                alt="Logo" 
+                                className="h-10 mr-2"
+                                whileHover={{ scale: 1.2 }}
+                                transition={{ duration: 0.3 }}
+                            />
                             <div className='text-[28px] text-black'>AV SMS</div>
                         </NavLink>
                         <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
