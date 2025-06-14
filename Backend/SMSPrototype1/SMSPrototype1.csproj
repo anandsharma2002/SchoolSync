@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\HomeController\**" />
+    <Content Remove="Controllers\HomeController\**" />
+    <EmbeddedResource Remove="Controllers\HomeController\**" />
+    <None Remove="Controllers\HomeController\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="JWT" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
@@ -33,10 +40,6 @@
     <ProjectReference Include="..\SMSRepository\SMSRepository.csproj" />
     <ProjectReference Include="..\SMSDataContext\SMSDataContext.csproj" />
     <ProjectReference Include="..\SMSServices\SMSServices.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\HomeController\" />
   </ItemGroup>
 
 

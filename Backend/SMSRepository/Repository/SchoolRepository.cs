@@ -9,7 +9,6 @@ using SMSDataModel.Model;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SMSRepository.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
-using SMSDataModel.Model.RequestDtos;
 using SMSDataModel.Model.Models;
 
 namespace SMSRepository.Repository

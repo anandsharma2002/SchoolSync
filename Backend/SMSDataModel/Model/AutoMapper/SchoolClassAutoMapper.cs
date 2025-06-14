@@ -13,7 +13,7 @@ namespace SMSDataModel.Model.AutoMapper
     {
         public SchoolClassAutoMapper() 
         {
-            CreateMap<SchoolClass, CreateClassRequestDto>();
+            CreateMap<SchoolClass, CreateClassRequestDto>().ReverseMap();
         }
 
     }
