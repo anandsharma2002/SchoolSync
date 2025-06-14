@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using SMSDataContext.Data;
+﻿using AutoMapper;
 using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
 using SMSRepository.RepositoryInterfaces;
