@@ -30,6 +30,8 @@ namespace SMSPrototype1
             builder.Services.AddTransient<ISchoolService, SchoolService>();
             builder.Services.AddTransient<ISchoolClassServices, SchoolClassServices>();
             builder.Services.AddTransient<ITeacherService, TeacherService>();
+            builder.Services.AddTransient<IStudentService, StudentService>();
+
 
 
 
@@ -37,10 +39,13 @@ namespace SMSPrototype1
             builder.Services.AddTransient<ISchoolRepository, SchoolRepository>();
             builder.Services.AddTransient<IClassRepository, ClassRepository>();
             builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
+            builder.Services.AddTransient<IStudentRepository, StudentRepository>();
 
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(SchoolAutoMapper));
             builder.Services.AddAutoMapper(typeof(SchoolClassAutoMapper));
+            builder.Services.AddAutoMapper(typeof(TeacherAutomapper));
+            builder.Services.AddAutoMapper(typeof(StudentAutomapper));
 
 
             // Add services to the container.
@@ -50,7 +55,7 @@ namespace SMSPrototype1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
+            var app = builder.Build();                                                                                                                                                                                           
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

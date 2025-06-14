@@ -62,7 +62,6 @@ namespace SMSPrototype1.Controllers
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
-
         }
 
         [HttpPost]
