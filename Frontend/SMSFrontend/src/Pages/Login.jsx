@@ -6,7 +6,7 @@ import HomePageBackground from '../assets/Photos/HomePageBackground1.jpg'
 export default function Login() {
   return (
     <div className='min-h-screen flex flex-col'>
-      <div className='bg-cover bg-center h-screen' style={{ backgroundImage: `url(${LoginBackground})` }}>
+      <div className='bg-cover bg-center h-screen' style={{ backgroundImage: `url(${HomePageBackground})` }}>
         <Navbar />
         <div className='container mx-auto px-4 py-8 flex-grow flex items-center justify-center'>
           <div className='max-w-md w-full'>

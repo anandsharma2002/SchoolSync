@@ -1,10 +1,15 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import logo from '../assets/Photos/logo.png'
+import FooterBackgroundImage from '../assets/Photos/FooterBackgroundImage.jpg'
 
 export default function Footer() {
   return (
-    <footer className="bg-[#111] text-white">
-      <div className="container mx-auto px-4 py-8">
+    <footer className="relative text-white">
+      <div className="absolute inset-0 bg-[#111] opacity-90"></div>
+      <div className="absolute inset-0 bg-cover  bg-center" style={{ backgroundImage: `url(${FooterBackgroundImage})` }}></div>
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
@@ -37,9 +42,9 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-4">Contact Us</h3>
             <ul className="space-y-2">
-              <li>Email: info@avsms.com</li>
-              <li>Phone: +1 (555) 123-4567</li>
-              <li>Address: 123 Education St, Learning City</li>
+              <li>Email: AnandSharma.ts3000@gmail.com</li>
+              <li>Phone: +91 7014791230</li>
+              <li>Address: Mansarovar, Jaipur, Rajasthan</li>
             </ul>
           </div>
 
@@ -47,12 +52,6 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-4">Follow Us</h3>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-gray-300">
-                <i className="fab fa-facebook"></i> Facebook
-              </a>
-              <a href="#" className="hover:text-gray-300">
-                <i className="fab fa-twitter"></i> Twitter
-              </a>
               <a href="#" className="hover:text-gray-300">
                 <i className="fab fa-linkedin"></i> LinkedIn
               </a>
