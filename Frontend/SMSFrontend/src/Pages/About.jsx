@@ -3,6 +3,12 @@ import Navbar from '../Components/Navbar'
 import Footer from '../Components/Footer'
 import AboutUs from '../assets/Photos/AboutUsIcon.png'
 import Logo from '../assets/Photos/Logo.png'
+import DelhiIcon from '../assets/Photos/DelhiIcon.png'
+import MumbaiIcon from '../assets/Photos/MumbaiIcon.png'
+import IndoreIcon from '../assets/Photos/IndoreIcon.png'
+import PuneIcon from '../assets/Photos/PuneIcon.png'
+import JodhpurIcon from '../assets/Photos/JodhpurIcon.png'
+import JaipurIcon from '../assets/Photos/JaipurIcon.png'
 import { motion } from 'framer-motion'
 
 export default function About() {
@@ -24,7 +30,7 @@ export default function About() {
             transition={{ duration: 0.3 }}
           >
             <div className=' flex flex-col md:flex-row-reverse justify-center items-center'>
-            <div className='md:w-1/2 p-8'>
+              <div className='md:w-1/2 p-8'>
                 <h3 className='text-[30px] font-bold mb-4 text-blue-600'>Our Story</h3>
                 <p className='text-[18px] text-gray-800 mb-4'>
                   Welcome to AV School Management System, where we're revolutionizing the way educational institutions operate. Founded with a vision to streamline school administration and enhance the learning experience, we've been at the forefront of educational technology since our inception.
@@ -41,6 +47,44 @@ export default function About() {
               </div>
             </div>
           </motion.div>
+        </div>
+
+        <div className='mt-20'>
+          <p className='text-[30px] font-bold text-blue-600 text-center'>Where are we?</p>
+        </div>
+
+        <div className='mt-10 w-[98%] mx-auto'>
+          <marquee behavior="" direction="left" className='text-[20px] font-bold bg-blue-50 rounded-lg p-4'>
+            <div className='flex flex-row'>
+              <div className='ml-20 flex flex-col items-center justify-center'>
+                <img src={DelhiIcon} alt="Teacher Portal" className='' />
+                <p>Delhi</p>
+              </div>
+              <div className='ml-20 flex flex-col items-center justify-center'>
+                <img src={MumbaiIcon} alt="Teacher Portal" className='' />
+                <p>Mumbai</p>
+              </div>
+              <div className='ml-20 flex flex-col items-center justify-center'>
+                <img src={JaipurIcon} alt="Teacher Portal" className='' />
+                <p>Jaipur</p>
+              </div>
+              <div className='ml-20 flex flex-col items-center justify-center'>
+                <img src={IndoreIcon} alt="Teacher Portal" className='' />
+                <p>Indore</p>
+              </div>
+              
+              <div className='ml-20 flex flex-col items-center justify-center'>
+                <img src={JodhpurIcon} alt="Teacher Portal" className='' />
+                <p>Jodhpur</p>
+              </div>
+              <div className='ml-20 flex flex-col items-center justify-center'>
+                <img src={PuneIcon} alt="Teacher Portal" className='' />
+                <p>Pune</p>
+              </div>
+              
+              
+            </div>
+          </marquee>
         </div>
       </div>
       <Footer />
