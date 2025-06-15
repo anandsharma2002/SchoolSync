@@ -24,12 +24,13 @@ export default function Navbar() {
                             <span className="block w-6 h-0.5 bg-black"></span>
                         </button>
                     </div>
-                    <div className={`absolute top-full left-0 w-full bg-white bg-opacity-40 shadow-lg md:shadow-none md:bg-transparent md:relative md:top-0 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-12 md:ml-auto text-left ${isOpen ? 'block' : 'hidden'} md:block`}>
-                        <NavLink to="/about" className="text-black hover:text-gray-600 text-[20px] px-4 py-2 md:py-0">About</NavLink>
+                    <div className={`absolute top-full left-0 w-full bg-white bg-opacity-40 shadow-lg md:shadow-none md:bg-transparent md:relative md:top-0 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-12 md:ml-auto text-left rounded-lg ${isOpen ? 'block' : 'hidden'} md:block`}>
+                        <NavLink to="/" className="text-black hover:text-gray-600 text-[20px] px-4 py-2 md:py-0">Home</NavLink>
+                        <NavLink to="/about" className="text-black hover:text-gray-600 text-[20px] px-4 py-2 md:py-0">About Us</NavLink>
                         <NavLink to="/pricing" className="text-black hover:text-gray-600 text-[20px] px-4 py-2 md:py-0">Pricing</NavLink>
                         <NavLink to="/schools" className="text-black hover:text-gray-600 text-[20px] px-4 py-2 md:py-0">Schools</NavLink>
-                        <NavLink to="/login" className="   ">
-                            <span className='text-white  text-[20px]   bg-blue-600 rounded-lg px-6 py-2 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg md:ml-4'>LogIn/SignUp</span>
+                        <NavLink to="/login" className="px-2 pb-4 md:py-0">
+                            <span className='text-white  text-[20px]   bg-gradient-to-r from-[#2A8AA2] to-[#4f95c7] rounded-lg px-6 py-2 hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg md:ml-4'>LogIn/SignUp</span>
                         </NavLink>
                     </div>
                 </div>
