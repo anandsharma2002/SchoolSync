@@ -63,7 +63,7 @@ namespace SMSServices.Services
                 var result = await schoolRepository.UpdateSchoolAsync(school);
                 return result;
             }
-            throw new Exception("School with this ID not found !");
+            throw new Exception("School with this ID not found");
         }
 
         public async Task<School> DeleteSchoolAsync(Guid id)
@@ -74,7 +74,7 @@ namespace SMSServices.Services
                 var result = await schoolRepository.DeleteSchoolAsync(school);
                 return result;
             }
-            throw new Exception("School with this ID not found !");
+            throw new Exception("School with this ID not found");
         }
 
     }

@@ -33,7 +33,7 @@ namespace SMSServices.Services
             {
                 return result;
             }
-            throw new Exception("Attendance with this Id not found");
+            throw new Exception("Attendance with this ID not found");
         }
         public async Task<Attendance> CreateAttendanceAsync(CreateAttendanceRqstDto newAttendanceRqst)
         {
@@ -50,7 +50,18 @@ namespace SMSServices.Services
                 var result = await _attendanceRepository.updatedAttendanceAsync(Attendance);
                 return result;
             }
-            throw new Exception("Attendance with this Id not found!");
+            throw new Exception("Attendance with this ID not found");
+        }
+        public async Task<Attendance> DeleteAttendanceAsync(Guid id)
+        {
+
+            var existingAttendance = await _attendanceRepository.GetAttendanceByIdAsync(id);
+            if (existingAttendance != null)
+            {
+                var result = await _attendanceRepository.DeleteAttendanceAsync(existingAttendance);
+                return result;
+            }
+            throw new Exception("Attendance with this ID not found");
         }
     }
 }

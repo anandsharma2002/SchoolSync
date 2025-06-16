@@ -51,7 +51,7 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = ex.Message == "Id for this teacher not Found"
+                apiResult.StatusCode = ex.Message == "Id for this Teacher not found"
                ? HttpStatusCode.NotFound
                : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
@@ -91,7 +91,7 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = ex.Message == "Id for this teacher not Found"
+                apiResult.StatusCode = ex.Message == "Id for this Teacher not found"
                  ? HttpStatusCode.NotFound
                  : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
@@ -113,7 +113,7 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = ex.Message == "Id for this teacher not Found"
+                apiResult.StatusCode = ex.Message == "Id for this Teacher not found"
                 ? HttpStatusCode.NotFound
                 : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;

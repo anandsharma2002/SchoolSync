@@ -8,6 +8,7 @@ using SMSRepository.Repository;
 using SMSRepository.RepositoryInterfaces;
 using SMSServices.Services;
 using SMSServices.ServicesInterfaces;
+using System.Net;
 
 
 namespace SMSPrototype1.Controllers
@@ -58,7 +59,9 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.StatusCode = ex.Message == "School with this ID not found"
+                   ? HttpStatusCode.NotFound
+                   : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
@@ -101,7 +104,9 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.StatusCode = ex.Message == "School with this ID not found"
+                   ? HttpStatusCode.NotFound
+                   : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
@@ -123,7 +128,9 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.StatusCode = ex.Message == "School with this ID not found"
+                   ? HttpStatusCode.NotFound
+                   : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }

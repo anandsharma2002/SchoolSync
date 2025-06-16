@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SMSRepository.Repository
 {
-    class AttendanceRepository: IAttendanceRepository
+    public class AttendanceRepository: IAttendanceRepository
     {
         private readonly DataContext _context;
         public AttendanceRepository(DataContext context)
@@ -21,15 +21,15 @@ namespace SMSRepository.Repository
         public async Task<List<Attendance>> GetAllAttendancesOfStudentsAsync()
         {
             var result = await _context.Attendance
-                .Include(s=> s.StudentId)
+                .Include(s=> s.Student)
                 .Include(s => s.School)
-                .Include(s => s.ClassId)
+                .Include(s => s.Class)
                 .ToListAsync();
             return result;
         }
         public async Task<Attendance> GetAttendanceByIdAsync(Guid id)
         {
-            var result = await _context.Attendance.Include(s => s.StudentId).Include(s=> s.SchoolId).Include(s=> s.ClassId).FirstOrDefaultAsync(s => s.AttendanceId == id);
+            var result = await _context.Attendance.Include(s => s.Student).Include(s=> s.School).Include(s=> s.Class).FirstOrDefaultAsync(s => s.AttendanceId == id);
             return result;
         }
         public async Task<Attendance> CreateAttendanceAsync(Attendance newAttendanceRqst)
@@ -43,6 +43,12 @@ namespace SMSRepository.Repository
             var result = _context.Attendance.Update(updatedAttendance);
             await _context.SaveChangesAsync();
             return result.Entity;
+        }
+        public async Task<Attendance> DeleteAttendanceAsync(Attendance existingAttendance)
+        {
+            var result = _context.Attendance.Remove(existingAttendance);
+            await _context.SaveChangesAsync();
+            return existingAttendance;
         }
     }
 }

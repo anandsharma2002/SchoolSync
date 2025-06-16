@@ -49,7 +49,7 @@ namespace SMSServices.Services
                 var result = await _teacherRepository.UpdateTeacherAsync(teacher);
                 return result;
             }
-            throw new Exception("Id for this teacher not Found");
+            throw new Exception("Id for this Teacher not found");
         }
         public async Task<Teacher> DeleteTeacherAsync(Guid id)
         {
@@ -59,7 +59,7 @@ namespace SMSServices.Services
                 var result = await _teacherRepository.DeleteTeacherAsync(id);
                 return result;
             }
-            throw new Exception("Id for this teacher not Found");
+            throw new Exception("Id for this Teacher not found");
         }
     }
 }
