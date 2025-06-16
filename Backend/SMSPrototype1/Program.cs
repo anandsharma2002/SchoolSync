@@ -73,7 +73,7 @@ namespace SMSPrototype1
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            //
+            
 
             // cors
             app.UseCors("corspolicy");
