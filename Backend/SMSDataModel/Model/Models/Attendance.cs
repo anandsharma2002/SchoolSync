@@ -1,5 +1,4 @@
-﻿using SMSDataModel.enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +16,7 @@ namespace SMSDataModel.Model.Models
         public Guid SchoolId { get; set; }
         public School School { get; set; }
         public DateOnly Date { get; set; }
-        public AttendanceStatus Status { get; set; }
+        public string Status { get; set; }
 
     }
 }

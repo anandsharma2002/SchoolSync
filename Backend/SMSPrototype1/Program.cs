@@ -31,7 +31,7 @@ namespace SMSPrototype1
             builder.Services.AddTransient<ISchoolClassServices, SchoolClassServices>();
             builder.Services.AddTransient<ITeacherService, TeacherService>();
             builder.Services.AddTransient<IStudentService, StudentService>();
-
+            builder.Services.AddTransient<IAttendanceService, AttendanceService>();
 
 
 
@@ -40,12 +40,14 @@ namespace SMSPrototype1
             builder.Services.AddTransient<IClassRepository, ClassRepository>();
             builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
+            builder.Services.AddTransient<IAttendanceRepository, AttendanceRepository>();
 
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(SchoolAutoMapper));
             builder.Services.AddAutoMapper(typeof(SchoolClassAutoMapper));
             builder.Services.AddAutoMapper(typeof(TeacherAutomapper));
             builder.Services.AddAutoMapper(typeof(StudentAutomapper));
+            builder.Services.AddAutoMapper(typeof(AttendanceAutomapper));
 
 
             // Add services to the container.

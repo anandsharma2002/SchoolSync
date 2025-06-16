@@ -52,7 +52,7 @@ namespace SMSServices.Services
                 var result = await classRepository.UpdateClassAsync(schoolClass);
                 return result;
             }
-            throw new Exception("Class with this Id not found!");
+            throw new Exception("Class with this Id not found");
         }
         public async Task<SchoolClass> DeleteClassAsync(Guid id)
         {
@@ -63,7 +63,7 @@ namespace SMSServices.Services
                 var result = await classRepository.DeleteClassAsync(schoolClass);
                 return result;
             }
-            throw new Exception("Class with this Id not found !");
+            throw new Exception("Class with this Id not found");
         }
     }
 }
