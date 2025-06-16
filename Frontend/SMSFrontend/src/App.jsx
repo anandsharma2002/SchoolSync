@@ -8,12 +8,14 @@ import Pricing from './Pages/Pricing';
 import Schools from './Pages/Schools';
 import Login from './Pages/Login';
 import Read from './Pages/Read';
+import Navbar from './Components/Navbar';
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <BrowserRouter>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
