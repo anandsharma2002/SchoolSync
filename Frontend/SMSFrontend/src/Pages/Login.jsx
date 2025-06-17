@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Footer from '../Components/Footer'
 import LoginPageBackground from '../assets/Photos/LoginPageBackground.jpg'
+import { NavLink } from 'react-router-dom';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,10 +19,9 @@ export default function Login() {
               <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-white bg-black bg-opacity-20 px-4 py-2 rounded-lg'>Welcome</h1>
               <div className='bg-white bg-opacity-30 p-3 sm:p-4 md:p-6 rounded-lg backdrop-blur-sm'>
                 <div className='relative'>
-                  <div 
-                    className={`absolute top-0 h-full rounded-lg z-10 transition-all duration-500 ease-in-out bg-gradient-to-r from-[#2a9b93] to-[#5f95c7] ${
-                      isLogin ? 'left-0 w-[50%]' : 'left-[50%] w-[50%]'
-                    }`}
+                  <div
+                    className={`absolute top-0 h-full rounded-lg z-10 transition-all duration-500 ease-in-out bg-gradient-to-r from-[#2a9b93] to-[#5f95c7] ${isLogin ? 'left-0 w-[50%]' : 'left-[50%] w-[50%]'
+                      }`}
                   ></div>
                   <div className='flex flex-col lg:flex-row'>
                     {/* Login Section */}
@@ -102,13 +102,15 @@ export default function Login() {
                         >
                           Sign Up
                         </button>
-                        <button
-                          type="button"
-                          onClick={handleToggle}
-                          className='w-full mt-2 text-green-500 hover:text-green-600 transition-colors duration-300'
-                        >
+                        <button type="button" onClick={handleToggle} className='w-full mt-2 text-green-500 hover:text-green-600 transition-colors duration-300'>
                           Already have an account? Login
                         </button>
+
+                        <div>
+                          <button className='border-2 rounded-lg p-2 bg-[#169] font-bold text-white'>
+                            <NavLink to="/dashboard">Dashboard</NavLink>
+                          </button>
+                        </div>
                       </form>
                     </div>
                   </div>
