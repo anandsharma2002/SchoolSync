@@ -1,54 +1,18 @@
 import React from 'react';
 import Sidebar from '../../Components/Dashborad/Sidebar';
 import { NavLink } from 'react-router-dom';
+import ClassCard from '../../Components/Dashborad/ClassCard';
+import ClassCardImage from '../../assets/Photos/ClassCardImage.jpg';
 
 const Students = () => {
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-6">Students Management</h1>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-6">
-            <input
-              type="text"
-              placeholder="Search students..."
-              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-              <NavLink to="/addStudent">Add New Student</NavLink>
-            </button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll No</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {/* Sample data - replace with actual data */}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap">John Doe</td>
-                  <td className="px-6 py-4 whitespace-nowrap">Class 10A</td>
-                  <td className="px-6 py-4 whitespace-nowrap">101</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                    <button className="text-red-600 hover:text-red-900">Delete</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 px-2 sm:px-0">
+          <ClassCard image={ClassCardImage} name="Class 1" buttonText="View Class" onButtonClick={() => {}} />
+          <ClassCard image={ClassCardImage} name="Class 2" buttonText="View Class" onButtonClick={() => {}} />
+          <ClassCard image={ClassCardImage} name="Class 3" buttonText="View Class" onButtonClick={() => {}} />
         </div>
       </div>
     </div>
