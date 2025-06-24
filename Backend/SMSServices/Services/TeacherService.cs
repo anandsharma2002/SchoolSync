@@ -36,6 +36,11 @@ namespace SMSServices.Services
         public async Task<Teacher> CreateTeacherAsync(CreateTeacherRqstDto teacherRqstDto)
         {
             var newTeacher = mapper.Map<Teacher>(teacherRqstDto);
+
+            // Needs to be change [static data]
+            newTeacher.SchoolId = Guid.Parse("63923485-ba05-42e0-b6c5-2f97651c6c42");
+
+
             var result = await _teacherRepository.CreateTeacherAsync(newTeacher);
             return result;
         }

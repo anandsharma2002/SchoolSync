@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './Pages/Home';
 import About from './Pages/About';
@@ -19,6 +17,8 @@ import Schedule from './Pages/Dashboard/Schedule';
 import Reports from './Pages/Dashboard/Reports';
 import Settings from './Pages/Dashboard/Settings';
 import AddStudent from './Pages/Dashboard/AddStudent';
+import AddNewTeacher from './Pages/Dashboard/AddNewTeacher';  
+import UpdateTeacher from './Pages/Dashboard/UpdateTeacher';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -44,6 +44,8 @@ function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/addNewTeacher" element={<AddNewTeacher />} />
+        <Route path="/updateTeacher" element={<UpdateTeacher />} />
       </Routes>
     </BrowserRouter>
   )
