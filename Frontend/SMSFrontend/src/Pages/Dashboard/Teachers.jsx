@@ -6,7 +6,13 @@ import { NavLink, useNavigate } from 'react-router-dom';
 const Teachers = () => {
 
   const [teachers, setTeachers] = useState([]);
+  const [finalTeachers, setfinalTeachers] = useState([]);
+
   const navigate = useNavigate();
+
+  const [filterTeachers, setFilterTeachers] = useState([])  
+
+  const isFilterTeachers = false
 
 
   useEffect(() => {
@@ -17,6 +23,8 @@ const Teachers = () => {
         // console.log(response);
         if (response.status === 200) {
           setTeachers(response.data.content);
+          setfinalTeachers(response.data.content);
+          setFilterTeachers(response.data.content);
         }
       }
       catch (error) {
@@ -38,6 +46,19 @@ const Teachers = () => {
     }
   }
 
+  const teacherFilter = (e) => {
+
+    if (e != null) {
+      const filtered = teachers.filter((x) =>
+        x.teacherName.toLowerCase().includes(e.toLowerCase())
+      );
+      setFilterTeachers(filtered)
+    }
+    else {
+      setFilterTeachers(finalTeachers);
+    }
+  }
+
 
   return (
     <div className="flex">
@@ -46,7 +67,7 @@ const Teachers = () => {
         <h1 className="text-3xl font-bold mb-6">Teachers Management</h1>
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-6">
-            <input type="text" placeholder="Search teachers..." className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input type="text" onChange={(e) => teacherFilter(e.target.value)} placeholder="Search teachers..." className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
             <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
               <NavLink to="/addNewTeacher">
                 Add New Teacher
@@ -67,7 +88,9 @@ const Teachers = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {teachers?.map((teacher, index) => (
+
+
+                {filterTeachers?.map((teacher, index) => (
                   <tr key={teacher?.teacherId}>
                     <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{teacher?.teacherName}</td>

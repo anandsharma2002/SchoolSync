@@ -34,7 +34,7 @@ const AddStudent = () => {
     // Handle form submission here
     console.log(formData);
     // Navigate back to students list after submission
-    navigate('/students');
+    navigate('/class');
   };
 
   return (
@@ -44,7 +44,7 @@ const AddStudent = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Add New Student</h1>
           <button
-            onClick={() => navigate('/students')}
+            onClick={() => navigate('/class')}
             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
           >
             Back to Students
@@ -246,7 +246,7 @@ const AddStudent = () => {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => navigate('/students')}
+                onClick={() => navigate('/class')}
                 className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
               >
                 Cancel

@@ -20,7 +20,7 @@ namespace SMSRepository.Repository
 
         public async Task<IEnumerable<Student>> GetAllStudentAsync()
         {
-            return await _context.Students.Include(s => s.School).Include(s => s.Class).ToListAsync();
+            return await _context.Students.Include("School").Include("Class").ToListAsync();
         }
         public async Task<Student> GetStudentByIdAsync(Guid studentId)
         {

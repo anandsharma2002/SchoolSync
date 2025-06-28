@@ -16,7 +16,7 @@ import {
 
 const menuItems = [
   { path: "/dashboard", name: "Dashboard", icon: <FaHome /> },
-  { path: "/students", name: "Students", icon: <FaUserGraduate /> },
+  { path: "/class", name: "Class", icon: <FaUserGraduate /> },
   { path: "/teachers", name: "Teachers", icon: <FaChalkboardTeacher /> },
   { path: "/courses", name: "Courses", icon: <FaBook /> },
   { path: "/schedule", name: "Schedule", icon: <FaCalendarAlt /> },

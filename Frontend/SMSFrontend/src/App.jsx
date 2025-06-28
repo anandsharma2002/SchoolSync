@@ -10,8 +10,8 @@ import Navbar from './Components/Navbar';
 
 // Dashboard Pages
 import Dashboard from './Pages/Dashboard/Dashboard';
-import Students from './Pages/Dashboard/Students';
 import Teachers from './Pages/Dashboard/Teachers';
+import Students from './Pages/Dashboard/Students';
 import Courses from './Pages/Dashboard/Courses';
 import Schedule from './Pages/Dashboard/Schedule';
 import Reports from './Pages/Dashboard/Reports';
@@ -19,6 +19,7 @@ import Settings from './Pages/Dashboard/Settings';
 import AddStudent from './Pages/Dashboard/AddStudent';
 import AddNewTeacher from './Pages/Dashboard/AddNewTeacher';  
 import UpdateTeacher from './Pages/Dashboard/UpdateTeacher';
+import Class from './Pages/Dashboard/Class';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -37,7 +38,7 @@ function App() {
 
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/students" element={<Students />} />
+        <Route path="/class" element={<Class />} />
         <Route path="/addStudent" element={<AddStudent />} />
         <Route path="/teachers" element={<Teachers />} />
         <Route path="/courses" element={<Courses />} />
@@ -46,6 +47,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/addNewTeacher" element={<AddNewTeacher />} />
         <Route path="/updateTeacher" element={<UpdateTeacher />} />
+        <Route path="/students" element={<Students />} /> 
       </Routes>
     </BrowserRouter>
   )
