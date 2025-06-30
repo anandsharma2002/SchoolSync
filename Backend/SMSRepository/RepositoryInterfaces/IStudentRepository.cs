@@ -11,6 +11,7 @@ namespace SMSRepository.RepositoryInterfaces
     {
         Task<IEnumerable<Student>> GetAllStudentAsync();
         Task<Student> GetStudentByIdAsync(Guid studentId);
+        Task<IEnumerable<Student>> GetStudentByClassIdAsync(Guid classId);
         Task<Student> CreateStudentAsync(Student student);
         Task<Student> UpdateStudentAsync(Student updatedStudent);
         Task<Student> DeleteStudentAsync(Student student);

@@ -11,7 +11,7 @@ export default function ClassCard({ item, index }) {
             <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
             <td className="px-6 py-4 whitespace-nowrap">{item?.className}</td>
             <td className="px-6 py-4 whitespace-nowrap">
-                <button onClick={()=> navigate('/Students', { state: { classId : item?.classId } })} className="bg-green-500 px-6 py-2 rounded-lg text-white text-[18px]" >Details</button>
+                <button onClick={()=> navigate('/Students', { state: { classId : item?.classId } })} className="bg-green-500 px-6 py-2 rounded-lg text-white text-[18px]" >See Students</button>
             </td>
         </tr>
     )

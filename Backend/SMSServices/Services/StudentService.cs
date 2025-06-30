@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace SMSServices.Services
 {
-    public class StudentService: IStudentService
+    public class StudentService : IStudentService
     {
         private readonly IStudentRepository _studentRepository;
         private readonly IMapper mapper;
@@ -35,6 +36,19 @@ namespace SMSServices.Services
             }
             throw new Exception("Student with this ID not found");
         }
+
+        
+        public async Task<IEnumerable<Student>> GetStudentByClassIdAsync(Guid classtId)
+        {
+            var result = await _studentRepository.GetStudentByClassIdAsync(classtId);
+            if (result != null)
+            {
+                return result;
+            }
+            throw new Exception("Student with class ID not found");
+        }
+
+
         public async Task<Student> CreateStudentAsync(CreateStudentRqstDto createStudent)
         {
             var newStudent = mapper.Map<Student>(createStudent);

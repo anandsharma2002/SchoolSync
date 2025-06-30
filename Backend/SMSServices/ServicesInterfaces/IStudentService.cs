@@ -12,6 +12,7 @@ namespace SMSServices.ServicesInterfaces
     {
         Task<IEnumerable<Student>> GetAllStudentAsync();
         Task<Student> GetStudentByIdAsync(Guid studentId);
+        Task<IEnumerable<Student>> GetStudentByClassIdAsync(Guid classId);
         Task<Student> CreateStudentAsync(CreateStudentRqstDto createStudent);
         Task<Student> UpdateStudentAsync(Guid id, CreateStudentRqstDto studentRqstDto);
         Task<Student> DeleteStudentAsync(Guid id);

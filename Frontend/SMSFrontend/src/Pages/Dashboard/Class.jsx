@@ -16,10 +16,10 @@ const Class = () => {
     useEffect(() => {
         const getClasses = async () => {
             const response = await axios.get("https://localhost:44313/api/Class")
-            // console.log(response.data)
-
+            
             if (response.data.statusCode == 200) {
                 setClasses(response.data.content)
+                console.log(response.data.content)
             }
         }
 

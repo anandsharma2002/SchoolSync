@@ -37,47 +37,80 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }
         }
-            [HttpGet("{id}")]
-            public async Task<ApiResult<Student>> GetStudentByIdAsync([FromRoute] Guid id)
+        [HttpGet("{id}")]
+        public async Task<ApiResult<Student>> GetStudentByIdAsync([FromRoute] Guid id)
+        {
+            var apiResult = new ApiResult<Student>();
+            try
             {
-                var apiResult = new ApiResult<Student>();
-                try
-                {
-                    apiResult.Content = await _studentService.GetStudentByIdAsync(id);
-                    apiResult.IsSuccess = true;
-                    apiResult.StatusCode = System.Net.HttpStatusCode.OK;
-                    return apiResult;
-                }
-                catch (Exception ex)
-                {
-                    apiResult.IsSuccess = false;
-                    apiResult.StatusCode = ex.Message == "Student with this ID not found"
-                   ? HttpStatusCode.NotFound
-                   : HttpStatusCode.BadRequest;
-                    apiResult.ErrorMessage = ex.Message;
-                    return apiResult;
-                }
+                apiResult.Content = await _studentService.GetStudentByIdAsync(id);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = ex.Message == "Student with this ID not found"
+               ? HttpStatusCode.NotFound
+               : HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
 
-            }
-            [HttpPost]
-            public async Task<ApiResult<Student>> CreateStudentAsync([FromBody] CreateStudentRqstDto createStudentRqstDto)
+        }
+
+
+
+        [HttpGet("GetStudentByClassIdAsync/{classId}")]
+        public async Task<ApiResult<IEnumerable<Student>>> GetStudentByClassIdAsync([FromRoute] Guid classId)
+        {
+            var apiResult = new ApiResult<IEnumerable<Student>>();
+            try
             {
-                var apiResult = new ApiResult<Student>();
-                try
-                {
-                    apiResult.Content = await _studentService.CreateStudentAsync(createStudentRqstDto);
-                    apiResult.IsSuccess = true;
-                    apiResult.StatusCode = System.Net.HttpStatusCode.OK;
-                    return apiResult;
-                }
-                catch (Exception ex)
-                {
-                    apiResult.IsSuccess = false;
-                    apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                    apiResult.ErrorMessage = ex.Message;
-                    return apiResult;
-                }
+                apiResult.Content = await _studentService.GetStudentByClassIdAsync(classId);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
             }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = ex.Message == "Student with this ID not found"
+               ? HttpStatusCode.NotFound
+               : HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+
+        }
+
+
+
+
+
+
+
+
+        [HttpPost]
+        public async Task<ApiResult<Student>> CreateStudentAsync([FromBody] CreateStudentRqstDto createStudentRqstDto)
+        {
+            var apiResult = new ApiResult<Student>();
+            try
+            {
+                apiResult.Content = await _studentService.CreateStudentAsync(createStudentRqstDto);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+        }
         [HttpPut("{id}")]
         public async Task<ApiResult<Student>> UpdateStudentAsync([FromRoute] Guid id, [FromBody] CreateStudentRqstDto updateStudent)
         {
