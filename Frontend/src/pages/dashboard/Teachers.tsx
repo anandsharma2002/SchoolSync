@@ -1,0 +1,113 @@
+
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Plus, Mail, Users } from 'lucide-react';
+
+const Teachers: React.FC = () => {
+  const teachers = [
+    {
+      id: 1,
+      name: 'Dr. Sarah Smith',
+      email: 'sarah.smith@school.edu',
+      subject: 'Mathematics',
+      classes: 3,
+      students: 75,
+      status: 'Active',
+    },
+    {
+      id: 2,
+      name: 'Prof. John Johnson',
+      email: 'john.johnson@school.edu',
+      subject: 'Physics',
+      classes: 2,
+      students: 45,
+      status: 'Active',
+    },
+    {
+      id: 3,
+      name: 'Ms. Emily Davis',
+      email: 'emily.davis@school.edu',
+      subject: 'English Literature',
+      classes: 4,
+      students: 120,
+      status: 'Active',
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900">Teachers</h2>
+          <p className="text-gray-600 mt-2">Manage your teaching staff</p>
+        </div>
+        <Button className="flex items-center space-x-2">
+          <Plus className="h-4 w-4" />
+          <span>Add New Teacher</span>
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Teacher Directory</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Classes</TableHead>
+                <TableHead>Students</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teachers.map((teacher) => (
+                <TableRow key={teacher.id}>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{teacher.name}</div>
+                      <div className="text-sm text-gray-500 flex items-center">
+                        <Mail className="h-3 w-3 mr-1" />
+                        {teacher.email}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{teacher.subject}</TableCell>
+                  <TableCell>{teacher.classes}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Users className="h-4 w-4 mr-1 text-gray-500" />
+                      {teacher.students}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {teacher.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Teachers;
