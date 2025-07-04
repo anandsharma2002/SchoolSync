@@ -10,8 +10,8 @@ import {
   Instagram,
 } from "lucide-react";
 
-import { Link } from 'react-router-dom';
-import { GraduationCap, Mail, Phone, MapPin, Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import { GraduationCap, Mail, Phone, MapPin, Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
 
 interface FooterLink {
   name: string;

@@ -130,7 +130,7 @@ const DashboardSidebar: React.FC = () => {
             <div className="w-7 h-7 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
               <GraduationCap className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-gray-800">EduManage</span>
+            <span className="text-lg font-bold text-gray-800">SchoolSync</span>
           </Link>
         </div>
         

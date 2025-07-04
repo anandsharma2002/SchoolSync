@@ -11,11 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Plus, Mail, Users } from "lucide-react";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Mail, Users } from 'lucide-react';
 
 const Teachers: React.FC = () => {
   const teachers = [

@@ -29,12 +29,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import React, { useState } from 'react';
-import { Search, Plus, Filter, MoreHorizontal, Edit, Trash2, Eye, Mail, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+
 
 interface Student {
   id: string;

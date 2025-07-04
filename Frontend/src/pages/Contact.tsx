@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 
-import { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 
 interface ContactInfo {
   icon: React.ComponentType<{ className?: string }>;

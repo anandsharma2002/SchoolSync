@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { CheckCircle, X } from "lucide-react";
 
-import { Link } from 'react-router-dom';
-import { CheckCircle, X } from 'lucide-react';
 
 interface PricingFeature {
   name: string;

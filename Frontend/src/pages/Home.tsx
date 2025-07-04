@@ -23,8 +23,8 @@ import {
   CalendarDays,
 } from "lucide-react";
 
-import { Link } from 'react-router-dom';
-import { Users, BookOpen, BarChart3, Shield, CheckCircle, Star, ArrowRight, PlayCircle } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import { Users, BookOpen, BarChart3, Shield, CheckCircle, Star, ArrowRight, PlayCircle } from 'lucide-react';
 
 interface Feature {
   icon: React.ComponentType<{ className?: string }>;
@@ -219,9 +219,6 @@ const Home: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-green-500 text-sm font-medium">
-                      +12%
-                    </div>
                     <div className="text-green-500 text-sm font-medium">+12%</div>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl">
@@ -238,9 +235,6 @@ const Home: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-green-500 text-sm font-medium">
-                      +5%
-                    </div>
                     <div className="text-green-500 text-sm font-medium">+5%</div>
                   </div>
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
@@ -256,9 +250,6 @@ const Home: React.FC = () => {
                           1,823
                         </div>
                       </div>
-                    </div>
-                    <div className="text-green-500 text-sm font-medium">
-                      +2.1%
                     </div>
                     <div className="text-green-500 text-sm font-medium">+2.1%</div>
                   </div>

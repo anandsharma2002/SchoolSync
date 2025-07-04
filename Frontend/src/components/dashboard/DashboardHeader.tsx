@@ -1,8 +1,6 @@
 import React from "react";
 import { Bell, Search, User } from "lucide-react";
 
-import React from 'react';
-import { Bell, Search, User } from 'lucide-react';
 
 const DashboardHeader: React.FC = () => {
   return (

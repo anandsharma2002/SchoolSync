@@ -3,10 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Users, Book, UserCheck } from "lucide-react";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, Users, Book, UserCheck } from 'lucide-react';
 
 const Classes: React.FC = () => {
   const classes = [

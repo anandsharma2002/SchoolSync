@@ -4,8 +4,8 @@ import anandImg from "../assests/team/anand.jpg";
 import rohitImg from "../assests/team/rohit.jpg";
 import vinishaImg from "../assests/team/vinisha.png";
 
-import { Link } from 'react-router-dom';
-import { Users, Target, Eye, Heart, Award, Globe } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import { Users, Target, Eye, Heart, Award, Globe } from 'lucide-react';
 
 interface TeamMember {
   name: string;
@@ -128,7 +128,7 @@ const About: React.FC = () => {
                 To revolutionize school management by providing a robust,
                 intuitive, and scalable platform that simplifies daily
                 operations, enhances communication, and improves the overall
-                learning experience — empowering every school to focus more on
+                learning experience ï¿½ empowering every school to focus more on
                 education and less on administration.
               </p>
               <div className="flex items-center mb-6">
