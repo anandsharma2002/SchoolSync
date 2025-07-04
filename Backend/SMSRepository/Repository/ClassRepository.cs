@@ -23,12 +23,12 @@ namespace SMSRepository.Repository
 
         public async Task<List<SchoolClass>> GetAllClassesAsync()
         {
-            var result = await _context.Classes.Include(s => s.School).ToListAsync();
+            var result = await _context.Classes.ToListAsync();
             return result;
         }
         public async Task<SchoolClass> GetClassByIdAsync(Guid id)
         {
-            var result = await _context.Classes.Include(s => s.School).FirstOrDefaultAsync(s => s.ClassId == id);
+            var result = await _context.Classes.FirstOrDefaultAsync(s => s.ClassId == id);
             return result;
         }
         public async Task<SchoolClass> CreateClassAsync(SchoolClass newClass)

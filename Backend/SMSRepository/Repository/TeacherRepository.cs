@@ -20,11 +20,11 @@ namespace SMSRepository.Repository
         }
         public async Task<IEnumerable<Teacher>> GetAllTeachersAsync()
         {
-            return await _context.Teachers.Include(t => t.School).ToListAsync();
+            return await _context.Teachers.ToListAsync();
         }
         public async Task<Teacher> GetTeacherByIdAsync(Guid id)
         {
-            return await _context.Teachers.Include(t => t.School).FirstOrDefaultAsync(s=> s.TeacherId == id);
+            return await _context.Teachers.FirstOrDefaultAsync(s=> s.TeacherId == id);
         }
         public async Task<Teacher> CreateTeacherAsync(Teacher teacher)
         {

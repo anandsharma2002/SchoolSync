@@ -23,7 +23,9 @@ namespace SMSPrototype1.Controllers
             this.schoolService = schoolService;
         }
 
-        [HttpGet]
+
+
+        [HttpGet("GetAllSchoolsAsync")]
         public async Task<ApiResult<IEnumerable<School>>> GetAllSchoolsAsync()
         {
             var apiResult = new ApiResult<IEnumerable<School>>();
@@ -44,14 +46,14 @@ namespace SMSPrototype1.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<ApiResult<School>> GetSchoolByIdAsync([FromRoute] Guid id)
+        [HttpGet("GetSchoolByIdAsync/{schoolId}")]
+        public async Task<ApiResult<School>> GetSchoolByIdAsync([FromRoute] Guid schoolId)
         {
 
             var apiResult = new ApiResult<School>();
             try
             {
-                apiResult.Content = await schoolService.GetSchoolByIdAsync(id);
+                apiResult.Content = await schoolService.GetSchoolByIdAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -67,7 +69,7 @@ namespace SMSPrototype1.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("CreateSchoolAsync")]
         public async Task<ApiResult<School>> CreateSchoolAsync([FromBody] CreateSchoolRequestDto createSchoolRequest)
         {
 
@@ -89,14 +91,14 @@ namespace SMSPrototype1.Controllers
         }
         
 
-        [HttpPut("{id}")]
-        public async Task<ApiResult<School>> UpdateSchool([FromRoute] Guid id, [FromBody] CreateSchoolRequestDto updateSchool)
+        [HttpPut("UpdateSchool/{schoolId}")]
+        public async Task<ApiResult<School>> UpdateSchool([FromRoute] Guid schoolId, [FromBody] CreateSchoolRequestDto updateSchool)
         {
 
             var apiResult = new ApiResult<School>();
             try
             {
-                apiResult.Content = await schoolService.UpdateSchoolAsync(id, updateSchool);
+                apiResult.Content = await schoolService.UpdateSchoolAsync(schoolId, updateSchool);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -113,14 +115,15 @@ namespace SMSPrototype1.Controllers
 
             
         }
-        [HttpDelete("{id}")]
-        public async Task<ApiResult<School>> DeleteSchool([FromRoute] Guid id)
+
+        [HttpDelete("{schoolId}")]
+        public async Task<ApiResult<School>> DeleteSchool([FromRoute] Guid schoolId)
         {
 
             var apiResult = new ApiResult<School>();
             try
             {
-                apiResult.Content = await schoolService.DeleteSchoolAsync(id);
+                apiResult.Content = await schoolService.DeleteSchoolAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;

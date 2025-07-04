@@ -11,6 +11,7 @@ namespace SMSRepository.RepositoryInterfaces
 {
     public interface ISchoolRepository
     {
+        Task<bool> SchoolExistsAsync(School school);
         Task<IEnumerable<School>> GetAllSchoolsAsync();
         Task<School> GetSchoolByIdAsync(Guid schoolId);
         Task<School> CreateSchoolAsync(School school);

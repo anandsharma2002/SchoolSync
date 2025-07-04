@@ -24,9 +24,6 @@ namespace SMSDataModel.Model.Models
 
         public int PinCode { get; set; }
 
-        //Navigation
-        //public ICollection<Class> Classes { get; set; }
-        //public 
 
     }
 }

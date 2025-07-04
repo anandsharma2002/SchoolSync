@@ -35,14 +35,19 @@ namespace SMSServices.Services
             {
                 return result;
             }
-            throw new Exception("School with this ID not found");
+            throw new Exception("School not found!");
         }
 
         public async Task<School> CreateSchoolAsync(CreateSchoolRequestDto createSchool)
         {
             var newSchool = mapper.Map<School>(createSchool);
-            var result = await schoolRepository.CreateSchoolAsync(newSchool);
-            return result;
+            var existingSchool = await schoolRepository.SchoolExistsAsync(newSchool);
+            if (!existingSchool)
+            {
+                var result = await schoolRepository.CreateSchoolAsync(newSchool);
+                return result;
+            }
+            throw new Exception("School with this name, email and pin code already exists");
         }
 
         public async Task<School> UpdateSchoolAsync(Guid id, CreateSchoolRequestDto updatedSchool)
@@ -50,20 +55,18 @@ namespace SMSServices.Services
             var school = await schoolRepository.GetSchoolByIdAsync(id);
             if (school != null)
             {
-                mapper.Map(updatedSchool, school);
-                // mapping data instead of manually mapping data
-                //school.SchoolName = updatedSchool.SchoolName;
-                //school.SchoolEmail = updatedSchool.SchoolEmail;
-                //school.PhoneNumber = updatedSchool.PhoneNumber;
-                //school.Address = updatedSchool.Address;
-                //school.City = updatedSchool.City;
-                //school.State = updatedSchool.State;
-                //school.PinCode = updatedSchool.PinCode;
+                school.SchoolName = updatedSchool.SchoolName;
+                school.SchoolEmail = updatedSchool.SchoolEmail;
+                school.PhoneNumber = updatedSchool.PhoneNumber;
+                school.Address = updatedSchool.Address;
+                school.City = updatedSchool.City;
+                school.State = updatedSchool.State;
+                school.PinCode = updatedSchool.PinCode;
 
                 var result = await schoolRepository.UpdateSchoolAsync(school);
                 return result;
             }
-            throw new Exception("School with this ID not found");
+            throw new Exception("School not found!");
         }
 
         public async Task<School> DeleteSchoolAsync(Guid id)
@@ -74,7 +77,7 @@ namespace SMSServices.Services
                 var result = await schoolRepository.DeleteSchoolAsync(school);
                 return result;
             }
-            throw new Exception("School with this ID not found");
+            throw new Exception("School not found!");
         }
 
     }
