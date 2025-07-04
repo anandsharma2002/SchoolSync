@@ -1,3 +1,14 @@
+import { Link } from "react-router-dom";
+import {
+  GraduationCap,
+  Mail,
+  Phone,
+  MapPin,
+  Twitter,
+  Facebook,
+  Linkedin,
+  Instagram,
+} from "lucide-react";
 
 import { Link } from 'react-router-dom';
 import { GraduationCap, Mail, Phone, MapPin, Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
@@ -21,39 +32,39 @@ interface SocialLink {
 const Footer: React.FC = () => {
   const footerSections: FooterSection[] = [
     {
-      title: 'Product',
+      title: "Product",
       links: [
-        { name: 'Features', href: '/' },
-        { name: 'Pricing', href: '/pricing' },
-        { name: 'Demo', href: '/contact' },
-        { name: 'API Documentation', href: '#' }
-      ]
+        { name: "Features", href: "/" },
+        { name: "Pricing", href: "/pricing" },
+        { name: "Demo", href: "/contact" },
+        { name: "API Documentation", href: "#" },
+      ],
     },
     {
-      title: 'Company',
+      title: "Company",
       links: [
-        { name: 'About Us', href: '/about' },
-        { name: 'Careers', href: '#' },
-        { name: 'Press', href: '#' },
-        { name: 'Partners', href: '#' }
-      ]
+        { name: "About Us", href: "/about" },
+        { name: "Careers", href: "#" },
+        { name: "Press", href: "#" },
+        { name: "Partners", href: "#" },
+      ],
     },
     {
-      title: 'Support',
+      title: "Support",
       links: [
-        { name: 'Contact', href: '/contact' },
-        { name: 'Help Center', href: '#' },
-        { name: 'Privacy Policy', href: '#' },
-        { name: 'Terms of Service', href: '#' }
-      ]
-    }
+        { name: "Contact", href: "/contact" },
+        { name: "Help Center", href: "#" },
+        { name: "Privacy Policy", href: "#" },
+        { name: "Terms of Service", href: "#" },
+      ],
+    },
   ];
 
   const socialLinks: SocialLink[] = [
-    { icon: Twitter, href: '#', color: 'hover:text-blue-400' },
-    { icon: Facebook, href: '#', color: 'hover:text-blue-600' },
-    { icon: Linkedin, href: '#', color: 'hover:text-blue-700' },
-    { icon: Instagram, href: '#', color: 'hover:text-pink-500' }
+    { icon: Twitter, href: "#", color: "hover:text-blue-400" },
+    { icon: Facebook, href: "#", color: "hover:text-blue-600" },
+    { icon: Linkedin, href: "#", color: "hover:text-blue-700" },
+    { icon: Instagram, href: "#", color: "hover:text-pink-500" },
   ];
 
   return (
@@ -63,7 +74,7 @@ const Footer: React.FC = () => {
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
       </div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -77,29 +88,35 @@ const Footer: React.FC = () => {
               </span>
             </Link>
             <p className="text-gray-400 mb-6 leading-relaxed">
-              Transforming education through innovative school management solutions. 
-              Empowering schools to focus on what matters most - student success.
+              Transforming education through innovative school management
+              solutions. Empowering schools to focus on what matters most -
+              student success.
             </p>
             <div className="space-y-3">
               <div className="flex items-center space-x-3 group">
                 <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-primary-600 transition-colors duration-300">
                   <Mail className="w-5 h-5 text-primary-400 group-hover:text-white" />
                 </div>
-                <span className="text-gray-400 group-hover:text-white transition-colors duration-300">hello@edumanage.com</span>
+                <span className="text-gray-400 group-hover:text-white transition-colors duration-300">
+                  avrtech25@outlook.com
+                </span>
               </div>
               <div className="flex items-center space-x-3 group">
                 <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-primary-600 transition-colors duration-300">
                   <Phone className="w-5 h-5 text-primary-400 group-hover:text-white" />
                 </div>
-                <span className="text-gray-400 group-hover:text-white transition-colors duration-300">+1 (555) 123-4567</span>
+                <span className="text-gray-400 group-hover:text-white transition-colors duration-300">
+                  +91 7014791203
+                </span>
               </div>
               <div className="flex items-start space-x-3 group">
                 <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-primary-600 transition-colors duration-300 mt-0.5">
                   <MapPin className="w-5 h-5 text-primary-400 group-hover:text-white" />
                 </div>
                 <span className="text-gray-400 group-hover:text-white transition-colors duration-300">
-                  123 Education Boulevard<br />
-                  Tech District, TC 12345
+                  AVR Tech, Business Corner
+                  <br />
+                  VT Road, Mansarover, Jaipur, Rajasthan.
                 </span>
               </div>
             </div>
@@ -108,7 +125,9 @@ const Footer: React.FC = () => {
           {/* Links Sections */}
           {footerSections.map((section, index) => (
             <div key={index}>
-              <h3 className="text-lg font-bold mb-6 text-white">{section.title}</h3>
+              <h3 className="text-lg font-bold mb-6 text-white">
+                {section.title}
+              </h3>
               <ul className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
@@ -129,7 +148,9 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-700 mt-12 pt-12">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Stay Updated</h3>
+              <h3 className="text-2xl font-bold mb-3 text-white">
+                Stay Updated
+              </h3>
               <p className="text-gray-400 text-lg">
                 Get the latest updates on new features and educational insights.
               </p>
@@ -153,7 +174,7 @@ const Footer: React.FC = () => {
             <p className="text-gray-400">
               © 2024 EduManage. All rights reserved.
             </p>
-            
+
             {/* Social Links */}
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => {
@@ -169,15 +190,24 @@ const Footer: React.FC = () => {
                 );
               })}
             </div>
-            
+
             <div className="flex space-x-6">
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors duration-300">
+              <Link
+                to="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300"
+              >
                 Privacy
               </Link>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors duration-300">
+              <Link
+                to="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300"
+              >
                 Terms
               </Link>
-              <Link to="#" className="text-gray-400 hover:text-white transition-colors duration-300">
+              <Link
+                to="#"
+                className="text-gray-400 hover:text-white transition-colors duration-300"
+              >
                 Cookies
               </Link>
             </div>

@@ -30,9 +30,10 @@ const Navigation: React.FC = () => {
           <Link to="/" className="flex items-center space-x-3 text-primary-600 hover:text-primary-700 transition-all duration-300 transform hover:scale-105">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
               <GraduationCap className="h-6 w-6 text-white" />
+              {/* <img className='h-6 w-6 text-white' src=''/> */}
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
-              EduManage
+            <span className="text-2xl font-bold text-primary-600  bg-clip-text">
+              SchoolSync
             </span>
           </Link>
 
@@ -56,7 +57,7 @@ const Navigation: React.FC = () => {
             ))}
             <Link
               to="/pricing"
-              className="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-xl font-medium hover:from-primary-700 hover:to-primary-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              className="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-xl font-medium hover:primary-700 hover:to-primary-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
             >
               Get Started
             </Link>

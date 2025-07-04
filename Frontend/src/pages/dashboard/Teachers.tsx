@@ -1,3 +1,15 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Mail, Users } from "lucide-react";
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,30 +21,48 @@ const Teachers: React.FC = () => {
   const teachers = [
     {
       id: 1,
-      name: 'Dr. Sarah Smith',
-      email: 'sarah.smith@school.edu',
-      subject: 'Mathematics',
+      name: "Ms. Anjali Mehta",
+      email: "anjali.mehta@gmail.com",
+      subject: "Mathematics",
       classes: 3,
       students: 75,
-      status: 'Active',
+      status: "Active",
     },
     {
       id: 2,
-      name: 'Prof. John Johnson',
-      email: 'john.johnson@school.edu',
-      subject: 'Physics',
+      name: "Mr. Rakesh Verma",
+      email: "rakesh.verma@outlook.com",
+      subject: "Physics",
       classes: 2,
       students: 45,
-      status: 'Active',
+      status: "Active",
     },
     {
       id: 3,
-      name: 'Ms. Emily Davis',
-      email: 'emily.davis@school.edu',
-      subject: 'English Literature',
+      name: "Ms. Priya Sharma",
+      email: "priya.sharma@gmail.com",
+      subject: "English Literature",
       classes: 4,
       students: 120,
-      status: 'Active',
+      status: "Active",
+    },
+    {
+      id: 4,
+      name: "Mr. Arvind Kumar",
+      email: "arvind.kumar@outlook.com",
+      subject: "Chemistry",
+      classes: 3,
+      students: 60,
+      status: "Active",
+    },
+    {
+      id: 5,
+      name: "Ms. Neha Joshi",
+      email: "neha.joshi@gmail.com",
+      subject: "Biology",
+      classes: 2,
+      students: 50,
+      status: "Active",
     },
   ];
 
@@ -60,7 +90,7 @@ const Teachers: React.FC = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Subject</TableHead>
                 <TableHead>Classes</TableHead>
-                <TableHead>Students</TableHead>
+                {/* <TableHead>Students</TableHead> */}
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -79,12 +109,12 @@ const Teachers: React.FC = () => {
                   </TableCell>
                   <TableCell>{teacher.subject}</TableCell>
                   <TableCell>{teacher.classes}</TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-1 text-gray-500" />
                       {teacher.students}
                     </div>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       {teacher.status}

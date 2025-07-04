@@ -1,3 +1,8 @@
+import { Link } from "react-router-dom";
+import { Users, Target, Eye, Heart, Award, Globe } from "lucide-react";
+import anandImg from "../assests/team/anand.jpg";
+import rohitImg from "../assests/team/rohit.jpg";
+import vinishaImg from "../assests/team/vinisha.png";
 
 import { Link } from 'react-router-dom';
 import { Users, Target, Eye, Heart, Award, Globe } from 'lucide-react';
@@ -18,41 +23,44 @@ interface Value {
 const About: React.FC = () => {
   const teamMembers: TeamMember[] = [
     {
-      name: 'Dr. Sarah Johnson',
-      role: 'CEO & Founder',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80',
-      bio: 'Former educator with 15+ years in school administration and EdTech innovation.'
+      name: "Anand Sharma",
+      role: "CEO & Founder",
+      image: anandImg,
+      bio: "Vision-driven founder with a strong focus on product strategy and full stack development. Committed to building scalable tech that solves real-world problems effectively.",
     },
     {
-      name: 'Michael Chen',
-      role: 'CTO',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80',
-      bio: 'Technology leader with expertise in scalable education platforms and data security.'
+      name: "Rohit Jain",
+      role: "Co-Founder & Frontend Lead",
+      image: rohitImg,
+      bio: "Creative technologist focused on delivering intuitive and user-friendly digital solutions. Passionate about bringing ideas to life through clean code and purposeful design.",
     },
     {
-      name: 'Emma Rodriguez',
-      role: 'VP of Product',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80',
-      bio: 'Product strategist focused on creating intuitive solutions for educational institutions.'
-    }
+      name: "Vinisha Rathod",
+      role: "Co-Founder & Systems Engineer",
+      image: vinishaImg,
+      bio: "Product-focused engineer with a knack for turning complex problems into simple, elegant systems. Brings clarity and structure to every stage of development.",
+    },
   ];
 
   const values: Value[] = [
     {
       icon: Heart,
-      title: 'Student-Centered',
-      description: 'Every feature we build is designed to improve student outcomes and educational experiences.'
+      title: "Student-Centered",
+      description:
+        "Every feature we build is designed to improve student outcomes and educational experiences.",
     },
     {
       icon: Globe,
-      title: 'Accessible Education',
-      description: 'Making quality education management tools available to schools worldwide, regardless of size or budget.'
+      title: "Accessible Education",
+      description:
+        "Making quality education management tools available to schools worldwide, regardless of size or budget.",
     },
     {
       icon: Award,
-      title: 'Innovation',
-      description: 'Continuously pushing the boundaries of what\'s possible in educational technology.'
-    }
+      title: "Innovation",
+      description:
+        "Continuously pushing the boundaries of what's possible in educational technology.",
+    },
   ];
 
   return (
@@ -61,29 +69,42 @@ const About: React.FC = () => {
       <section className="relative bg-gradient-to-br from-primary-50 via-white to-blue-50 py-20 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-20 left-10 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div
+            className="absolute bottom-20 right-10 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
+            style={{ animationDelay: "2s" }}
+          ></div>
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight mb-8">
             Empowering Education Through
-            <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent"> Innovation</span>
+            <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent">
+              {" "}
+              Innovation
+            </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
-            We're on a mission to transform how schools operate, making education management 
-            more efficient, transparent, and focused on what truly matters - student success.
+            We're on a mission to transform how schools operate, making
+            education management more efficient, transparent, and focused on
+            what truly matters - student success.
           </p>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-3xl font-bold text-primary-600 mb-2">2019</div>
+              <div className="text-3xl font-bold text-primary-600 mb-2">
+                2024
+              </div>
               <div className="text-gray-700">Founded</div>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-3xl font-bold text-primary-600 mb-2">500+</div>
+              <div className="text-3xl font-bold text-primary-600 mb-2">
+                15+
+              </div>
               <div className="text-gray-700">Schools Served</div>
             </div>
             <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100">
-              <div className="text-3xl font-bold text-primary-600 mb-2">50+</div>
+              <div className="text-3xl font-bold text-primary-600 mb-2">
+                12+
+              </div>
               <div className="text-gray-700">Team Members</div>
             </div>
           </div>
@@ -99,12 +120,16 @@ const About: React.FC = () => {
                 <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center mr-4">
                   <Target className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900">Our Mission</h2>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  Our Mission
+                </h2>
               </div>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                To revolutionize school management by providing intuitive, powerful tools that 
-                enable educators to focus on teaching and students to focus on learning. We believe 
-                that technology should simplify, not complicate, the educational process.
+                To revolutionize school management by providing a robust,
+                intuitive, and scalable platform that simplifies daily
+                operations, enhances communication, and improves the overall
+                learning experience — empowering every school to focus more on
+                education and less on administration.
               </p>
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center mr-4">
@@ -113,14 +138,16 @@ const About: React.FC = () => {
                 <h2 className="text-3xl font-bold text-gray-900">Our Vision</h2>
               </div>
               <p className="text-lg text-gray-600 leading-relaxed">
-                A world where every school, regardless of size or resources, has access to 
-                world-class management tools that enhance educational outcomes and create 
-                stronger learning communities.
+                To develop a user-friendly, all-in-one digital solution that,
+                Automates routine administrative tasks Brings transparency
+                through centralized data Enables easy access across all devices
+                Enhances collaboration between teachers, students, and parents
+                Ensures security and scalability for growing institutions
               </p>
             </div>
             <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                 alt="Team collaboration"
                 className="rounded-2xl shadow-2xl w-full"
               />
@@ -136,10 +163,14 @@ const About: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
               Our Core
-              <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent"> Values</span>
+              <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent">
+                {" "}
+                Values
+              </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These principles guide everything we do and shape how we build products for the education community.
+              These principles guide everything we do and shape how we build
+              products for the education community.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -172,10 +203,14 @@ const About: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
               Meet Our
-              <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent"> Leadership Team</span>
+              <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent">
+                {" "}
+                Leadership Team
+              </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Passionate educators and technologists working together to transform education.
+              Passionate educators and technologists working together to
+              transform education.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -185,13 +220,17 @@ const About: React.FC = () => {
                 className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group"
               >
                 <div className="text-center">
-                  <img 
-                    src={member.image} 
+                  <img
+                    src={member.image}
                     alt={member.name}
                     className="w-24 h-24 rounded-full object-cover mx-auto mb-6 group-hover:scale-110 transition-transform duration-300"
                   />
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                  <div className="text-primary-600 font-medium mb-4">{member.role}</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {member.name}
+                  </h3>
+                  <div className="text-primary-600 font-medium mb-4">
+                    {member.role}
+                  </div>
                   <p className="text-gray-600 leading-relaxed">{member.bio}</p>
                 </div>
               </div>
@@ -208,7 +247,8 @@ const About: React.FC = () => {
             Ready to Join Our Mission?
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Discover how EduManage can transform your school's operations and enhance student outcomes.
+            Discover how EduManage can transform your school's operations and
+            enhance student outcomes.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link

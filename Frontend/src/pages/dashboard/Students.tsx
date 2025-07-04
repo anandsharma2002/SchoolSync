@@ -1,3 +1,33 @@
+import React, { useState } from "react";
+import {
+  Search,
+  Plus,
+  Filter,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Eye,
+  Mail,
+  Phone,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 import React, { useState } from 'react';
 import { Search, Plus, Filter, MoreHorizontal, Edit, Trash2, Eye, Mail, Phone } from 'lucide-react';
@@ -17,105 +47,114 @@ interface Student {
   parentPhone: string;
   address: string;
   admissionDate: string;
-  status: 'Active' | 'Inactive' | 'Graduated';
+  status: "Active" | "Inactive" | "Graduated";
 }
 
 const Students: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterClass, setFilterClass] = useState('all');
+  const [filterClass, setFilterClass] = useState("all");
   const studentsPerPage = 10;
 
   // Sample student data
   const [students] = useState<Student[]>([
     {
-      id: '1',
-      name: 'John Smith',
-      email: 'john.smith@email.com',
-      phone: '+1 234 567 8901',
-      class: 'Class 10A',
-      rollNumber: 'STU001',
-      parentName: 'Robert Smith',
-      parentPhone: '+1 234 567 8902',
-      address: '123 Main St, City, State',
-      admissionDate: '2023-04-15',
-      status: 'Active'
+      id: "1",
+      name: "Aryan Sharma",
+      email: "aryan.sharma@gmail.com",
+      phone: "+91 9876543210",
+      class: "Class 10A",
+      rollNumber: "STU001",
+      parentName: "Ravi Sharma",
+      parentPhone: "+91 9876543211",
+      address: "12 MG Road, Jaipur, Rajasthan",
+      admissionDate: "2023-04-15",
+      status: "Active",
     },
     {
-      id: '2',
-      name: 'Emma Johnson',
-      email: 'emma.johnson@email.com',
-      phone: '+1 234 567 8903',
-      class: 'Class 10B',
-      rollNumber: 'STU002',
-      parentName: 'Michael Johnson',
-      parentPhone: '+1 234 567 8904',
-      address: '456 Oak Ave, City, State',
-      admissionDate: '2023-04-20',
-      status: 'Active'
+      id: "2",
+      name: "Ishita Verma",
+      email: "ishita.verma@outlook.com",
+      phone: "+91 9876543212",
+      class: "Class 10B",
+      rollNumber: "STU002",
+      parentName: "Amit Verma",
+      parentPhone: "+91 9876543213",
+      address: "221 Civil Lines, Lucknow, Uttar Pradesh",
+      admissionDate: "2023-04-20",
+      status: "Active",
     },
     {
-      id: '3',
-      name: 'David Brown',
-      email: 'david.brown@email.com',
-      phone: '+1 234 567 8905',
-      class: 'Class 9A',
-      rollNumber: 'STU003',
-      parentName: 'William Brown',
-      parentPhone: '+1 234 567 8906',
-      address: '789 Pine St, City, State',
-      admissionDate: '2023-03-10',
-      status: 'Active'
+      id: "3",
+      name: "Krishna Nair",
+      email: "krishna.nair@gmail.com",
+      phone: "+91 9876543214",
+      class: "Class 9A",
+      rollNumber: "STU003",
+      parentName: "Suresh Nair",
+      parentPhone: "+91 9876543215",
+      address: "33 MG Street, Kochi, Kerala",
+      admissionDate: "2023-03-10",
+      status: "Active",
     },
     {
-      id: '4',
-      name: 'Sarah Davis',
-      email: 'sarah.davis@email.com',
-      phone: '+1 234 567 8907',
-      class: 'Class 11A',
-      rollNumber: 'STU004',
-      parentName: 'James Davis',
-      parentPhone: '+1 234 567 8908',
-      address: '321 Elm St, City, State',
-      admissionDate: '2022-04-05',
-      status: 'Active'
+      id: "4",
+      name: "Simran Kaur",
+      email: "simran.kaur@outlook.com",
+      phone: "+91 9876543216",
+      class: "Class 11A",
+      rollNumber: "STU004",
+      parentName: "Harpreet Singh",
+      parentPhone: "+91 9876543217",
+      address: "55 Sector 17, Chandigarh",
+      admissionDate: "2022-04-05",
+      status: "Active",
     },
     {
-      id: '5',
-      name: 'Michael Wilson',
-      email: 'michael.wilson@email.com',
-      phone: '+1 234 567 8909',
-      class: 'Class 12A',
-      rollNumber: 'STU005',
-      parentName: 'Thomas Wilson',
-      parentPhone: '+1 234 567 8910',
-      address: '654 Maple Ave, City, State',
-      admissionDate: '2021-04-01',
-      status: 'Graduated'
+      id: "5",
+      name: "Rohan Mehta",
+      email: "rohan.mehta@gmail.com",
+      phone: "+91 9876543218",
+      class: "Class 12A",
+      rollNumber: "STU005",
+      parentName: "Manish Mehta",
+      parentPhone: "+91 9876543219",
+      address: "78 Nehru Place, Delhi",
+      admissionDate: "2021-04-01",
+      status: "Graduated",
     },
     {
-      id: '6',
-      name: 'Lisa Anderson',
-      email: 'lisa.anderson@email.com',
-      phone: '+1 234 567 8911',
-      class: 'Class 9B',
-      rollNumber: 'STU006',
-      parentName: 'Charles Anderson',
-      parentPhone: '+1 234 567 8912',
-      address: '987 Cedar St, City, State',
-      admissionDate: '2023-05-12',
-      status: 'Active'
-    }
+      id: "6",
+      name: "Tanvi Deshmukh",
+      email: "tanvi.deshmukh@outlook.com",
+      phone: "+91 9876543220",
+      class: "Class 9B",
+      rollNumber: "STU006",
+      parentName: "Rajesh Deshmukh",
+      parentPhone: "+91 9876543221",
+      address: "101 FC Road, Pune, Maharashtra",
+      admissionDate: "2023-05-12",
+      status: "Active",
+    },
   ]);
 
-  const classes = ['all', 'Class 9A', 'Class 9B', 'Class 10A', 'Class 10B', 'Class 11A', 'Class 12A'];
+  const classes = [
+    "all",
+    "Class 9A",
+    "Class 9B",
+    "Class 10A",
+    "Class 10B",
+    "Class 11A",
+    "Class 12A",
+  ];
 
   // Filter students based on search term and class filter
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesClass = filterClass === 'all' || student.class === filterClass;
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch =
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesClass = filterClass === "all" || student.class === filterClass;
     return matchesSearch && matchesClass;
   });
 
@@ -127,14 +166,14 @@ const Students: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Active':
-        return 'bg-green-100 text-green-800';
-      case 'Inactive':
-        return 'bg-red-100 text-red-800';
-      case 'Graduated':
-        return 'bg-blue-100 text-blue-800';
+      case "Active":
+        return "bg-green-100 text-green-800";
+      case "Inactive":
+        return "bg-red-100 text-red-800";
+      case "Graduated":
+        return "bg-blue-100 text-blue-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -144,7 +183,9 @@ const Students: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Students</h1>
-          <p className="text-gray-600 mt-1">Manage all student information and records</p>
+          <p className="text-gray-600 mt-1">
+            Manage all student information and records
+          </p>
         </div>
         <Button className="bg-primary-600 hover:bg-primary-700">
           <Plus className="h-4 w-4 mr-2" />
@@ -159,7 +200,9 @@ const Students: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Students</p>
-                <p className="text-2xl font-bold text-gray-900">{students.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {students.length}
+                </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Eye className="h-5 w-5 text-blue-600" />
@@ -173,7 +216,7 @@ const Students: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Active Students</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {students.filter(s => s.status === 'Active').length}
+                  {students.filter((s) => s.status === "Active").length}
                 </p>
               </div>
               <div className="p-2 bg-green-100 rounded-lg">
@@ -188,7 +231,7 @@ const Students: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Graduated</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {students.filter(s => s.status === 'Graduated').length}
+                  {students.filter((s) => s.status === "Graduated").length}
                 </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -201,7 +244,7 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">New This Month</p>
+                <p className="text-sm text-gray-600">New This Year</p>
                 <p className="text-2xl font-bold text-purple-600">3</p>
               </div>
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -236,9 +279,9 @@ const Students: React.FC = () => {
                 value={filterClass}
                 onChange={(e) => setFilterClass(e.target.value)}
               >
-                {classes.map(cls => (
+                {classes.map((cls) => (
                   <option key={cls} value={cls}>
-                    {cls === 'all' ? 'All Classes' : cls}
+                    {cls === "all" ? "All Classes" : cls}
                   </option>
                 ))}
               </select>
@@ -264,11 +307,17 @@ const Students: React.FC = () => {
                   <TableRow key={student.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium text-gray-900">{student.name}</div>
-                        <div className="text-sm text-gray-500">{student.email}</div>
+                        <div className="font-medium text-gray-900">
+                          {student.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {student.email}
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">{student.rollNumber}</TableCell>
+                    <TableCell className="font-medium">
+                      {student.rollNumber}
+                    </TableCell>
                     <TableCell>{student.class}</TableCell>
                     <TableCell>
                       <div className="space-y-1">
@@ -284,12 +333,18 @@ const Students: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <div className="text-sm font-medium">{student.parentName}</div>
-                        <div className="text-sm text-gray-500">{student.parentPhone}</div>
+                        <div className="text-sm font-medium">
+                          {student.parentName}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {student.parentPhone}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(student.status)}`}>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(student.status)}`}
+                      >
                         {student.status}
                       </span>
                     </TableCell>
@@ -318,26 +373,40 @@ const Students: React.FC = () => {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    <PaginationPrevious
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
+                      className={
+                        currentPage === 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => setCurrentPage(page)}
-                        isActive={currentPage === page}
-                        className="cursor-pointer"
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
                   <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
+                      className={
+                        currentPage === totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
                     />
                   </PaginationItem>
                 </PaginationContent>
