@@ -25,12 +25,12 @@ namespace SMSRepository.Repository
         }
         public async Task<Student> GetStudentByIdAsync(Guid studentId)
         {
-            var existingStudent = await _context.Students.Include(s => s.School).Include(s => s.Class).FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
             return existingStudent;
         }
         public async Task<IEnumerable<Student>> GetStudentByClassIdAsync(Guid classId)
         {
-            var a =  await _context.Students.Where(x => x.ClassId == classId).Include(s => s.School).Include(s => s.Class).ToListAsync();
+            var a =  await _context.Students.Where(x => x.ClassId == classId).ToListAsync();
             return a;        
         }
 

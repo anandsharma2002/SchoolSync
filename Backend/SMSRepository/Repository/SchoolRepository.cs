@@ -21,10 +21,21 @@ namespace SMSRepository.Repository
             _Context = context;
         }
 
+
+        public async Task<bool> SchoolExistsAsync(School school)
+        {
+            var result = await _Context.Schools.FirstOrDefaultAsync(x => x.SchoolName == school.SchoolName && x.SchoolEmail == school.SchoolEmail && x.PinCode == school.PinCode);
+            return result!=null ? true : false;
+        }
+
+
+
         public async Task<IEnumerable<School>> GetAllSchoolsAsync()
         {
             return await _Context.Schools.ToListAsync();
         }
+
+
         public async Task<School> GetSchoolByIdAsync(Guid schoolId)
         {
             var existingSchool = await _Context.Schools.FindAsync(schoolId);

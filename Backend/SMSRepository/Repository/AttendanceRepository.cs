@@ -20,16 +20,12 @@ namespace SMSRepository.Repository
 
         public async Task<List<Attendance>> GetAllAttendancesOfStudentsAsync()
         {
-            var result = await _context.Attendance
-                .Include(s=> s.Student)
-                .Include(s => s.School)
-                .Include(s => s.Class)
-                .ToListAsync();
+            var result = await _context.Attendance.ToListAsync();
             return result;
         }
         public async Task<Attendance> GetAttendanceByIdAsync(Guid id)
         {
-            var result = await _context.Attendance.Include(s => s.Student).Include(s=> s.School).Include(s=> s.Class).FirstOrDefaultAsync(s => s.AttendanceId == id);
+            var result = await _context.Attendance.FirstOrDefaultAsync(s => s.AttendanceId == id);
             return result;
         }
         public async Task<Attendance> CreateAttendanceAsync(Attendance newAttendanceRqst)
