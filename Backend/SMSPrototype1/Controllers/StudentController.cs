@@ -96,6 +96,16 @@ namespace SMSPrototype1.Controllers
         public async Task<ApiResult<Student>> CreateStudentAsync([FromBody] CreateStudentRqstDto createStudentRqstDto)
         {
             var apiResult = new ApiResult<Student>();
+
+            if (!ModelState.IsValid)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = string.Join(" | ", ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .Select(e => e.ErrorMessage));
+                return apiResult;
+            }
             try
             {
                 apiResult.Content = await _studentService.CreateStudentAsync(createStudentRqstDto);

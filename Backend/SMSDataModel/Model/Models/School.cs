@@ -23,6 +23,8 @@ namespace SMSDataModel.Model.Models
         public string State { get; set; }
 
         public int PinCode { get; set; }
+        public int Subscription { get; set; } = 0;
+        public DateOnly? SubscriptionDate { get; set; }
 
 
     }

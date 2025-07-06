@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SMSDataModel.Model.RequestDtos
+namespace SMSDataModel.Model.Models
 {
-    public class CreateAttendanceRqstDto
+    public class TeacherAttendance
     {
-        public Guid StudentId { get; set; }
-        public Guid SchoolId { get; set; }
+        public Guid TeacherAttendanceId { get; set; }
+        public Guid TeacherId { get; set; }
         public DateOnly Date { get; set; }
         public string Status { get; set; }
-
-
+        public Teacher Teacher { get; set; }
     }
 }

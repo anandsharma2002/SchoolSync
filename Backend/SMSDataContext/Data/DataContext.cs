@@ -21,6 +21,7 @@ namespace SMSDataContext.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<TeacherAttendance> TeachersAttendance { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
