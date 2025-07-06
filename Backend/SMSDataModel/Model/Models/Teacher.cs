@@ -11,9 +11,8 @@ namespace SMSDataModel.Model.Models
     {
         public Guid TeacherId { get; set; }
         public string TeacherName { get; set; }
-        [AllowNull]
-        public string TeacherMailId{ get; set; }
         public string TeacherEmailId { get; set; }
+        public string? TeacherMailId { get; set; }
         public string PhoneNumber { get; set; }
         public string Subject { get; set; }
         public string Address { get; set; }

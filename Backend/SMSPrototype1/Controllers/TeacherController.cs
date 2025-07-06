@@ -22,6 +22,15 @@ namespace SMSPrototype1.Controllers
         public async Task <ApiResult<IEnumerable<Teacher>>> GetAllTeachersAsync()
         {
             var apiResult = new ApiResult<IEnumerable<Teacher>>();
+            if (!ModelState.IsValid)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = string.Join(" | ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return apiResult;
+            }
             try
             {
                 apiResult.Content = await _teacherservice.GetAllTeachersAsync();

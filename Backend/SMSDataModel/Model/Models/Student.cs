@@ -19,10 +19,9 @@ namespace SMSDataModel.Model.Models
         public string Gender { get; set; }
         public string FatherName { get; set; }
         public string MotherName { get; set; }
-        [AllowNull]
-        public string StudentMailId { get; set; }
+        public string? StudentMailId { get; set; }
         public string ParentEmailId { get; set; }
-        public string OtherPhoneNumber { get; set; }
+        public string ParentPhoneNumber { get; set; }
 
         public string Address { get; set; }
 

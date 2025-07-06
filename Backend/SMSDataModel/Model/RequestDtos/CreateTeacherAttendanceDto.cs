@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace SMSDataModel.Model.RequestDtos
 {
-    public class CreateAttendanceRqstDto
+    public class CreateTeacherAttendanceDto
     {
-        public Guid StudentId { get; set; }
-        public Guid SchoolId { get; set; }
+        public Guid TeacherId { get; set; }
         public DateOnly Date { get; set; }
         public string Status { get; set; }
-
 
     }
 }
