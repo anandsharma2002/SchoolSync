@@ -15,6 +15,7 @@ namespace SMSDataModel.Model.Models
         public string ClassName { get; set; }
         public string ClassSection { get; set; }
         public Guid? ClassTeacherId {  get; set; }
+        public List<Guid> AssignedTeacher { get; set; }
         public Teacher ClassTeacher { get; set; }
         public Guid SchoolId { get; set; }
         public School School { get; set; }
