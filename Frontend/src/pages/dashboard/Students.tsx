@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Plus,
@@ -28,6 +28,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useStudent } from "@/hooks/useStudents";
+import { useClasses } from "@/hooks/useClasses";
 
 
 
@@ -52,102 +54,112 @@ const Students: React.FC = () => {
   const studentsPerPage = 10;
 
   // Sample student data
-  const [students] = useState<Student[]>([
-    {
-      id: "1",
-      name: "Aryan Sharma",
-      email: "aryan.sharma@gmail.com",
-      phone: "+91 9876543210",
-      class: "Class 10A",
-      rollNumber: "STU001",
-      parentName: "Ravi Sharma",
-      parentPhone: "+91 9876543211",
-      address: "12 MG Road, Jaipur, Rajasthan",
-      admissionDate: "2023-04-15",
-      status: "Active",
-    },
-    {
-      id: "2",
-      name: "Ishita Verma",
-      email: "ishita.verma@outlook.com",
-      phone: "+91 9876543212",
-      class: "Class 10B",
-      rollNumber: "STU002",
-      parentName: "Amit Verma",
-      parentPhone: "+91 9876543213",
-      address: "221 Civil Lines, Lucknow, Uttar Pradesh",
-      admissionDate: "2023-04-20",
-      status: "Active",
-    },
-    {
-      id: "3",
-      name: "Krishna Nair",
-      email: "krishna.nair@gmail.com",
-      phone: "+91 9876543214",
-      class: "Class 9A",
-      rollNumber: "STU003",
-      parentName: "Suresh Nair",
-      parentPhone: "+91 9876543215",
-      address: "33 MG Street, Kochi, Kerala",
-      admissionDate: "2023-03-10",
-      status: "Active",
-    },
-    {
-      id: "4",
-      name: "Simran Kaur",
-      email: "simran.kaur@outlook.com",
-      phone: "+91 9876543216",
-      class: "Class 11A",
-      rollNumber: "STU004",
-      parentName: "Harpreet Singh",
-      parentPhone: "+91 9876543217",
-      address: "55 Sector 17, Chandigarh",
-      admissionDate: "2022-04-05",
-      status: "Active",
-    },
-    {
-      id: "5",
-      name: "Rohan Mehta",
-      email: "rohan.mehta@gmail.com",
-      phone: "+91 9876543218",
-      class: "Class 12A",
-      rollNumber: "STU005",
-      parentName: "Manish Mehta",
-      parentPhone: "+91 9876543219",
-      address: "78 Nehru Place, Delhi",
-      admissionDate: "2021-04-01",
-      status: "Graduated",
-    },
-    {
-      id: "6",
-      name: "Tanvi Deshmukh",
-      email: "tanvi.deshmukh@outlook.com",
-      phone: "+91 9876543220",
-      class: "Class 9B",
-      rollNumber: "STU006",
-      parentName: "Rajesh Deshmukh",
-      parentPhone: "+91 9876543221",
-      address: "101 FC Road, Pune, Maharashtra",
-      admissionDate: "2023-05-12",
-      status: "Active",
-    },
-  ]);
+  // const [students] = useState<Student[]>([
+  //   {
+  //     id: "1",
+  //     name: "Aryan Sharma",
+  //     email: "aryan.sharma@gmail.com",
+  //     phone: "+91 9876543210",
+  //     class: "Class 10A",
+  //     rollNumber: "STU001",
+  //     parentName: "Ravi Sharma",
+  //     parentPhone: "+91 9876543211",
+  //     address: "12 MG Road, Jaipur, Rajasthan",
+  //     admissionDate: "2023-04-15",
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Ishita Verma",
+  //     email: "ishita.verma@outlook.com",
+  //     phone: "+91 9876543212",
+  //     class: "Class 10B",
+  //     rollNumber: "STU002",
+  //     parentName: "Amit Verma",
+  //     parentPhone: "+91 9876543213",
+  //     address: "221 Civil Lines, Lucknow, Uttar Pradesh",
+  //     admissionDate: "2023-04-20",
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: "3",
+  //     name: "Krishna Nair",
+  //     email: "krishna.nair@gmail.com",
+  //     phone: "+91 9876543214",
+  //     class: "Class 9A",
+  //     rollNumber: "STU003",
+  //     parentName: "Suresh Nair",
+  //     parentPhone: "+91 9876543215",
+  //     address: "33 MG Street, Kochi, Kerala",
+  //     admissionDate: "2023-03-10",
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: "4",
+  //     name: "Simran Kaur",
+  //     email: "simran.kaur@outlook.com",
+  //     phone: "+91 9876543216",
+  //     class: "Class 11A",
+  //     rollNumber: "STU004",
+  //     parentName: "Harpreet Singh",
+  //     parentPhone: "+91 9876543217",
+  //     address: "55 Sector 17, Chandigarh",
+  //     admissionDate: "2022-04-05",
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: "5",
+  //     name: "Rohan Mehta",
+  //     email: "rohan.mehta@gmail.com",
+  //     phone: "+91 9876543218",
+  //     class: "Class 12A",
+  //     rollNumber: "STU005",
+  //     parentName: "Manish Mehta",
+  //     parentPhone: "+91 9876543219",
+  //     address: "78 Nehru Place, Delhi",
+  //     admissionDate: "2021-04-01",
+  //     status: "Graduated",
+  //   },
+  //   {
+  //     id: "6",
+  //     name: "Tanvi Deshmukh",
+  //     email: "tanvi.deshmukh@outlook.com",
+  //     phone: "+91 9876543220",
+  //     class: "Class 9B",
+  //     rollNumber: "STU006",
+  //     parentName: "Rajesh Deshmukh",
+  //     parentPhone: "+91 9876543221",
+  //     address: "101 FC Road, Pune, Maharashtra",
+  //     admissionDate: "2023-05-12",
+  //     status: "Active",
+  //   },
+  // ]);
 
-  const classes = [
-    "all",
-    "Class 9A",
-    "Class 9B",
-    "Class 10A",
-    "Class 10B",
-    "Class 11A",
-    "Class 12A",
-  ];
+  // const classes = [
+  //   "all",
+  //   "Class 9A",
+  //   "Class 9B",
+  //   "Class 10A",
+  //   "Class 10B",
+  //   "Class 11A",
+  //   "Class 12A",
+  // ];
+
+  const studentQuery = useStudent();
+  const classQuery = useClasses();
+
+  if(studentQuery.isLoading || classQuery.isLoading) return <h1>Loading....</h1>
+  if(studentQuery.isError || classQuery.isError) return <h1>"Error:"{studentQuery.isError},{classQuery.isError}</h1>
+
+  const students = studentQuery.data;
+  const classes = classQuery.data;
+
 
   // Filter students based on search term and class filter
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.studentMailId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesClass = filterClass === "all" || student.class === filterClass;
     return matchesSearch && matchesClass;
@@ -275,8 +287,8 @@ const Students: React.FC = () => {
                 onChange={(e) => setFilterClass(e.target.value)}
               >
                 {classes.map((cls) => (
-                  <option key={cls} value={cls}>
-                    {cls === "all" ? "All Classes" : cls}
+                  <option key={cls.classId} value={cls.className}>
+                    {cls.className === "all" ? "All Classes" : cls.className}
                   </option>
                 ))}
               </select>
@@ -303,10 +315,10 @@ const Students: React.FC = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium text-gray-900">
-                          {student.name}
+                          {student.firstName +" "+ student.lastName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {student.email}
+                          {student.studentMailId !== null ?student.studentMailId: student.parentEmailId}
                         </div>
                       </div>
                     </TableCell>
@@ -318,21 +330,21 @@ const Students: React.FC = () => {
                       <div className="space-y-1">
                         <div className="flex items-center text-sm text-gray-600">
                           <Phone className="h-3 w-3 mr-1" />
-                          {student.phone}
+                          {student.phoneNumber !== null ? student.phoneNumber : student.parentPhoneNumber}
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
                           <Mail className="h-3 w-3 mr-1" />
-                          {student.email}
+                          {student.studentMailId !== null ?student.studentMailId: student.parentEmailId}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <div className="text-sm font-medium">
-                          {student.parentName}
+                          {student.fatherName !== null ? student.fatherName: student.motherName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {student.parentPhone}
+                          {student.parentPhoneNumber}
                         </div>
                       </div>
                     </TableCell>

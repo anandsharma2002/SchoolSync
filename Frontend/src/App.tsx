@@ -25,8 +25,10 @@ import Payment from "./pages/dashboard/Payment";
 import Leave from "./pages/dashboard/Leave";
 
 const queryClient = new QueryClient();
+const schoolId = "FDB0E272-D728-4AC6-ADEF-00CA12F0AC15";
 
 const App: React.FC = () => (
+  
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -73,16 +75,16 @@ const App: React.FC = () => (
           
           {/* Dashboard routes without public navigation */}
           <Route path="/dashboard" element={<Dashboard />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="classes" element={<Classes />} />
-            <Route path="teachers" element={<Teachers />} />
-            <Route path="students" element={<Students />} />
-            <Route path="schedule" element={<Schedule />} />
-            <Route path="announcements" element={<Announcements />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="payment" element={<Payment />} />
-            <Route path="leave" element={<Leave />} />
+            <Route index element={<DashboardHome schoolId = {schoolId} />} />
+            <Route path="classes" element={<Classes schoolId = {schoolId} />} />
+            <Route path="teachers" element={<Teachers schoolId = {schoolId} />} />
+            <Route path="students" element={<Students schoolId = {schoolId} />} />
+            <Route path="schedule" element={<Schedule schoolId = {schoolId} />} />
+            <Route path="announcements" element={<Announcements schoolId = {schoolId}/>} />
+            <Route path="reports" element={<Reports schoolId = {schoolId} />} />
+            <Route path="settings" element={<Settings schoolId = {schoolId}/>} />
+            <Route path="payment" element={<Payment schoolId = {schoolId}/>} />
+            <Route path="leave" element={<Leave schoolId = {schoolId}/>} />
           </Route>
           
           <Route path="*" element={<NotFound />} />

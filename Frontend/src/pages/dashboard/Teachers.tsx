@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,56 +10,64 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Mail, Users } from "lucide-react";
+import { useTeachers } from "@/hooks/useTeachers";
 
 
 const Teachers: React.FC = () => {
-  const teachers = [
-    {
-      id: 1,
-      name: "Ms. Anjali Mehta",
-      email: "anjali.mehta@gmail.com",
-      subject: "Mathematics",
-      classes: 3,
-      students: 75,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Mr. Rakesh Verma",
-      email: "rakesh.verma@outlook.com",
-      subject: "Physics",
-      classes: 2,
-      students: 45,
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Ms. Priya Sharma",
-      email: "priya.sharma@gmail.com",
-      subject: "English Literature",
-      classes: 4,
-      students: 120,
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Mr. Arvind Kumar",
-      email: "arvind.kumar@outlook.com",
-      subject: "Chemistry",
-      classes: 3,
-      students: 60,
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Ms. Neha Joshi",
-      email: "neha.joshi@gmail.com",
-      subject: "Biology",
-      classes: 2,
-      students: 50,
-      status: "Active",
-    },
-  ];
+  // const teachers = [
+  //   {
+  //     id: 1,
+  //     name: "Ms. Anjali Mehta",
+  //     email: "anjali.mehta@gmail.com",
+  //     subject: "Mathematics",
+  //     classes: 3,
+  //     students: 75,
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Mr. Rakesh Verma",
+  //     email: "rakesh.verma@outlook.com",
+  //     subject: "Physics",
+  //     classes: 2,
+  //     students: 45,
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Ms. Priya Sharma",
+  //     email: "priya.sharma@gmail.com",
+  //     subject: "English Literature",
+  //     classes: 4,
+  //     students: 120,
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Mr. Arvind Kumar",
+  //     email: "arvind.kumar@outlook.com",
+  //     subject: "Chemistry",
+  //     classes: 3,
+  //     students: 60,
+  //     status: "Active",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Ms. Neha Joshi",
+  //     email: "neha.joshi@gmail.com",
+  //     subject: "Biology",
+  //     classes: 2,
+  //     students: 50,
+  //     status: "Active",
+  //   },
+  // ];
+
+  // const [teachers, setTeachers] = useState([]);
+
+  const {data:teachers, isLoading, isError,error} = useTeachers();
+
+  if(isLoading) return <h1>Loading.....</h1>
+  if(isError) return <h1>"Error: "{error.message}</h1>;
 
   return (
     <div className="space-y-6">
@@ -95,10 +103,10 @@ const Teachers: React.FC = () => {
                 <TableRow key={teacher.id}>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{teacher.name}</div>
+                      <div className="font-medium">{teacher.teacherName}</div>
                       <div className="text-sm text-gray-500 flex items-center">
                         <Mail className="h-3 w-3 mr-1" />
-                        {teacher.email}
+                        {teacher.teacherEmailId}
                       </div>
                     </div>
                   </TableCell>
@@ -112,7 +120,7 @@ const Teachers: React.FC = () => {
                   </TableCell> */}
                   <TableCell>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      {teacher.status}
+                      {teacher.status !== null ? teacher.status : "Active"}
                     </span>
                   </TableCell>
                   <TableCell>

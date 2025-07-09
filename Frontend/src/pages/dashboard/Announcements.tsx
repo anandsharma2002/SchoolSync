@@ -1,36 +1,48 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Bell, Calendar, User } from 'lucide-react';
+import { log } from 'console';
 
 const Announcements: React.FC = () => {
-  const announcements = [
-    {
-      id: 1,
-      title: 'School Holiday - Independence Day',
-      content: 'School will be closed on August 15th for Independence Day celebration.',
-      author: 'Principal Office',
-      date: '2024-07-01',
-      priority: 'high' as const,
-    },
-    {
-      id: 2,
-      title: 'Parent-Teacher Meeting',
-      content: 'Monthly parent-teacher meeting scheduled for this Friday at 2:00 PM.',
-      author: 'Academic Office',
-      date: '2024-07-02',
-      priority: 'medium' as const,
-    },
-    {
-      id: 3,
-      title: 'New Library Books Available',
-      content: 'New collection of science and literature books are now available in the library.',
-      author: 'Library Department',
-      date: '2024-07-03',
-      priority: 'low' as const,
-    },
-  ];
+  // const announcements = [
+  //   {
+  //     id: 1,
+  //     title: 'School Holiday - Independence Day',
+  //     content: 'School will be closed on August 15th for Independence Day celebration.',
+  //     author: 'Principal Office',
+  //     date: '2024-07-01',
+  //     priority: 'high' as const,
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Parent-Teacher Meeting',
+  //     content: 'Monthly parent-teacher meeting scheduled for this Friday at 2:00 PM.',
+  //     author: 'Academic Office',
+  //     date: '2024-07-02',
+  //     priority: 'medium' as const,
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'New Library Books Available',
+  //     content: 'New collection of science and literature books are now available in the library.',
+  //     author: 'Library Department',
+  //     date: '2024-07-03',
+  //     priority: 'low' as const,
+  //   },
+  // ];
+
+  const [announcements, setAnnouncements] = useState([]);
+
+  // useEffect(()=>{
+  //   try{
+  //     const announcement = fetch("")
+  //   }catch( err){
+  //     console.log("Error while fecthing the data",err);
+      
+  //   }
+  // })
 
   const getPriorityColor = (priority: 'high' | 'medium' | 'low') => {
     switch (priority) {

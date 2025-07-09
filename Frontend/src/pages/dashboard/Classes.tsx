@@ -1,47 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Users, Book, UserCheck } from "lucide-react";
+import { useClasses } from "@/hooks/useClasses";
 
 const Classes: React.FC = () => {
-  const classes = [
-    {
-      id: 1,
-      name: "Class 11-A",
-      teacher: "Ms. Sweta",
-      totalTeacher: 4,
-      students: 25,
-      room: "Room A-101",
-      time: "9:00 AM - 10:30 AM",
-      attendance: "22/25",
-    },
-    {
-      id: 2,
-      name: "Class 11-B",
-      teacher: "Mr. Neeraj",
-      totalTeacher: 4,
-      students: 18,
-      room: "Room B-203",
-      time: "11:00 AM - 12:30 PM",
-      attendance: "16/18",
-    },
-    {
-      id: 3,
-      name: "Class 11-C",
-      teacher: "Ms. Ragini",
-      totalTeacher: 4,
-      students: 30,
-      room: "Room C-105",
-      time: "2:00 PM - 3:30 PM",
-      attendance: "28/30",
-    },
-  ];
+  // const classes = [
+  //   {
+  //     id: 1,
+  //     name: "Class 11-A",
+  //     teacher: "Ms. Sweta",
+  //     totalTeacher: 4,
+  //     students: 25,
+  //     room: "Room A-101",
+  //     time: "9:00 AM - 10:30 AM",
+  //     attendance: "22/25",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Class 11-B",
+  //     teacher: "Mr. Neeraj",
+  //     totalTeacher: 4,
+  //     students: 18,
+  //     room: "Room B-203",
+  //     time: "11:00 AM - 12:30 PM",
+  //     attendance: "16/18",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Class 11-C",
+  //     teacher: "Ms. Ragini",
+  //     totalTeacher: 4,
+  //     students: 30,
+  //     room: "Room C-105",
+  //     time: "2:00 PM - 3:30 PM",
+  //     attendance: "28/30",
+  //   },
+  // ];
 
-  // const fetchData = async () => {
-  //   const data = await fetch("");
-  //   const json = data.json();
-  // };
 
+  const {data:classes, isLoading, isError, error} = useClasses();
+
+  if(isLoading) return <h1>Loading.....</h1>
+  if(isError) return <h1>"Error: "{error.message}</h1>;
+   
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -68,13 +70,13 @@ const Classes: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Book className="h-5 w-5 text-primary-600" />
-                <span className="text-sm sm:text-base">{classItem.name}</span>
+                <span className="text-sm sm:text-base">{classItem.className+classItem.classSection}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Class Teacher:</span>
-                <span className="text-sm font-medium">{classItem.teacher}</span>
+                <span className="text-sm font-medium">{classItem.classTeacher !== null ? classItem.classTeacher : "Not Assigned"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Total Students:</span>
@@ -92,7 +94,7 @@ const Classes: React.FC = () => {
                 <div className="flex items-center space-x-1">
                   <Users className="h-4 w-4 text-gray-500" />
                   <span className="text-sm font-medium">
-                    {classItem.totalTeacher}
+                    {classItem.assignedTeacher !== null ? classItem.assignedTeacher.length : "0"}
                   </span>
                 </div>
               </div>

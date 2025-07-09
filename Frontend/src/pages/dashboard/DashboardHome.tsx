@@ -1,37 +1,48 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Book, Calendar, LayoutDashboard, UserCheck, Clock } from 'lucide-react';
+import { useDashboardHome } from '@/hooks/useDashboardHome';
 
-const DashboardHome: React.FC = () => {
+interface DashboardHomeProps {
+  schoolId: string;
+}
+  // const [stats, setStats] = useState([]);
+ const DashboardHome: React.FC = ({schoolId}:DashboardHomeProps) => {
+  
+  const {data:statsData, isLoading, isError , error} = useDashboardHome(schoolId);
+
+  if (!statsData) return <h1>Loading data...</h1>;
+  if (isError) return <h1>Error: {(error as Error).message}</h1>;
+
   const stats = [
     {
-      title: 'Total Students',
-      value: '1,234',
+      title: "Total Students",
+      value: statsData.totalStudents,
       icon: Users,
-      change: '+12%',
-      changeType: 'increase' as const,
+      change: "+12%",
+      changeType: "increase" as const,
     },
     {
-      title: 'Active Classes',
-      value: '45',
+      title: "Total Classes",
+      value: statsData.totalClasses,
       icon: Book,
-      change: '+3%',
-      changeType: 'increase' as const,
+      change: "+3%",
+      changeType: "increase" as const,
     },
     {
-      title: 'Teachers',
-      value: '67',
+      title: "Teachers",
+      value: statsData.totalTeachers,
       icon: Users,
-      change: '+5%',
-      changeType: 'increase' as const,
+      change: "+5%",
+      changeType: "increase" as const,
     },
     {
-      title: 'Today\'s Classes',
-      value: '23',
+      title: "Total Present Students",
+      value: statsData.presentStudents,
       icon: Calendar,
-      change: '-2%',
-      changeType: 'decrease' as const,
+      change: "-2%",
+      changeType: "decrease" as const,
     },
   ];
 
@@ -47,6 +58,9 @@ const DashboardHome: React.FC = () => {
       description: 'Advanced scheduling system with notifications'
     }
   ];
+
+  
+  
 
   return (
     <div className="space-y-6">
@@ -79,33 +93,7 @@ const DashboardHome: React.FC = () => {
         })}
       </div>
 
-      {/* Upcoming Features Section */}
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-4">Upcoming Features</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {upcomingFeatures.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <Card key={feature.title} className="border-2 border-dashed border-red-200 bg-red-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Icon className="h-6 w-6 text-red-500" />
-                      <div>
-                        <h4 className="font-medium text-gray-900">{feature.title}</h4>
-                        <p className="text-sm text-gray-600">{feature.description}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
-                      upcoming
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
@@ -161,7 +149,35 @@ const DashboardHome: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+      {/* Upcoming Features Section */}
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-4">Upcoming Features</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {upcomingFeatures.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <Card key={feature.title} className="border-2 border-dashed border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Icon className="h-6 w-6 text-red-500" />
+                      <div>
+                        <h4 className="font-medium text-gray-900">{feature.title}</h4>
+                        <p className="text-sm text-gray-600">{feature.description}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                      upcoming
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
     </div>
+    
   );
 };
 
