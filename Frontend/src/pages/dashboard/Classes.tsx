@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Users, Book, UserCheck } from "lucide-react";
 
-
 const Classes: React.FC = () => {
   const classes = [
     {
@@ -37,6 +36,11 @@ const Classes: React.FC = () => {
       attendance: "28/30",
     },
   ];
+
+  // const fetchData = async () => {
+  //   const data = await fetch("");
+  //   const json = data.json();
+  // };
 
   return (
     <div className="space-y-6">

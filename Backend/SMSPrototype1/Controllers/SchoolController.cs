@@ -74,6 +74,15 @@ namespace SMSPrototype1.Controllers
         {
 
             var apiResult = new ApiResult<School>();
+            if (!ModelState.IsValid)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = string.Join(" | ", ModelState.Values
+                .SelectMany(x => x.Errors)
+                .Select(e => e.ErrorMessage));
+                return apiResult;
+            }
             try
             {
                 apiResult.Content = await schoolService.CreateSchoolAsync(createSchoolRequest);

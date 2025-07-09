@@ -21,11 +21,27 @@ namespace SMSDataContext.Data
         public DbSet<Student> Students { get; set; }
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<TeacherAttendance> TeachersAttendance { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            //base.OnModelCreating(builder);
+
+            //// Jab School delete ho, Students auto-delete NA ho
+            //builder.Entity<Student>()
+            //    .HasOne(s => s.School)
+            //    .WithMany()
+            //    .HasForeignKey(s => s.SchoolId)
+            //    .OnDelete(DeleteBehavior.Restrict);  // Cascade hata diya
+
+            //// Class delete hone par Students delete ho jaayein (agar aap chahein)
+            //builder.Entity<Student>()
+            //    .HasOne(s => s.Class)
+            //    .WithMany()
+            //    .HasForeignKey(s => s.ClassId)
+            //    .OnDelete(DeleteBehavior.Cascade);
         }
 
 

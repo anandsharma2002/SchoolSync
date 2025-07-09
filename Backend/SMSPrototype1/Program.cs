@@ -4,13 +4,13 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using SMSDataContext.Data;
 using SMSRepository.Repository;
 //using SMS
 using SMSRepository.RepositoryInterfaces;
 using SMSDataModel.Model.AutoMapper;
 using SMSServices.ServicesInterfaces;
 using SMSServices.Services;
+using SMSDataContext.Data;
 //using SMSDataModel.Model.AutoMapper;
 
 namespace SMSPrototype1
@@ -23,8 +23,11 @@ namespace SMSPrototype1
             var builder = WebApplication.CreateBuilder(args);
 
 
-            builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+            //builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+            //var connectionString = builder.Configuration.GetConnectionString("PostgresSQLConnectionString")
+            //    ?? throw new InvalidOperationException("Invalid!! PostgresSQLConnectionString not found");
 
+            builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
 
             // Services Transient
             builder.Services.AddTransient<ISchoolService, SchoolService>();
@@ -42,6 +45,7 @@ namespace SMSPrototype1
             builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
             builder.Services.AddTransient<IAttendanceRepository, AttendanceRepository>();
+            builder.Services.AddTransient<ITeacherAttendanceRepository, TeacherAttendanceRepository>();
 
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(SchoolAutoMapper));

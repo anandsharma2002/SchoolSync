@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SMSDataModel.Model;
 using SMSDataModel.Model.ApiResult;
 using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
-using SMSRepository.Repository;
-using SMSRepository.RepositoryInterfaces;
-using SMSServices.Services;
 using SMSServices.ServicesInterfaces;
 using System.Net;
 
@@ -14,74 +10,22 @@ namespace SMSPrototype1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassController : ControllerBase
+    public class TeacherAttendanceController : ControllerBase
     {
-        private readonly ISchoolClassServices  schoolClassServices;
-        public ClassController(ISchoolClassServices schoolClassServices)
+        private readonly ITeacherAttendanceService _teacherAttendanceService;
+        public TeacherAttendanceController(ITeacherAttendanceService teacherAttendanceService)
         {
-            this.schoolClassServices = schoolClassServices;
+            _teacherAttendanceService = teacherAttendanceService;
         }
 
-
-        [HttpGet]
-        public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync()
+        [HttpGet("GetTeacherAttendance")]
+        public async Task<ApiResult<IEnumerable<TeacherAttendance>>> GetAllAttendancesOfTeachersAsync()
         {
 
-            var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
+            var apiResult = new ApiResult<IEnumerable<TeacherAttendance>>();
             try
             {
-                apiResult.Content = await schoolClassServices.GetAllClassesAsync();
-                apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
-                return apiResult;
-            }
-            catch (Exception ex) 
-            {
-                apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                apiResult.ErrorMessage = ex.Message;
-                return apiResult;
-            }
-
-        }
-        [HttpGet("{id}")]
-        public async Task<ApiResult<SchoolClass>> GetClassByIdAsync([FromRoute]Guid id)
-        {
-            var apiResult = new ApiResult<SchoolClass>();
-            try
-            {
-                apiResult.Content = await schoolClassServices.GetClassByIdAsync(id);
-                apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
-                return apiResult;
-            }
-            catch (Exception ex)
-            {
-                apiResult.IsSuccess = false;
-                apiResult.StatusCode = ex.Message == "Class with this Id not found"
-                   ? HttpStatusCode.NotFound
-                   : HttpStatusCode.BadRequest;
-                apiResult.ErrorMessage = ex.Message;
-                return apiResult;
-            }
-        }
-
-        [HttpPost]
-        public async Task<ApiResult<SchoolClass>> CreateClassAsync([FromBody]CreateClassRequestDto newClass)
-        {
-            var apiResult = new ApiResult<SchoolClass>();
-            if (!ModelState.IsValid)
-            {
-                apiResult.IsSuccess = false;
-                apiResult.StatusCode = HttpStatusCode.BadRequest;
-                apiResult.ErrorMessage = string.Join(" | ", ModelState.Values
-                    .SelectMany(x => x.Errors)
-                    .Select(e => e.ErrorMessage));
-                return apiResult;
-            }
-            try
-            {
-                apiResult.Content = await schoolClassServices.CreateClassAsync(newClass);
+                apiResult.Content = await _teacherAttendanceService.GetAllAttendancesOfTeachersAsync();
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -94,15 +38,13 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }
         }
-        
-
-        [HttpPut("{id}")]
-        public async Task<ApiResult<SchoolClass>> UpdateClassAsync([FromRoute] Guid id, [FromBody] CreateClassRequestDto updatedClass)
+        [HttpGet("GetTeacherByAttendanceId/{teacherAttendanceid}")]
+        public async Task<ApiResult<TeacherAttendance>> GetTeacherByAttendanceIdAsync([FromRoute] Guid teacherAttendanceid)
         {
-            var apiResult = new ApiResult<SchoolClass>();
+            var apiResult = new ApiResult<TeacherAttendance>();
             try
             {
-                apiResult.Content = await schoolClassServices.UpdateClassAsync(id, updatedClass);
+                apiResult.Content = await _teacherAttendanceService.GetTeacherByAttendanceIdAsync(teacherAttendanceid);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -110,21 +52,20 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = ex.Message == "Class with this Id not found"
+                apiResult.StatusCode = ex.Message == "Attendance with this ID not found"
                    ? HttpStatusCode.NotFound
                    : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
         }
-
-        [HttpDelete("{id}")]
-        public async Task<ApiResult<SchoolClass>> DeleteClassAsync([FromRoute] Guid id)
+        [HttpPost("createTeacherAttendance")]
+        public async Task<ApiResult<TeacherAttendance>> CreateAttendanceAsync([FromBody] CreateTeacherAttendanceDto newAttendance)
         {
-            var apiResult = new ApiResult<SchoolClass>();
+            var apiResult = new ApiResult<TeacherAttendance>();
             try
             {
-                apiResult.Content = await schoolClassServices.DeleteClassAsync(id);
+                apiResult.Content = await _teacherAttendanceService.CreateTeacherAttendanceAsync(newAttendance);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -132,7 +73,47 @@ namespace SMSPrototype1.Controllers
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = ex.Message == "Class with this Id not found"
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+        }
+        [HttpPut("{teacherId}")]
+        public async Task<ApiResult<TeacherAttendance>> UpdateTeacherAttendandanceAsync([FromRoute] Guid teacherId, [FromBody] CreateTeacherAttendanceDto updatedTeacherAttendance)
+        {
+            var apiResult = new ApiResult<TeacherAttendance>();
+            try
+            {
+                apiResult.Content = await _teacherAttendanceService.UpdatedTeacherAttendanceAsync(teacherId, updatedTeacherAttendance);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = ex.Message == "Attendance with this ID not found"
+                   ? HttpStatusCode.NotFound
+                   : HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+        }
+        [HttpDelete("{attendanceId}")]
+        public async Task<ApiResult<TeacherAttendance>> DeleteTeacherAttendanceAsync([FromRoute] Guid attendanceId)
+        {
+            var apiResult = new ApiResult<TeacherAttendance>();
+            try
+            {
+                apiResult.Content = await _teacherAttendanceService.DeleteTeacherAttendanceAsync(attendanceId);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = ex.Message == "Attendance with this ID not found"
                    ? HttpStatusCode.NotFound
                    : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
@@ -140,6 +121,5 @@ namespace SMSPrototype1.Controllers
             }
 
         }
-
     }
 }
