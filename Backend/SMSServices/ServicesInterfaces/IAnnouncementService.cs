@@ -1,4 +1,5 @@
 ﻿using SMSDataModel.Model.Models;
+using SMSDataModel.Model.RequestDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,8 @@ namespace SMSServices.ServicesInterfaces
     {
         Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync();
         Task<Announcement> GetAnnouncementByIdAsync(Guid AnnoucementId);
+        Task<Announcement> CreateAnnouncementAsync(CreateAnnouncementRqstDto createAnnouncement);
+        Task<Announcement> UpdateAnnouncementAsync(Guid id, CreateAnnouncementRqstDto updatedAnnouncement);
+        Task<Announcement> DeleteAnnouncementAsync(Guid id);
     }
 }

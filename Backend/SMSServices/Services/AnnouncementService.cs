@@ -34,16 +34,33 @@ namespace SMSServices.Services
             }
             throw new Exception("Announcement not found!");
         }
-        public async Task<School> createAnnouncementRqst(CreateAnnouncementRqstDto createAnnouncement)
+        public async Task<Announcement> CreateAnnouncementAsync(CreateAnnouncementRqstDto createAnnouncement)
         {
             var newAnnouncement = _mapper.Map<Announcement>(createAnnouncement);
-            var existingAnnouncement = await _announcementRepository.AnnouncecemntExistsAsync(newAnnouncement);
-            if (!existingAnnouncement)
+                var result = await _announcementRepository.CreateAnnouncementAsync(newAnnouncement);
+                return result;
+        } 
+        public async Task<Announcement> UpdateAnnouncementAsync(Guid id, CreateAnnouncementRqstDto updatedAnnouncement)
+        {
+            var announcement = await _announcementRepository.GetAnnouncementByIdAsync(id);
+            if (announcement != null)
             {
-                var result = await _announcementRepository.CreateSchoolAsync(newAnnouncement);
+                _mapper.Map(updatedAnnouncement, announcement);
+                var result = await _announcementRepository.UpdateAnnouncementAsync(announcement);
                 return result;
             }
-            throw new Exception("School with this name, email and pin code already exists");
+            throw new Exception("Announcement with this ID not found");
+        }
+        public async Task<Announcement> DeleteAnnouncementAsync(Guid id)
+        {
+
+            var existingAnnouncement = await _announcementRepository.GetAnnouncementByIdAsync(id);
+            if (existingAnnouncement != null)
+            {
+                var result = await _announcementRepository.DeleteAnnouncementAsync(existingAnnouncement);
+                return result;
+            }
+            throw new Exception("Attendance with this ID not found");
         }
     }
 }

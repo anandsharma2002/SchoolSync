@@ -62,7 +62,7 @@ namespace SMSPrototype1.Controllers
             }
         }
 
-        [HttpPost("CreateSchoolAsync")]
+        [HttpPost("CreateAnnouncement")]
         public async Task<ApiResult<Announcement>> CreateAnnouncement([FromBody] CreateAnnouncementRqstDto createAnnouncementRqst)
         {
 
@@ -78,7 +78,7 @@ namespace SMSPrototype1.Controllers
             }
             try
             {
-                apiResult.Content = await _announcementService.CreateAnnouncement(createAnnouncementRqst);
+                apiResult.Content = await _announcementService.CreateAnnouncementAsync(createAnnouncementRqst);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -90,6 +90,49 @@ namespace SMSPrototype1.Controllers
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
+        }
+        [HttpPut("{id}")]
+        public async Task<ApiResult<Announcement>> UpdateAnnouncementAsync([FromRoute] Guid id, [FromBody] CreateAnnouncementRqstDto updatedAnnouncement)
+        {
+            var apiResult = new ApiResult<Announcement>();
+            try
+            {
+                apiResult.Content = await _announcementService.UpdateAnnouncementAsync(id, updatedAnnouncement);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = ex.Message == "Attendance with this ID not found"
+                   ? HttpStatusCode.NotFound
+                   : HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+        }
+        [HttpDelete("{id}")]
+        public async Task<ApiResult<Announcement>> DeleteAnnouncementAsync([FromRoute] Guid id)
+        {
+            var apiResult = new ApiResult<Announcement>();
+            try
+            {
+                apiResult.Content = await _announcementService.DeleteAnnouncementAsync(id);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = ex.Message == "Attendance with this ID not found"
+                   ? HttpStatusCode.NotFound
+                   : HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+
         }
 
     }

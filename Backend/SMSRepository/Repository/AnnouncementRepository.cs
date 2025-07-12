@@ -26,6 +26,24 @@ namespace SMSRepository.Repository
             var existingAnnouncement = await _Context.Announcements.FindAsync(AnnoucementId);
             return existingAnnouncement;
         }
+        public async Task<Announcement> CreateAnnouncementAsync(Announcement announcement)
+        {
+            await _Context.Announcements.AddAsync(announcement);
+            await _Context.SaveChangesAsync();
+            return announcement;
+        }
+        public async Task<Announcement> UpdateAnnouncementAsync(Announcement updatedAnnouncement)
+        {
+            var result = _Context.Announcements.Update(updatedAnnouncement);
+            await _Context.SaveChangesAsync();
+            return result.Entity;
+        }
+        public async Task<Announcement> DeleteAnnouncementAsync(Announcement existingAnnouncement)
+        {
+            var result = _Context.Announcements.Remove(existingAnnouncement);
+            await _Context.SaveChangesAsync();
+            return existingAnnouncement;
+        }
 
 
     }

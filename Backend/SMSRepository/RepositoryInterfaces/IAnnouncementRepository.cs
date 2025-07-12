@@ -11,5 +11,8 @@ namespace SMSRepository.RepositoryInterfaces
     {
         Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync();
         Task<Announcement> GetAnnouncementByIdAsync(Guid AnnoucementId);
+        Task<Announcement> CreateAnnouncementAsync(Announcement announcement);
+        Task<Announcement> UpdateAnnouncementAsync(Announcement updatedAnnouncement);
+        Task<Announcement> DeleteAnnouncementAsync(Announcement existingAnnouncement);
     }
 }

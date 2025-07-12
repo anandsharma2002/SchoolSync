@@ -13,7 +13,7 @@ namespace SMSDataModel.Model.AutoMapper
     {
         public AnnouncementAutomapper()
         {
-            CreateMap<Announcement, CreateAttendanceRqstDto>().ReverseMap();
+            CreateMap<Announcement, CreateAnnouncementRqstDto>().ReverseMap();
         }
     }
 }
