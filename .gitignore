@@ -365,6 +365,7 @@ FodyWeavers.xsd
 
 # By Anand Sharma
 Backend/SMSDataContext/Migrations/
+Backend/SMSPrototype1/Program.cs
 Backend/SMSPrototype1/appsettings.json
 
 Frontend/SMSFrontend/node_modules/
