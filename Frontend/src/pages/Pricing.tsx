@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { CheckCircle, X } from "lucide-react";
 
-
 interface PricingFeature {
   name: string;
   basic: boolean;
@@ -79,83 +78,89 @@ const Pricing: React.FC = () => {
 
   const detailedFeatures: PricingFeature[] = [
     {
-      name: "Attendance Tracking",
+      name: "Role Based Dashboard",
       basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Students Management",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Teachers Management",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Class Management",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Students Attendance",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Teachers Attendance",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    { name: "Announcement", basic: true, professional: true, enterprise: true },
+    {
+      name: "Data Export in Excel File",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Email Notification",
+      basic: true,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      name: "Teacher’s Class Schedule",
+      basic: false,
       professional: true,
       enterprise: true,
     },
     {
       name: "Class Schedule",
-      basic: true,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Course Management",
-      basic: true,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Multi-device Compatibility",
-      basic: true,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Secure & Reliable Infrastructure",
-      basic: true,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Student Management",
-      basic: true,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Accounts Management",
       basic: false,
       professional: true,
       enterprise: true,
     },
     {
-      name: "Advanced Analytics",
+      name: "Student progress",
       basic: false,
       professional: true,
       enterprise: true,
     },
     {
-      name: "Announcements & Events",
-      basic: false,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Parent Portal",
-      basic: false,
-      professional: true,
-      enterprise: true,
-    },
-    { name: "Reports", basic: false, professional: true, enterprise: true },
-    {
-      name: "Role-based Access Control",
-      basic: false,
-      professional: true,
-      enterprise: true,
-    },
-    {
-      name: "Dedicated Support",
+      name: "Student Fee",
       basic: false,
       professional: false,
       enterprise: true,
     },
     {
-      name: "Custom Integrations",
+      name: "Teachers Salary",
       basic: false,
       professional: false,
-      enterprise: "Available",
+      enterprise: true,
+    },
+    {
+      name: "Yearly Feedback",
+      basic: false,
+      professional: false,
+      enterprise: true,
     },
   ];
 

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
 
-
 interface ContactInfo {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
@@ -253,7 +252,7 @@ const Contact: React.FC = () => {
               </div>
 
               {/* Contact Info Sidebar */}
-              <div className=" bg-primary-600 p-8 lg:p-12 text-white">
+              <div className=" bg-gradient-to-r from-primary-600 to-primary-700 p-8 lg:p-12 text-white">
                 <h3 className="text-2xl font-bold mb-8">
                   Let's Start a Conversation
                 </h3>
