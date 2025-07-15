@@ -20,12 +20,12 @@ namespace SMSServices.Services
             _teacherAttendanceRepository = teacherAttendanceRepository;
             this.mapper = mapper;
         }
-        public async Task<List<TeacherAttendance>> GetAllAttendancesOfTeachersAsync()
+        public async Task<List<Attendance>> GetAllAttendancesOfTeachersAsync()
         {
             var result = await _teacherAttendanceRepository.GetAllAttendancesOfTeachersAsync();
             return result;
         }
-        public async Task<TeacherAttendance> GetTeacherByAttendanceIdAsync(Guid teacherAttendanceid)
+        public async Task<Attendance> GetTeacherByAttendanceIdAsync(Guid teacherAttendanceid)
         {
             var result = await _teacherAttendanceRepository.GetTeacherByAttendanceIdAsync(teacherAttendanceid);
             if (result != null)
@@ -34,13 +34,13 @@ namespace SMSServices.Services
             }
             throw new Exception("Attendance with this ID not found");
         }
-        public async Task<TeacherAttendance> CreateTeacherAttendanceAsync(CreateTeacherAttendanceDto newTeacherAttendanceRqst)
+        public async Task<Attendance> CreateTeacherAttendanceAsync(CreateTeacherAttendanceDto newTeacherAttendanceRqst)
         {
-            var newteacherAttendence = mapper.Map<TeacherAttendance>(newTeacherAttendanceRqst);
+            var newteacherAttendence = mapper.Map<Attendance>(newTeacherAttendanceRqst);
             var result = await _teacherAttendanceRepository.CreateTeacherAttendanceAsync(newteacherAttendence);
             return result;
         }
-        public async Task<TeacherAttendance> UpdatedTeacherAttendanceAsync(Guid id, CreateTeacherAttendanceDto updatedTeacher)
+        public async Task<Attendance> UpdatedTeacherAttendanceAsync(Guid id, CreateTeacherAttendanceDto updatedTeacher)
         {
             var TeacherAttendance = await _teacherAttendanceRepository.GetTeacherByAttendanceIdAsync(id);
             if (TeacherAttendance != null)
@@ -51,7 +51,7 @@ namespace SMSServices.Services
             }
             throw new Exception("Attendance with this ID not found");
         }
-        public async Task<TeacherAttendance> DeleteTeacherAttendanceAsync(Guid id)
+        public async Task<Attendance> DeleteTeacherAttendanceAsync(Guid id)
         {
 
             var existingTeacherAttendance = await _teacherAttendanceRepository.GetTeacherByAttendanceIdAsync(id);

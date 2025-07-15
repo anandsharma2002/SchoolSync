@@ -24,7 +24,7 @@ namespace SMSRepository.Repository
         }
         public async Task<Teacher> GetTeacherByIdAsync(Guid id)
         {
-            return await _context.Teachers.FirstOrDefaultAsync(s=> s.TeacherId == id);
+            return await _context.Teachers.FirstOrDefaultAsync(s=> s.Id == id);
         }
         public async Task<Teacher> CreateTeacherAsync(Teacher teacher)
         {

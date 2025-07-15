@@ -24,7 +24,7 @@ namespace SMSRepository.Repository
 
         public async Task<bool> SchoolExistsAsync(School school)
         {
-            var result = await _Context.Schools.FirstOrDefaultAsync(x => x.SchoolName == school.SchoolName && x.SchoolEmail == school.SchoolEmail && x.PinCode == school.PinCode);
+            var result = await _Context.Schools.FirstOrDefaultAsync(x => x.Name == school.Name && x.Email == school.Email && x.PinCode == school.PinCode);
             return result!=null ? true : false;
         }
 

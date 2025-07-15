@@ -25,7 +25,7 @@ namespace SMSRepository.Repository
         }
         public async Task<Student> GetStudentByIdAsync(Guid studentId)
         {
-            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Id == studentId);
             return existingStudent;
         }
         public async Task<IEnumerable<Student>> GetStudentByClassIdAsync(Guid classId)

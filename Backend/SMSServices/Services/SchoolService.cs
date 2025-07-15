@@ -55,9 +55,9 @@ namespace SMSServices.Services
             var school = await schoolRepository.GetSchoolByIdAsync(id);
             if (school != null)
             {
-                school.SchoolName = updatedSchool.SchoolName;
-                school.SchoolEmail = updatedSchool.SchoolEmail;
-                school.PhoneNumber = updatedSchool.PhoneNumber;
+                school.Name = updatedSchool.SchoolName;
+                school.Email = updatedSchool.SchoolEmail;
+                school.Phone = updatedSchool.PhoneNumber;
                 school.Address = updatedSchool.Address;
                 school.City = updatedSchool.City;
                 school.State = updatedSchool.State;

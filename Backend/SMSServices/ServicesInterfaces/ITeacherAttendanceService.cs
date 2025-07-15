@@ -10,10 +10,10 @@ namespace SMSServices.ServicesInterfaces
 {
     public interface ITeacherAttendanceService
     {
-        Task<List<TeacherAttendance>> GetAllAttendancesOfTeachersAsync();
-        Task<TeacherAttendance> GetTeacherByAttendanceIdAsync(Guid teacherAttendanceid);
-        Task<TeacherAttendance> CreateTeacherAttendanceAsync(CreateTeacherAttendanceDto newTeacherAttendanceRqst);
-        Task<TeacherAttendance> UpdatedTeacherAttendanceAsync(Guid id, CreateTeacherAttendanceDto updatedTeacher);
-        Task<TeacherAttendance> DeleteTeacherAttendanceAsync(Guid id);
+        Task<List<Attendance>> GetAllAttendancesOfTeachersAsync();
+        Task<Attendance> GetTeacherByAttendanceIdAsync(Guid teacherAttendanceid);
+        Task<Attendance> CreateTeacherAttendanceAsync(CreateTeacherAttendanceDto newTeacherAttendanceRqst);
+        Task<Attendance> UpdatedTeacherAttendanceAsync(Guid id, CreateTeacherAttendanceDto updatedTeacher);
+        Task<Attendance> DeleteTeacherAttendanceAsync(Guid id);
     }
 }

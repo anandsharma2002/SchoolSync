@@ -15,13 +15,17 @@ namespace SMSDataContext.Data
     {
         public DataContext (DbContextOptions<DataContext> options ) : base (options) { }
 
+        public DbSet<Announcement> Announcements { get; set; }
+        // Application user with Authentication
+        //public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Attendance> Attendance { get; set; }
+        public DbSet<Parents> Parents { get; set; }
         public DbSet<School> Schools { get; set; }
         public DbSet<SchoolClass> Classes { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Student> Students { get; set; }
-        public DbSet<Attendance> Attendance { get; set; }
-        public DbSet<Announcement> Announcements { get; set; }
-        public DbSet<TeacherAttendance> TeachersAttendance { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Teacher> TeacherSubject { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

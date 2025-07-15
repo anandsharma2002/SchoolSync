@@ -9,10 +9,10 @@ namespace SMSRepository.RepositoryInterfaces
 {
     public interface ITeacherAttendanceRepository
     {
-        Task<List<TeacherAttendance>> GetAllAttendancesOfTeachersAsync();
-        Task<TeacherAttendance> GetTeacherByAttendanceIdAsync(Guid teacherAttendanceid);
-        Task<TeacherAttendance> CreateTeacherAttendanceAsync(TeacherAttendance newTeacherAttendanceRqst);
-        Task<TeacherAttendance> UpdateTeacherAttendandanceAsync(TeacherAttendance updatedTeacher);
-        Task<TeacherAttendance> DeleteTeacherAttendanceAsync(TeacherAttendance existingTeacherAttendance);
+        Task<List<Attendance>> GetAllAttendancesOfTeachersAsync();
+        Task<Attendance> GetTeacherByAttendanceIdAsync(Guid teacherAttendanceid);
+        Task<Attendance> CreateTeacherAttendanceAsync(Attendance newTeacherAttendanceRqst);
+        Task<Attendance> UpdateTeacherAttendandanceAsync(Attendance updatedTeacher);
+        Task<Attendance> DeleteTeacherAttendanceAsync(Attendance existingTeacherAttendance);
     }
 }

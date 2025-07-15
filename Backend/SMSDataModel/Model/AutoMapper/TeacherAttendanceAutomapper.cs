@@ -13,7 +13,7 @@ namespace SMSDataModel.Model.AutoMapper
     {
         public TeacherAttendanceAutomapper()
         {
-            CreateMap<TeacherAttendance, CreateTeacherAttendanceDto>().ReverseMap();
+            //CreateMap<TeacherAttendance, CreateTeacherAttendanceDto>().ReverseMap();
         }
     }
 }
