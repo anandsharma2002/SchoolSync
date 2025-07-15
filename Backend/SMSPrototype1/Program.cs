@@ -35,7 +35,7 @@ namespace SMSPrototype1
             builder.Services.AddTransient<ITeacherService, TeacherService>();
             builder.Services.AddTransient<IStudentService, StudentService>();
             builder.Services.AddTransient<IAttendanceService, AttendanceService>();
-            builder.Services.AddTransient<ITeacherAttendanceService, TeacherAttendanceService>();
+            builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
 
 
 
