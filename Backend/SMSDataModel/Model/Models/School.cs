@@ -25,7 +25,7 @@ namespace SMSDataModel.Model.Models
         public int PinCode { get; set; }
         public int Subscription { get; set; } = 0;
         public DateOnly? SubscriptionDate { get; set; }
-        public bool IsSoftDeleted { get; set; }
+        public bool IsSoftDeleted { get; set; } = false;
 
 
     }

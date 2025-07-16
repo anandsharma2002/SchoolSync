@@ -24,13 +24,13 @@ namespace SMSPrototype1.Controllers
 
 
         [HttpGet]
-        public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync()
+        public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync([FromRoute] Guid schoolId)
         {
 
             var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
             try
             {
-                apiResult.Content = await schoolClassServices.GetAllClassesAsync();
+                apiResult.Content = await schoolClassServices.GetAllClassesAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -44,6 +44,8 @@ namespace SMSPrototype1.Controllers
             }
 
         }
+
+        // Not now
         [HttpGet("{id}")]
         public async Task<ApiResult<SchoolClass>> GetClassByIdAsync([FromRoute]Guid id)
         {
@@ -97,7 +99,7 @@ namespace SMSPrototype1.Controllers
         
 
         [HttpPut("{id}")]
-        public async Task<ApiResult<SchoolClass>> UpdateClassAsync([FromRoute] Guid id, [FromBody] CreateClassRequestDto updatedClass)
+        public async Task<ApiResult<SchoolClass>> UpdateClassAsync([FromRoute] Guid id, [FromBody] UpdateClassRequestDto updatedClass)
         {
             var apiResult = new ApiResult<SchoolClass>();
             try

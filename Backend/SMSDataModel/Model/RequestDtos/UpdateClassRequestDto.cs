@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SMSDataModel.Model.Models;
 
 namespace SMSDataModel.Model.RequestDtos
 {
-    public class CreateClassRequestDto
+    public class UpdateClassRequestDto
     {
         [Required]
         [MaxLength(50)]
@@ -17,7 +16,5 @@ namespace SMSDataModel.Model.RequestDtos
         [MaxLength(5)]
         public string Section { get; set; }
         public Guid? ClassTeacherId { get; set; }
-        [Required]
-        public Guid SchoolId { get; set; }
     }
 }

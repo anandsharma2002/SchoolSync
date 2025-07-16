@@ -9,16 +9,18 @@ namespace SMSDataModel.Model.RequestDtos
 {
     public class CreateSchoolRequestDto
     {
+        public string RegistrationNumber { get; set; }
+
         [Required]
         [MaxLength(100)]
-        public string SchoolName { get; set; }
+        public string Name { get; set; }
         [Required]
         [EmailAddress]
-        public string SchoolEmail { get; set; }
+        public string Email { get; set; }
         [Required]
         [Phone]
         [MaxLength(12)]
-        public string PhoneNumber { get; set; }
+        public string Phone { get; set; }
         [Required]
         public string Address { get; set; }
         [Required]
@@ -27,8 +29,6 @@ namespace SMSDataModel.Model.RequestDtos
         public string State { get; set; }
         [Range(100000, 999999, ErrorMessage = "Pincode must be a 6-digit number")]
         public int PinCode { get; set; }
-        [Range(0, 3, ErrorMessage = "Subscription must be between 0 and 3")]
-        public int Subscription { get; set; } = 0;
-        public DateOnly? SubscriptionDate { get; set; }
     }
 }
+
