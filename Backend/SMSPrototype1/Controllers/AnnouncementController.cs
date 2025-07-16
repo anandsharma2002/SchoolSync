@@ -25,7 +25,8 @@ namespace SMSPrototype1.Controllers
             var apiResult = new ApiResult<IEnumerable<Announcement>>();
             try
             {
-                apiResult.Content = await _announcementService.GetAllAnnouncemetsAsync();
+                Guid schoolId = Guid.Parse("742bb760-efe2-4ac4-8ef7-a45819d21bef");
+                apiResult.Content = await _announcementService.GetAllAnnouncemetsAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -92,12 +93,12 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpPut("{id}")]
-        public async Task<ApiResult<Announcement>> UpdateAnnouncementAsync([FromRoute] Guid id, [FromBody] CreateAnnouncementRqstDto updatedAnnouncement)
+        public async Task<ApiResult<Announcement>> UpdateAnnouncementAsync([FromRoute] Guid id, [FromBody] UpdateAnnouncementRequestDto updateAnnouncementRequestDto)
         {
             var apiResult = new ApiResult<Announcement>();
             try
             {
-                apiResult.Content = await _announcementService.UpdateAnnouncementAsync(id, updatedAnnouncement);
+                apiResult.Content = await _announcementService.UpdateAnnouncementAsync(id, updateAnnouncementRequestDto);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;

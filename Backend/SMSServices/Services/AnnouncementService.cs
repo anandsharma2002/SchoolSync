@@ -21,9 +21,9 @@ namespace SMSServices.Services
             _announcementRepository = announcementRepository;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync()
+        public async Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync(Guid schoolid)
         {
-            return await _announcementRepository.GetAllAnnouncemetsAsync();
+            return await _announcementRepository.GetAllAnnouncemetsAsync(schoolid);
         }
         public async Task<Announcement> GetAnnouncementByIdAsync(Guid AnnoucementId)
         {
@@ -37,15 +37,15 @@ namespace SMSServices.Services
         public async Task<Announcement> CreateAnnouncementAsync(CreateAnnouncementRqstDto createAnnouncement)
         {
             var newAnnouncement = _mapper.Map<Announcement>(createAnnouncement);
-                var result = await _announcementRepository.CreateAnnouncementAsync(newAnnouncement);
-                return result;
-        } 
-        public async Task<Announcement> UpdateAnnouncementAsync(Guid id, CreateAnnouncementRqstDto updatedAnnouncement)
+            var result = await _announcementRepository.CreateAnnouncementAsync(newAnnouncement);
+            return result;
+        }
+        public async Task<Announcement> UpdateAnnouncementAsync(Guid id, UpdateAnnouncementRequestDto updateAnnouncementRequestDto)
         {
             var announcement = await _announcementRepository.GetAnnouncementByIdAsync(id);
             if (announcement != null)
             {
-                _mapper.Map(updatedAnnouncement, announcement);
+                announcement = _mapper.Map(updateAnnouncementRequestDto, announcement);
                 var result = await _announcementRepository.UpdateAnnouncementAsync(announcement);
                 return result;
             }
