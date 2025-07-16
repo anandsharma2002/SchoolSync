@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 const server_url = import.meta.env.VITE_API_URL;
 
@@ -7,11 +8,12 @@ const fetchClasses = async () => {
   if (!res.ok) throw new Error(res.statusText);
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
-  return json.content;
+  return json.content ?? []; 
 };
 
-const createClass = async (newClass) => {
-  const res = await fetch(`${server_url}/api/Class`, {
+
+const createClass = async ({ schoolId, newClass }: { schoolId: string; newClass: any }) => {
+  const res = await fetch(`${server_url}/api/Class?schoolId=${schoolId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newClass),
@@ -21,8 +23,8 @@ const createClass = async (newClass) => {
   return json.content;
 };
 
-const updateClass = async (updatedClass) => {
-  const res = await fetch(`${server_url}/api/Class/${updatedClass.id}`, {
+const updateClass = async ({ schoolId, updatedClass }: { schoolId: string; updatedClass: any }) => {
+  const res = await fetch(`${server_url}/api/Class/${updatedClass.id}?schoolId=${schoolId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updatedClass),
@@ -32,8 +34,8 @@ const updateClass = async (updatedClass) => {
   return json.content;
 };
 
-const removeClass = async (id) => {
-  const res = await fetch(`${server_url}/api/Class/${id}`, {
+const removeClass = async ({ schoolId, id }: { schoolId: string; id: string }) => {
+  const res = await fetch(`${server_url}/api/Class/${id}?schoolId=${schoolId}`, {
     method: "DELETE",
   });
   const json = await res.json();
@@ -41,35 +43,35 @@ const removeClass = async (id) => {
   return json.content;
 };
 
-export const useClasses = () => {
+export const useClasses = (schoolId: string) => {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["classes"],
+    queryKey: ["classes", schoolId], // Include schoolId in queryKey
     queryFn: fetchClasses,
-    staleTime: 60000,
-    refetchOnWindowFocus: true,
-    retry: 1,
+    
   });
-
+ useEffect(() => {
+  console.log("Classes Cache:", queryClient.getQueryData(["classes"]));
+}, []);
   const addClass = useMutation({
-    mutationFn: createClass,
+    mutationFn: ({ newClass }: { newClass: any }) => createClass({ schoolId, newClass }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["classes"] });
+      queryClient.invalidateQueries({ queryKey: ["classes", schoolId] });
     },
   });
 
   const editClass = useMutation({
-    mutationFn: updateClass,
+    mutationFn: ({ updatedClass }: { updatedClass: any }) => updateClass({ schoolId, updatedClass }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["classes"] });
+      queryClient.invalidateQueries({ queryKey: ["classes", schoolId] });
     },
   });
 
   const deleteClass = useMutation({
-    mutationFn: removeClass,
+    mutationFn: ({ id }: { id: string }) => removeClass({ schoolId, id }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["classes"] });
+      queryClient.invalidateQueries({ queryKey: ["classes", schoolId] });
     },
   });
 

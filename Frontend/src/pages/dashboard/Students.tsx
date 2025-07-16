@@ -9,6 +9,10 @@ import {
   Eye,
   Mail,
   Phone,
+  Users,
+  UserX,
+  UserCheck,
+  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -211,12 +215,12 @@ const Students: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Students</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-blue-600">
                   {students.length}
                 </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Eye className="h-5 w-5 text-blue-600" />
+                <Users className="h-5 w-5 text-blue-600" />
               </div>
             </div>
           </CardContent>
@@ -225,13 +229,13 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Active Students</p>
+                <p className="text-sm text-gray-600">Present Students</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {students.filter((s) => s.status === "Active").length}
+                  {students.filter((s) => s.status === "Present").length}
                 </p>
               </div>
               <div className="p-2 bg-green-100 rounded-lg">
-                <Eye className="h-5 w-5 text-green-600" />
+                <UserCheck className="h-5 w-5 text-green-600" />
               </div>
             </div>
           </CardContent>
@@ -240,13 +244,15 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Graduated</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-sm text-gray-600">
+                  Students in Other Activities
+                </p>
+                <p className="text-2xl font-bold text-purple-600">
                   {students.filter((s) => s.status === "Graduated").length}
                 </p>
               </div>
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Eye className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Activity className="h-5 w-5 text-purple-600" />
               </div>
             </div>
           </CardContent>
@@ -255,11 +261,11 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">New This Year</p>
-                <p className="text-2xl font-bold text-purple-600">3</p>
+                <p className="text-sm text-gray-600">Absent</p>
+                <p className="text-2xl font-bold text-red-600">3</p>
               </div>
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Plus className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-red-100 rounded-lg">
+                <UserX className="h-5 w-5 text-red-600" />
               </div>
             </div>
           </CardContent>
