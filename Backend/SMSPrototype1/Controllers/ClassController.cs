@@ -30,7 +30,7 @@ namespace SMSPrototype1.Controllers
             var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
             try
             {
-                Guid schoolId = Guid.NewGuid();
+                Guid schoolId = Guid.Parse("742bb760-efe2-4ac4-8ef7-a45819d21bef");
                 apiResult.Content = await schoolClassServices.GetAllClassesAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;

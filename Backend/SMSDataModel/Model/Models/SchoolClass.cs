@@ -22,3 +22,5 @@ namespace SMSDataModel.Model.Models
         public School School { get; set; }
     }
 }
+
+

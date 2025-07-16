@@ -18,28 +18,26 @@ namespace SMSRepository.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Student>> GetAllStudentAsync()
+        public async Task<IEnumerable<Student>> GetAllStudentAsync(Guid schoolId)
         {
-            var a =  await _context.Students.ToListAsync();
-            return a;
+            return  await _context.Students.Include("Class").Where(x=>x.Class.SchoolId==schoolId).ToListAsync();
         }
+
         public async Task<Student> GetStudentByIdAsync(Guid studentId)
         {
-            var existingStudent = await _context.Students.FirstOrDefaultAsync(s => s.Id == studentId);
-            return existingStudent;
+            return await _context.Students.FirstOrDefaultAsync(s => s.Id == studentId);
         }
         public async Task<IEnumerable<Student>> GetStudentByClassIdAsync(Guid classId)
         {
-            var a =  await _context.Students.Where(x => x.ClassId == classId).ToListAsync();
-            return a;        
+            return await _context.Students.Where(x => x.ClassId == classId).ToListAsync();
         }
 
 
         public async Task<Student> CreateStudentAsync(Student student)
         {
-            await _context.Students.AddAsync(student);
+            var result = await _context.Students.AddAsync(student);
             await _context.SaveChangesAsync();
-            return student;
+            return result.Entity;
         }
         public async Task<Student> UpdateStudentAsync(Student updatedStudent)
         {

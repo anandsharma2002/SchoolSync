@@ -24,7 +24,8 @@ namespace SMSPrototype1.Controllers
             var apiResult = new ApiResult<IEnumerable<Student>>();
             try
             {
-                apiResult.Content = await _studentService.GetAllStudentAsync();
+                Guid schoolId = Guid.Parse("742bb760-efe2-4ac4-8ef7-a45819d21bef"); ; // Replace with actual school ID retrieval logic
+                apiResult.Content = await _studentService.GetAllStudentAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -86,12 +87,6 @@ namespace SMSPrototype1.Controllers
         }
 
 
-
-
-
-
-
-
         [HttpPost]
         public async Task<ApiResult<Student>> CreateStudentAsync([FromBody] CreateStudentRqstDto createStudentRqstDto)
         {
@@ -122,13 +117,13 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpPut("{id}")]
-        public async Task<ApiResult<Student>> UpdateStudentAsync([FromRoute] Guid id, [FromBody] CreateStudentRqstDto updateStudent)
+        public async Task<ApiResult<Student>> UpdateStudentAsync([FromRoute] Guid id, [FromBody] UpdateStudentRequestDto updateStudentRequestDto )
         {
 
             var apiResult = new ApiResult<Student>();
             try
             {
-                apiResult.Content = await _studentService.UpdateStudentAsync(id, updateStudent);
+                apiResult.Content = await _studentService.UpdateStudentAsync(id, updateStudentRequestDto);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;

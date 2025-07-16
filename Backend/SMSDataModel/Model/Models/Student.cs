@@ -10,8 +10,9 @@ namespace SMSDataModel.Model.Models
     public class Student
     {
         public Guid Id { get; set; }
-        public int SRNumber { get; set; }
+        public string SRNumber { get; set; }
         public int RollNumber { get; set; }
+        public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; } 
         public DateOnly DOB { get; set; }
@@ -22,7 +23,5 @@ namespace SMSDataModel.Model.Models
         // User Id
         public Guid? UserId { get; set; }
         public ApplicationUser User { get; set; }
-
-
     }
 }

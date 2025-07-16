@@ -9,8 +9,8 @@ namespace SMSDataModel.Model.RequestDtos
 {
     public class CreateSchoolRequestDto
     {
+        [Required]
         public string RegistrationNumber { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string Name { get; set; }
