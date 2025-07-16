@@ -11,7 +11,7 @@ namespace SMSDataModel.Model.Models
         public Guid Id { get; set; }
         public DateOnly Date { get; set; }
         public string Status { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public ApplicationUser User { get; set; }
     } 
 }

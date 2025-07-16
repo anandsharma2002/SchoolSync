@@ -11,16 +11,16 @@ using System.Threading.Tasks;
 
 namespace SMSRepository.Repository
 {
-    public class TeacherRepository: ITeacherRepository
+    public class TeacherRepository : ITeacherRepository
     {
         private readonly DataContext _context;
         public TeacherRepository(DataContext context)
         {
             _context = context;
         }
-        public async Task<IEnumerable<Teacher>> GetAllTeachersAsync()
+        public async Task<IEnumerable<Teacher>> GetAllTeachersAsync(Guid schoolId)
         {
-            return await _context.Teachers.ToListAsync();
+            return await _context.Teachers.Where(x=>x.SchoolId==schoolId).ToListAsync();
         }
         public async Task<Teacher> GetTeacherByIdAsync(Guid id)
         {

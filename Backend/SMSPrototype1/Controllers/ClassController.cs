@@ -24,12 +24,13 @@ namespace SMSPrototype1.Controllers
 
 
         [HttpGet]
-        public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync([FromRoute] Guid schoolId)
+        public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync()
         {
 
             var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
             try
             {
+                Guid schoolId = Guid.NewGuid();
                 apiResult.Content = await schoolClassServices.GetAllClassesAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;

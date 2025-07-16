@@ -10,7 +10,7 @@ namespace SMSRepository.RepositoryInterfaces
 {
     public interface ITeacherRepository
     {
-        Task<IEnumerable<Teacher>> GetAllTeachersAsync();
+        Task<IEnumerable<Teacher>> GetAllTeachersAsync(Guid schoolId);
         Task<Teacher> GetTeacherByIdAsync(Guid id);
         Task<Teacher> CreateTeacherAsync(Teacher teacher);
         Task<Teacher> UpdateTeacherAsync(Teacher teacher);
