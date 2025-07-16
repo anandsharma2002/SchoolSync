@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Mail, Users } from "lucide-react";
 import { useTeachers } from "@/hooks/useTeachers";
-
+import TeachersSkeleton from "@/skeletons/TeachersSkeleton";
 
 const Teachers: React.FC = () => {
   // const teachers = [
@@ -64,10 +64,10 @@ const Teachers: React.FC = () => {
 
   // const [teachers, setTeachers] = useState([]);
 
-  const {data:teachers, isLoading, isError,error} = useTeachers();
+  const { data: teachers, isLoading, isError, error } = useTeachers();
 
-  if(isLoading) return <h1>Loading.....</h1>
-  if(isError) return <h1>"Error: "{error.message}</h1>;
+  if (isLoading) return <TeachersSkeleton />;
+  if (isError) return <h1>"Error: "{error.message}</h1>;
 
   return (
     <div className="space-y-6">

@@ -30,8 +30,7 @@ import {
 } from "@/components/ui/pagination";
 import { useStudent } from "@/hooks/useStudents";
 import { useClasses } from "@/hooks/useClasses";
-
-
+import StudentsSkeleton from "@/skeletons/StudentsSkeleton";
 
 interface Student {
   id: string;
@@ -148,12 +147,17 @@ const Students: React.FC = () => {
   const studentQuery = useStudent();
   const classQuery = useClasses();
 
-  if(studentQuery.isLoading || classQuery.isLoading) return <h1>Loading....</h1>
-  if(studentQuery.isError || classQuery.isError) return <h1>"Error:"{studentQuery.isError},{classQuery.isError}</h1>
+  if (studentQuery.isLoading || classQuery.isLoading)
+    return <StudentsSkeleton />;
+  if (studentQuery.isError || classQuery.isError)
+    return (
+      <h1>
+        "Error:"{studentQuery.isError},{classQuery.isError}
+      </h1>
+    );
 
   const students = studentQuery.data;
   const classes = classQuery.data;
-
 
   // Filter students based on search term and class filter
   const filteredStudents = students.filter((student) => {
@@ -315,10 +319,12 @@ const Students: React.FC = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium text-gray-900">
-                          {student.firstName +" "+ student.lastName}
+                          {student.firstName + " " + student.lastName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {student.studentMailId !== null ?student.studentMailId: student.parentEmailId}
+                          {student.studentMailId !== null
+                            ? student.studentMailId
+                            : student.parentEmailId}
                         </div>
                       </div>
                     </TableCell>
@@ -330,18 +336,24 @@ const Students: React.FC = () => {
                       <div className="space-y-1">
                         <div className="flex items-center text-sm text-gray-600">
                           <Phone className="h-3 w-3 mr-1" />
-                          {student.phoneNumber !== null ? student.phoneNumber : student.parentPhoneNumber}
+                          {student.phoneNumber !== null
+                            ? student.phoneNumber
+                            : student.parentPhoneNumber}
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
                           <Mail className="h-3 w-3 mr-1" />
-                          {student.studentMailId !== null ?student.studentMailId: student.parentEmailId}
+                          {student.studentMailId !== null
+                            ? student.studentMailId
+                            : student.parentEmailId}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <div className="text-sm font-medium">
-                          {student.fatherName !== null ? student.fatherName: student.motherName}
+                          {student.fatherName !== null
+                            ? student.fatherName
+                            : student.motherName}
                         </div>
                         <div className="text-sm text-gray-500">
                           {student.parentPhoneNumber}

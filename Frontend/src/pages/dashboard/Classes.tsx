@@ -1,14 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Book, Eye, Pencil, Trash2, GraduationCap } from "lucide-react";
-import AddClassModal from "@/components/AddClassModal";
-import EditClassModal from "@/components/EditClassModal";
-import ViewClassModal from "@/components/ViewClassModal";
-import DeleteClassModal from "@/components/DeleteClassModal";
 import { useClasses } from "@/hooks/useClasses";
+import { useQueryClient } from "@tanstack/react-query";
+import AddClassModal from "@/utility/classes/AddClassModal";
+import EditClassModal from "@/utility/classes/EditClassModal";
+import ViewClassModal from "@/utility/classes/ViewClassModal";
+import DeleteClassModal from "@/utility/classes/DeleteClassModal";
+import ClassesSkeleton from "@/skeletons/ClassesSkeleton";
 
-const Classes: React.FC = () => {
+interface ClassesProps {
+  schoolId: string;
+}
+
+const Classes: React.FC<ClassesProps> = ({ schoolId }) => {
   const {
     data: classes,
     isLoading,
@@ -16,16 +22,18 @@ const Classes: React.FC = () => {
     addClass,
     editClass,
     deleteClass,
-  } = useClasses();
+  } = useClasses(schoolId); // Pass schoolId to useClasses
 
-  const [selectedClass, setSelectedClass] = useState(null);
+  const queryClient = useQueryClient();
+
+  const [selectedClass, setSelectedClass] = useState<>(null);
   const [modal, setModal] = useState<"add" | "edit" | "view" | "delete" | null>(
     null
   );
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
-  const openModal = (type, classItem = null) => {
+  const openModal = (type: "add" | "edit" | "view" | "delete", classItem) => {
     setSelectedClass(classItem);
     setModal(type);
     setModalError(null);
@@ -41,7 +49,7 @@ const Classes: React.FC = () => {
     setModalLoading(true);
     setModalError(null);
     try {
-      await addClass(newClass);
+      await addClass({ newClass }); // Pass as object
       closeModal();
     } catch (err) {
       setModalError(err instanceof Error ? err.message : "Failed to add class");
@@ -54,7 +62,7 @@ const Classes: React.FC = () => {
     setModalLoading(true);
     setModalError(null);
     try {
-      await editClass(updatedClass);
+      await editClass({ updatedClass }); // Pass as object
       closeModal();
     } catch (err) {
       setModalError(
@@ -65,11 +73,11 @@ const Classes: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     setModalLoading(true);
     setModalError(null);
     try {
-      await deleteClass(id);
+      await deleteClass({ id }); // Pass as object
       closeModal();
     } catch (err) {
       setModalError(
@@ -79,6 +87,8 @@ const Classes: React.FC = () => {
       setModalLoading(false);
     }
   };
+
+  if (isLoading) return <ClassesSkeleton />;
 
   return (
     <div className="space-y-6">
@@ -100,31 +110,15 @@ const Classes: React.FC = () => {
         </Button>
       </div>
 
-      {error && (
-        <div className="text-red-500 text-sm">
-          ⚠️ Error loading classes: {error.message}
-        </div>
-      )}
-
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center text-center py-16 px-6 mt-12">
+        <div className="flex flex-col items-center justify-center text-center py-20 px-6 mt-12 animate-pulse">
           <div className="bg-gray-200 rounded-full p-4 mb-4">
             <GraduationCap className="h-12 w-12 text-primary-700" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-primary-800 mb-2">
-            No Classes Found
-          </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-md mb-6">
-            🚀 It looks like you haven’t added any classes yet. Start by
-            creating your first class.
-          </p>
-          <Button
-            onClick={() => openModal("add")}
-            className="flex items-center space-x-2 w-full sm:w-auto"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add New Class</span>
-          </Button>
+          <div className="h-6 w-48 bg-gray-300 rounded mb-3"></div>
+          <div className="h-4 w-80 max-w-full bg-gray-200 rounded mb-2"></div>
+          <div className="h-4 w-64 max-w-full bg-gray-200 rounded mb-6"></div>
+          <div className="h-10 w-40 bg-primary-600/70 rounded-md"></div>
         </div>
       ) : Array.isArray(classes) && classes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -170,7 +164,6 @@ const Classes: React.FC = () => {
                     </div>
                   );
                 })}
-
                 <div className="pt-3 space-y-2 w-full">
                   <div className="flex gap-2 w-full">
                     <Button
@@ -204,12 +197,27 @@ const Classes: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-gray-500">
-          No classes to display.
+        <div className="flex flex-col items-center justify-center text-center py-16 px-6 mt-12">
+          <div className="bg-gray-200 rounded-full p-4 mb-4">
+            <GraduationCap className="h-12 w-12 text-primary-700" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-primary-800 mb-2">
+            No Classes Found
+          </h2>
+          <p className="text-gray-600 text-base sm:text-lg max-w-md mb-6">
+            🚀 It looks like you haven’t added any classes yet. Start by
+            creating your first class.
+          </p>
+          <Button
+            onClick={() => openModal("add")}
+            className="flex items-center space-x-2 w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add New Class</span>
+          </Button>
         </div>
       )}
 
-      {/* Modals */}
       {modal === "add" && (
         <AddClassModal
           onClose={closeModal}
