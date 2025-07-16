@@ -14,6 +14,7 @@ namespace SMSDataModel.Model.AutoMapper
         public AnnouncementAutomapper()
         {
             CreateMap<Announcement, CreateAnnouncementRqstDto>().ReverseMap();
+            CreateMap<Announcement, UpdateAnnouncementRequestDto>().ReverseMap();
         }
     }
 }

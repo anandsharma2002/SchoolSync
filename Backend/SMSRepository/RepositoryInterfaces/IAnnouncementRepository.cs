@@ -9,7 +9,7 @@ namespace SMSRepository.RepositoryInterfaces
 {
     public interface IAnnouncementRepository
     {
-        Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync();
+        Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync(Guid schoolid);
         Task<Announcement> GetAnnouncementByIdAsync(Guid AnnoucementId);
         Task<Announcement> CreateAnnouncementAsync(Announcement announcement);
         Task<Announcement> UpdateAnnouncementAsync(Announcement updatedAnnouncement);

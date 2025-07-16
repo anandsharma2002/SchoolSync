@@ -17,9 +17,9 @@ namespace SMSRepository.Repository
         {
             _Context = context;
         }
-        public async Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync()
+        public async Task<IEnumerable<Announcement>> GetAllAnnouncemetsAsync(Guid schoolid)
         {
-            return await _Context.Announcements.ToListAsync();
+            return await _Context.Announcements.Where(x=>x.SchoolId== schoolid).ToListAsync();
         }
         public async Task<Announcement> GetAnnouncementByIdAsync(Guid AnnoucementId)
         {
