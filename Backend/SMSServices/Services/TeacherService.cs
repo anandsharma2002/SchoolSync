@@ -20,9 +20,9 @@ namespace SMSServices.Services
             _teacherRepository = teacherRepository;
             this.mapper = mapper;
         }
-        public async Task<IEnumerable<Teacher>> GetAllTeachersAsync()
+        public async Task<IEnumerable<Teacher>> GetAllTeachersAsync(Guid schoolId)
         {
-            return await _teacherRepository.GetAllTeachersAsync();
+            return await _teacherRepository.GetAllTeachersAsync(schoolId);
         }
         public async Task<Teacher> GetTeacherByIdAsync(Guid id)
         {
@@ -36,21 +36,16 @@ namespace SMSServices.Services
         public async Task<Teacher> CreateTeacherAsync(CreateTeacherRqstDto teacherRqstDto)
         {
             var newTeacher = mapper.Map<Teacher>(teacherRqstDto);
-
-            // Needs to be change [static data]
-            //newTeacher.SchoolId = Guid.Parse("0197deb0-7f42-74f5-9f07-da0bec1cc523");
-
-
             var result = await _teacherRepository.CreateTeacherAsync(newTeacher);
             return result;
         }
 
-        public async Task<Teacher> UpdateTeacherAsync(Guid id, CreateTeacherRqstDto teacherRqstDto)
+        public async Task<Teacher> UpdateTeacherAsync(Guid id, UpdateTeacherRequestDto updateTeacherRequestDto)
         {
             var existingTeacher = await _teacherRepository.GetTeacherByIdAsync(id);
             if(existingTeacher != null)
             {
-                var teacher = mapper.Map(teacherRqstDto, existingTeacher);
+                var teacher = mapper.Map(updateTeacherRequestDto, existingTeacher);
                 var result = await _teacherRepository.UpdateTeacherAsync(teacher);
                 return result;
             }

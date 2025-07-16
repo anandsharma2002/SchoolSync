@@ -33,7 +33,8 @@ namespace SMSPrototype1.Controllers
             }
             try
             {
-                apiResult.Content = await _teacherservice.GetAllTeachersAsync();
+                Guid schoolId = Guid.NewGuid(); // This should be replaced with actual schoolId retrieval logic
+                apiResult.Content = await _teacherservice.GetAllTeachersAsync(schoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -87,12 +88,12 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpPut("{id}")]
-        public async Task<ApiResult<Teacher>> UpdateTeacherAsync([FromRoute] Guid id, [FromBody] CreateTeacherRqstDto teacherRqstDto)
+        public async Task<ApiResult<Teacher>> UpdateTeacherAsync([FromRoute] Guid id, [FromBody] UpdateTeacherRequestDto updateTeacherRequestDto)
         {
             var apiResult = new ApiResult<Teacher>();
             try
             {
-                apiResult.Content = await _teacherservice.UpdateTeacherAsync(id, teacherRqstDto);
+                apiResult.Content = await _teacherservice.UpdateTeacherAsync(id, updateTeacherRequestDto);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;

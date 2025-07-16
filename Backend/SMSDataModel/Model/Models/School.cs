@@ -27,6 +27,9 @@ namespace SMSDataModel.Model.Models
         public DateOnly? SubscriptionDate { get; set; }
         public bool IsSoftDeleted { get; set; } = false;
 
+        public Guid? UserId { get; set; }
+        public ApplicationUser User { get; set; }
+
 
     }
 }

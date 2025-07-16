@@ -20,7 +20,7 @@ namespace SMSDataModel.Model.Models
         public Guid ClassId { get; set; }
         public SchoolClass Class { get; set; }
         // User Id
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public ApplicationUser User { get; set; }
 
 
