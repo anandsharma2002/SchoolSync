@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
 using SMSRepository.Repository;
@@ -23,10 +24,12 @@ namespace SMSServices.Services
             this.mapper = mapper;
         }
 
-        public async Task<IEnumerable<Student>> GetAllStudentAsync()
+        public async Task<IEnumerable<Student>> GetAllStudentAsync(Guid schoolId)
         {
-            return await _studentRepository.GetAllStudentAsync();
+            return await _studentRepository.GetAllStudentAsync(schoolId);
         }
+
+
         public async Task<Student> GetStudentByIdAsync(Guid studentId)
         {
             var result = await _studentRepository.GetStudentByIdAsync(studentId);
@@ -34,7 +37,7 @@ namespace SMSServices.Services
             {
                 return result;
             }
-            throw new Exception("Student with this ID not found");
+            throw new Exception("Student not found");
         }
 
         
@@ -45,7 +48,7 @@ namespace SMSServices.Services
             {
                 return result;
             }
-            throw new Exception("Student with class ID not found");
+            throw new Exception("Students with class Id not found");
         }
 
 
@@ -55,12 +58,12 @@ namespace SMSServices.Services
             var result = await _studentRepository.CreateStudentAsync(newStudent);
             return result;
         }
-        public async Task<Student> UpdateStudentAsync(Guid id, CreateStudentRqstDto studentRqstDto)
+        public async Task<Student> UpdateStudentAsync(Guid id, UpdateStudentRequestDto updateStudentRequestDto)
         {
             var existingStudent = await _studentRepository.GetStudentByIdAsync(id);
             if (existingStudent != null)
             {
-                mapper.Map(studentRqstDto, existingStudent);
+                existingStudent = mapper.Map(updateStudentRequestDto, existingStudent);
                 var result = await _studentRepository.UpdateStudentAsync(existingStudent);
                 return result;
             }

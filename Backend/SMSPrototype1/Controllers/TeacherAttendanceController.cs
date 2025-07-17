@@ -19,10 +19,10 @@ namespace SMSPrototype1.Controllers
         }
 
         [HttpGet("GetTeacherAttendance")]
-        public async Task<ApiResult<IEnumerable<TeacherAttendance>>> GetAllAttendancesOfTeachersAsync()
+        public async Task<ApiResult<IEnumerable<Attendance>>> GetAllAttendancesOfTeachersAsync()
         {
 
-            var apiResult = new ApiResult<IEnumerable<TeacherAttendance>>();
+            var apiResult = new ApiResult<IEnumerable<Attendance>>();
             try
             {
                 apiResult.Content = await _teacherAttendanceService.GetAllAttendancesOfTeachersAsync();
@@ -39,9 +39,9 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpGet("GetTeacherByAttendanceId/{teacherAttendanceid}")]
-        public async Task<ApiResult<TeacherAttendance>> GetTeacherByAttendanceIdAsync([FromRoute] Guid teacherAttendanceid)
+        public async Task<ApiResult<Attendance>> GetTeacherByAttendanceIdAsync([FromRoute] Guid teacherAttendanceid)
         {
-            var apiResult = new ApiResult<TeacherAttendance>();
+            var apiResult = new ApiResult<Attendance>();
             try
             {
                 apiResult.Content = await _teacherAttendanceService.GetTeacherByAttendanceIdAsync(teacherAttendanceid);
@@ -60,9 +60,9 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpPost("createTeacherAttendance")]
-        public async Task<ApiResult<TeacherAttendance>> CreateAttendanceAsync([FromBody] CreateTeacherAttendanceDto newAttendance)
+        public async Task<ApiResult<Attendance>> CreateAttendanceAsync([FromBody] CreateTeacherAttendanceDto newAttendance)
         {
-            var apiResult = new ApiResult<TeacherAttendance>();
+            var apiResult = new ApiResult<Attendance>();
             try
             {
                 apiResult.Content = await _teacherAttendanceService.CreateTeacherAttendanceAsync(newAttendance);
@@ -79,9 +79,9 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpPut("{teacherId}")]
-        public async Task<ApiResult<TeacherAttendance>> UpdateTeacherAttendandanceAsync([FromRoute] Guid teacherId, [FromBody] CreateTeacherAttendanceDto updatedTeacherAttendance)
+        public async Task<ApiResult<Attendance>> UpdateTeacherAttendandanceAsync([FromRoute] Guid teacherId, [FromBody] CreateTeacherAttendanceDto updatedTeacherAttendance)
         {
-            var apiResult = new ApiResult<TeacherAttendance>();
+            var apiResult = new ApiResult<Attendance>();
             try
             {
                 apiResult.Content = await _teacherAttendanceService.UpdatedTeacherAttendanceAsync(teacherId, updatedTeacherAttendance);
@@ -100,9 +100,9 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpDelete("{attendanceId}")]
-        public async Task<ApiResult<TeacherAttendance>> DeleteTeacherAttendanceAsync([FromRoute] Guid attendanceId)
+        public async Task<ApiResult<Attendance>> DeleteTeacherAttendanceAsync([FromRoute] Guid attendanceId)
         {
-            var apiResult = new ApiResult<TeacherAttendance>();
+            var apiResult = new ApiResult<Attendance>();
             try
             {
                 apiResult.Content = await _teacherAttendanceService.DeleteTeacherAttendanceAsync(attendanceId);

@@ -16,11 +16,13 @@ namespace SMSServices.Services
             this.classRepository = classRepository;
             this.mapper = mapper;
         }
-        public async Task<List<SchoolClass>> GetAllClassesAsync()
+        public async Task<List<SchoolClass>> GetAllClassesAsync(Guid schoolId)
         {
-            var result = await classRepository.GetAllClassesAsync();
+            var result = await classRepository.GetAllClassesAsync(schoolId);
             return result;
         }
+
+        // Not now
         public async Task<SchoolClass> GetClassByIdAsync(Guid id)
         {
             var result = await classRepository.GetClassByIdAsync(id);
@@ -30,25 +32,20 @@ namespace SMSServices.Services
             }
             throw new Exception("Class with this Id not found");
         }
-        public async Task<SchoolClass> CreateClassAsync(CreateClassRequestDto newClass)
+        public async Task<SchoolClass> CreateClassAsync(CreateClassRequestDto createClassRequestDto)
         {
-            var new1Class = mapper.Map<SchoolClass>(newClass);
-            //var schoolClass = new SchoolClass
-            //{
-            //    ClassName = newClass.ClassName,
-            //    SchoolId = newClass.SchoolId,
-            //};
-            var result = await classRepository.CreateClassAsync(new1Class);
+            var newClass = mapper.Map<SchoolClass>(createClassRequestDto);
+            var result = await classRepository.CreateClassAsync(newClass);
             return result;
         }
-        public async Task<SchoolClass> UpdateClassAsync(Guid id, CreateClassRequestDto updatedClass)
+        public async Task<SchoolClass> UpdateClassAsync(Guid classId, UpdateClassRequestDto updatedClass)
         {
-            var schoolClass = await classRepository.GetClassByIdAsync(id);
+            var schoolClass = await classRepository.GetClassByIdAsync(classId);
             if (schoolClass != null)
             {
-                mapper.Map(updatedClass, schoolClass);
-                //schoolClass.ClassName = updatedClass.ClassName;
-                //schoolClass.SchoolId = updatedClass.SchoolId;
+                schoolClass.Name = updatedClass.Name;
+                schoolClass.Section = updatedClass.Section;
+                schoolClass.ClassTeacherId = updatedClass.ClassTeacherId;
                 var result = await classRepository.UpdateClassAsync(schoolClass);
                 return result;
             }

@@ -8,10 +8,10 @@ namespace SMSDataModel.Model.Models
 {
     public class Attendance
     {
-        public Guid AttendanceId { get; set; }
-        public Guid StudentId { get; set; }
+        public Guid Id { get; set; }
         public DateOnly Date { get; set; }
         public string Status { get; set; }
-        public Student Student { get; set; }
+        public Guid? UserId { get; set; }
+        public ApplicationUser User { get; set; }
     } 
 }

@@ -26,7 +26,7 @@ namespace SMSRepository.Repository
             var totalClasses = await _Context.Classes.CountAsync();
             var totalTeachers = await _Context.Teachers.CountAsync();
             var totalPresentStudents = await _Context.Attendance.Where(x=>x.Date== DateOnly.FromDateTime(DateTime.Now) && x.Status.Equals("Present")).CountAsync();
-            var totalPresentTeachers = await _Context.TeachersAttendance.Where(x=>x.Date== DateOnly.FromDateTime(DateTime.Now) && x.Status.Equals("Present")).CountAsync();
+            var totalPresentTeachers = await _Context.Attendance.Where(x=>x.Date== DateOnly.FromDateTime(DateTime.Now) && x.Status.Equals("Present")).CountAsync();
             var result = new HomeCombinedDetails
             {
                 TotalSchools = totalSchools,
@@ -42,8 +42,9 @@ namespace SMSRepository.Repository
 
         public async Task<HomeCombinedDetails> DashboardCombinedDetail(Guid schoolId)
         {
-            var totalStudents = await _Context.Students.Where(x=>x.SchoolId==schoolId).CountAsync();
-            var totalSchools = await _Context.Schools.Where(x => x.SchoolId == schoolId).CountAsync();
+            // Need to correct
+            var totalStudents = await _Context.Students.Where(x=>x.Id==schoolId).CountAsync();
+            var totalSchools = await _Context.Schools.Where(x => x.Id == schoolId).CountAsync();
             var totalClasses = await _Context.Classes.Where(x => x.SchoolId == schoolId).CountAsync();
             var totalTeachers = await _Context.Teachers.Where(x => x.SchoolId == schoolId).CountAsync();
             //var totalPresentStudents = await _Context.Attendance.Where(x => x.SchoolId==schoolId && x.Date == DateOnly.FromDateTime(DateTime.Now) && x.Status.Equals("Present")).CountAsync();

@@ -25,7 +25,7 @@ namespace SMSRepository.Repository
         }
         public async Task<Attendance> GetAttendanceByIdAsync(Guid id)
         {
-            var result = await _context.Attendance.FirstOrDefaultAsync(s => s.AttendanceId == id);
+            var result = await _context.Attendance.FirstOrDefaultAsync(s => s.Id == id);
             return result;
         }
         public async Task<Attendance> CreateAttendanceAsync(Attendance newAttendanceRqst)

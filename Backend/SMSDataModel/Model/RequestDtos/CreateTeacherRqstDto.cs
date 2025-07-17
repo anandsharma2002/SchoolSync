@@ -5,23 +5,21 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SMSDataModel.Model.Models;
 
 namespace SMSDataModel.Model.RequestDtos
 {
     public class CreateTeacherRqstDto
     {
         [Required]
-        public string TeacherName { get; set; }
+        public string Name { get; set; }
         [Required]
         [EmailAddress]
-        public string TeacherEmailId { get; set; }
-        [EmailAddress]
-        public string ?TeacherMailId { get; set; }
+        public string Email { get; set; }
         [Required]
         [Phone]
-        public string PhoneNumber { get; set; }
-        [Required]
-        public string Subject { get; set; }
+        [MaxLength(12)]
+        public string Phone { get; set; }
         [Required]
         public string Address { get; set; }
         [Required]

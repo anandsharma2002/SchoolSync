@@ -21,16 +21,20 @@ namespace SMSRepository.Repository
             _context = context;
         }
 
-        public async Task<List<SchoolClass>> GetAllClassesAsync()
+        public async Task<List<SchoolClass>> GetAllClassesAsync(Guid schoolId)
         {
-            var result = await _context.Classes.ToListAsync();
+            var result = await _context.Classes.Where(x=>x.SchoolId==schoolId).ToListAsync();
             return result;
         }
-        public async Task<SchoolClass> GetClassByIdAsync(Guid id)
+
+        // Not now
+        public async Task<SchoolClass> GetClassByIdAsync(Guid classId)
         {
-            var result = await _context.Classes.FirstOrDefaultAsync(s => s.ClassId == id);
+            var result = await _context.Classes.FirstOrDefaultAsync(s => s.Id == classId);
             return result;
         }
+
+
         public async Task<SchoolClass> CreateClassAsync(SchoolClass newClass)
         {
             var result = await _context.Classes.AddAsync(newClass);
