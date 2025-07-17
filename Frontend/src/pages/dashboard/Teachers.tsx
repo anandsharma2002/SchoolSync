@@ -90,7 +90,7 @@ const Teachers: React.FC = () => {
   ];
 
   const filteredTeachers = teachers.filter((teacher) => {
-    const fullName = teacher.teacherName.toLowerCase();
+    const fullName = teacher.name.toLowerCase();
     const matchesSearch =
       fullName.includes(searchTerm.toLowerCase()) ||
       teacher.teacherEmailId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -150,7 +150,7 @@ const Teachers: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Subject</TableHead>
+                {/* <TableHead>Subject</TableHead> */}
                 <TableHead>Phone</TableHead>
                 <TableHead>Address</TableHead>
                 <TableHead>Status</TableHead>
@@ -162,15 +162,15 @@ const Teachers: React.FC = () => {
                 <TableRow key={teacher.teacherId}>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{teacher.teacherName}</div>
+                      <div className="font-medium">{teacher.name}</div>
                       <div className="text-sm text-gray-500 flex items-center">
                         <Mail className="h-3 w-3 mr-1" />
-                        {teacher.teacherEmailId}
+                        {teacher.email}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{teacher.subject}</TableCell>
-                  <TableCell>{teacher.phoneNumber}</TableCell>
+                  {/* <TableCell>{teacher.subject}</TableCell> */}
+                  <TableCell>{teacher.phone}</TableCell>
                   <TableCell>
                     <div className="text-sm text-gray-600 truncate max-w-xs">
                       {teacher.address}

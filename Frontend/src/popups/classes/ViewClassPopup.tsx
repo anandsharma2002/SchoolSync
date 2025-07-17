@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, UserCheck, Book, MapPin, Clock } from 'lucide-react';
+const server_url = import.meta.env.VITE_API_URL;
 
 interface ViewClassPopupProps {
   isOpen: boolean;
@@ -10,7 +11,30 @@ interface ViewClassPopupProps {
   classData: any;
 }
 
+
+  
+
+ 
+
+
 const ViewClassPopup: React.FC<ViewClassPopupProps> = ({ isOpen, onClose, classData }) => {
+const [students,setStudents] =  useState([]);
+
+   const fetchStudents = async() =>{
+    const res = await fetch(`${server_url}/api/Student`);
+    if(!res.ok) throw new Error(res.statusText);
+    const json = await res.json();
+    if(!json.isSuccess) throw new Error(json.errorMessage);
+    console.log("Students"+json.content);
+    setStudents(json.content);
+    return json;
+  }
+
+  useEffect(()=>{
+    const timeout =  setTimeout(()=>fetchStudents(),1000);
+    return () => clearTimeout(timeout);
+  },[])
+
   if (!classData) return null;
 
   return (
@@ -19,7 +43,7 @@ const ViewClassPopup: React.FC<ViewClassPopupProps> = ({ isOpen, onClose, classD
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Book className="h-5 w-5" />
-            {classData.className}{classData.classSection}
+            {classData.name}{classData.section}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6">
@@ -30,7 +54,7 @@ const ViewClassPopup: React.FC<ViewClassPopupProps> = ({ isOpen, onClose, classD
                 <span className="text-sm font-medium">Class Teacher</span>
               </div>
               <p className="text-sm text-muted-foreground pl-6">
-                {classData.classTeacher || 'Not assigned'}
+                {classData.classTeacher.name || 'Not assigned'}
               </p>
             </div>
             <div className="space-y-3">
@@ -39,7 +63,7 @@ const ViewClassPopup: React.FC<ViewClassPopupProps> = ({ isOpen, onClose, classD
                 <span className="text-sm font-medium">Total Students</span>
               </div>
               <p className="text-sm text-muted-foreground pl-6">
-                {classData.students || 0}
+               {students.filter((student)=>student.classId === classData.id).length ?? "N/A"}
               </p>
             </div>
           </div>
@@ -65,7 +89,7 @@ const ViewClassPopup: React.FC<ViewClassPopupProps> = ({ isOpen, onClose, classD
             </div>
           </div>
 
-          {classData.room && (
+          {/* {classData.room && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -96,7 +120,7 @@ const ViewClassPopup: React.FC<ViewClassPopupProps> = ({ isOpen, onClose, classD
                 {classData.description}
               </p>
             </div>
-          )}
+          )} */}
 
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Status:</span>

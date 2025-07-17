@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+const server_url = import.meta.env.VITE_API_URL;
 
 interface AddClassPopupProps {
   isOpen: boolean;
@@ -30,9 +31,9 @@ const AddClassPopup: React.FC<AddClassPopupProps> = ({
   onSubmit,
 }) => {
   const [formData, setFormData] = useState({
-    className: "",
-    classSection: "",
-    classTeacher: "",
+    name: "",
+    section: "",
+    classTeacherId: "",
     // capacity: "",
     // room: "",
     // description: "",
@@ -42,7 +43,7 @@ const AddClassPopup: React.FC<AddClassPopupProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.className || !formData.classSection) {
+    if (!formData.name || !formData.section) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -53,15 +54,31 @@ const AddClassPopup: React.FC<AddClassPopupProps> = ({
 
     onSubmit(formData);
     setFormData({
-      className: "",
-      classSection: "",
-      classTeacher: "",
+      name: "",
+      section: "",
+      classTeacherId: "",
       // capacity: "",
       // room: "",
       // description: "",
     });
     onClose();
   };
+
+  const [teachers,setTeachers] = useState([]);
+
+  const fetchTeachers = async() =>{
+      const res = await fetch(`${server_url}/api/Teacher`);
+      if(!res.ok) throw new Error(res.statusText);
+      const json = await res.json();
+      if(!json.isSuccess) throw new Error(json.errorMessage);
+      setTeachers(json.content);
+      return json;
+    }
+  
+    useEffect(()=>{
+       const timeout =  setTimeout(()=>fetchTeachers(),1000);
+      return () => clearTimeout(timeout);
+    },[])
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -76,38 +93,36 @@ const AddClassPopup: React.FC<AddClassPopupProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="className">Class Name *</Label>
+              <Label htmlFor="name">Class Name *</Label>
               <Input
-                id="className"
-                value={formData.className}
-                onChange={(e) => handleChange("className", e.target.value)}
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
                 placeholder="e.g., Grade 10"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="classSection">Section *</Label>
+              <Label htmlFor="section">Section *</Label>
               <Input
-                id="classSection"
-                value={formData.classSection}
-                onChange={(e) => handleChange("classSection", e.target.value)}
+                id="section"
+                value={formData.section}
+                onChange={(e) => handleChange("section", e.target.value)}
                 placeholder="e.g., A"
                 required
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="classTeacher">Class Teacher</Label>
+            <Label htmlFor="classTeacherId">Class Teacher</Label>
             <Select
-              onValueChange={(value) => handleChange("classTeacher", value)}
+              onValueChange={(value) => handleChange("classTeacherId", value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select class teacher" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="teacher1">Ms. Sarah Smith</SelectItem>
-                <SelectItem value="teacher2">Mr. John Johnson</SelectItem>
-                <SelectItem value="teacher3">Ms. Emily Davis</SelectItem>
+                {teachers?.map((teacher) => (<SelectItem value={teacher.id}>{teacher.name}</SelectItem> ))}
               </SelectContent>
             </Select>
           </div>

@@ -1,10 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+const server_url = import.meta.env.VITE_API_URL;
 
 interface EditClassPopupProps {
   isOpen: boolean;
@@ -13,48 +26,68 @@ interface EditClassPopupProps {
   classData: any;
 }
 
-const EditClassPopup: React.FC<EditClassPopupProps> = ({ isOpen, onClose, onSubmit, classData }) => {
+const EditClassPopup: React.FC<EditClassPopupProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  classData,
+}) => {
+  const [teachers, setTeachers] = useState([]);
+
+  const fetchTeachers = async () => {
+    const res = await fetch(`${server_url}/api/Teacher`);
+    if (!res.ok) throw new Error(res.statusText);
+    const json = await res.json();
+    if (!json.isSuccess) throw new Error(json.errorMessage);
+    setTeachers(json.content);
+    return json;
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => fetchTeachers(), 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const [formData, setFormData] = useState({
-    className: '',
-    classSection: '',
-    classTeacher: '',
-    capacity: '',
-    room: '',
-    description: ''
+    name: "",
+    section: "",
+    classTeacherId: "",
+    // capacity: "",
+    // room: "",
+    // description: "",
   });
   const { toast } = useToast();
 
   useEffect(() => {
     if (classData) {
       setFormData({
-        className: classData.className || '',
-        classSection: classData.classSection || '',
-        classTeacher: classData.classTeacher || '',
-        capacity: classData.capacity?.toString() || '',
-        room: classData.room || '',
-        description: classData.description || ''
+        name: classData.name || "",
+        section: classData.section || "",
+        classTeacherId: classData.classTeacherId || "",
+        // capacity: classData.capacity?.toString() || '',
+        // room: classData.room || '',
+        // description: classData.description || ''
       });
     }
   }, [classData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.className || !formData.classSection) {
+
+    if (!formData.name || !formData.section) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
-
-    onSubmit({ ...classData, ...formData });
+    onSubmit({ ...formData, id: classData.id });
     onClose();
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -66,41 +99,50 @@ const EditClassPopup: React.FC<EditClassPopupProps> = ({ isOpen, onClose, onSubm
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="className">Class Name *</Label>
+              <Label htmlFor="name">Class Name *</Label>
               <Input
-                id="className"
-                value={formData.className}
-                onChange={(e) => handleChange('className', e.target.value)}
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
                 placeholder="e.g., Grade 10"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="classSection">Section *</Label>
+              <Label htmlFor="section">Section *</Label>
               <Input
-                id="classSection"
-                value={formData.classSection}
-                onChange={(e) => handleChange('classSection', e.target.value)}
+                id="section"
+                value={formData.section}
+                onChange={(e) => handleChange("section", e.target.value)}
                 placeholder="e.g., A"
                 required
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="classTeacher">Class Teacher</Label>
-            <Select value={formData.classTeacher} onValueChange={(value) => handleChange('classTeacher', value)}>
+            <Label htmlFor="classTeacherId">Class Teacher</Label>
+            <Select
+              value={
+                teachers.find(
+                  (teacher) => teacher.id === formData.classTeacherId
+                )?.name
+              }
+              onValueChange={(value) => handleChange("classTeacherId", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select class teacher" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="teacher1">Ms. Sarah Smith</SelectItem>
-                <SelectItem value="teacher2">Mr. John Johnson</SelectItem>
-                <SelectItem value="teacher3">Ms. Emily Davis</SelectItem>
+                <SelectContent>
+                  {teachers?.map((teacher) => (
+                    <SelectItem value={teacher.id}>{teacher.name}</SelectItem>
+                  ))}
+                </SelectContent>
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+          {/* <div className="grid grid-cols-2 gap-4"> */}
+          {/* <div className="space-y-2">
               <Label htmlFor="capacity">Capacity</Label>
               <Input
                 id="capacity"
@@ -128,7 +170,7 @@ const EditClassPopup: React.FC<EditClassPopupProps> = ({ isOpen, onClose, onSubm
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Class description"
             />
-          </div>
+          </div> */}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
