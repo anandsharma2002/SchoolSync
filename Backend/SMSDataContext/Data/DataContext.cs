@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SMSDataModel.Model.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Text;
+using System.Threading.Tasks;
 
 
 namespace SMSDataContext.Data
@@ -22,7 +23,7 @@ namespace SMSDataContext.Data
         public DbSet<Parents> Parents { get; set; }
         public DbSet<School> Schools { get; set; }
         public DbSet<SchoolClass> Classes { get; set; }
-        public DbSet<Student> Students { get; set; }
+        public DbSet<Student> Students { get; set ; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Teacher> TeacherSubject { get; set; }
@@ -30,8 +31,15 @@ namespace SMSDataContext.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Attendance>()
+            .Property(a => a.Status)
+            .HasConversion<string>();
+
+             builder.Entity<Student>()
+               .Property(s => s.Gender)
+               .HasConversion<string>();
+
             base.OnModelCreating(builder);
-            //base.OnModelCreating(builder);
 
             //// Jab School delete ho, Students auto-delete NA ho
             //builder.Entity<Student>()

@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Book, Eye, Pencil, Trash2, GraduationCap } from "lucide-react";
+import AddClassModal from "@/components/AddClassModal";
+import EditClassModal from "@/components/EditClassModal";
+import ViewClassModal from "@/components/ViewClassModal";
+import DeleteClassModal from "@/components/DeleteClassModal";
 import { useClasses } from "@/hooks/useClasses";
 import ClassesSkeleton from "@/skeletons/ClassesSkeleton";
 import AddClassPopup from "@/popups/classes/AddClassPopup";
@@ -9,7 +13,6 @@ import EditClassPopup from "@/popups/classes/EditClassPopup";
 import ViewClassPopup from "@/popups/classes/ViewClassPopup";
 import DeleteClassPopup from "@/popups/classes/DeleteClassPopup";
 const server_url = import.meta.env.VITE_API_URL;
-
 
 interface ClassesProps {
   schoolId: string;
@@ -23,9 +26,7 @@ interface ClassItem {
   schoolId: string;
 }
 
-
 const Classes: React.FC<ClassesProps> = () => {
-  
   const {
     data: classes,
     isLoading,
@@ -35,77 +36,81 @@ const Classes: React.FC<ClassesProps> = () => {
     deleteClass,
   } = useClasses();
 
-  
-
   const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
-  const [modal, setModal] = useState<"add" | "edit" | "view" | "delete" | null>(null);
+  const [modal, setModal] = useState<"add" | "edit" | "view" | "delete" | null>(
+    null
+  );
   const [isOpen, setIsOpen] = useState(false);
-  
-const [teachers, setTeachers] = useState([]);
-const [students,setStudents] =  useState([]);
 
-  
+  const [teachers, setTeachers] = useState([]);
+  const [students, setStudents] = useState([]);
 
-  const fetchStudents = async() =>{
+  const fetchStudents = async () => {
     const res = await fetch(`${server_url}/api/Student`);
-    if(!res.ok) throw new Error(res.statusText);
+    if (!res.ok) throw new Error(res.statusText);
     const json = await res.json();
-    if(!json.isSuccess) throw new Error(json.errorMessage);
-    console.log("Students"+json.content);
+    if (!json.isSuccess) throw new Error(json.errorMessage);
+    console.log("Students" + json.content);
     setStudents(json.content);
     return json;
-  }
+  };
 
-  useEffect(()=>{
-    const timeout =  setTimeout(()=>fetchStudents(),1000);
+  useEffect(() => {
+    const timeout = setTimeout(() => fetchStudents(), 1000);
     return () => clearTimeout(timeout);
-  },[])
+  }, []);
 
-  const openModal = (
-    type: "add" | "edit" | "view" | "delete",
-    classItem?: ClassItem
-  ) => {
-    setIsOpen(true);
-    setSelectedClass(classItem || null);
+  const openModal = (type, classItem = null) => {
+    setSelectedClass(classItem);
     setModal(type);
+    setModalError(null);
   };
 
   const closeModal = () => {
-    setIsOpen(false);
     setSelectedClass(null);
     setModal(null);
+    setModalError(null);
   };
 
-  const handleAdd = async (newClass: ClassItem) => {
+  const handleAdd = async (newClass) => {
+    setModalLoading(true);
+    setModalError(null);
     try {
-    console.log("Creating:", newClass,);
-    const result = await addClass({ newClass });
-    console.log("Created class:", result);
+      console.log("Creating:", newClass);
+      const result = await addClass({ newClass });
+      console.log("Created class:", result);
       closeModal();
     } catch (err) {
-      console.error(err instanceof Error ? err.message : "Failed to add class");
+      setModalError(err instanceof Error ? err.message : "Failed to add class");
+    } finally {
+      setModalLoading(false);
     }
   };
 
- const handleEdit = async (updatedClass: ClassItem) => {
-  if (!selectedClass) return;
-  try {
-    const classWithId = { ...selectedClass, ...updatedClass };
-    console.log("Sending updated class:", classWithId);
-    await editClass({ updatedClass: classWithId });
-    closeModal();
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : "Failed to update class");
-  }
-};
-
-
-  const handleDelete = async (id: string) => {
+  const handleEdit = async (updatedClass: ClassItem) => {
+    if (!selectedClass) return;
     try {
-      await deleteClass({ id }); 
+      const classWithId = { ...selectedClass, ...updatedClass };
+      console.log("Sending updated class:", classWithId);
+      await editClass({ updatedClass: classWithId });
       closeModal();
     } catch (err) {
-      console.error(err instanceof Error ? err.message : "Failed to delete class");
+      console.error(
+        err instanceof Error ? err.message : "Failed to update class"
+      );
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setModalLoading(true);
+    setModalError(null);
+    try {
+      await deleteClass({ id });
+      closeModal();
+    } catch (err) {
+      console.error(
+        err instanceof Error ? err.message : "Failed to delete class"
+      );
     }
   };
 
@@ -116,19 +121,55 @@ const [students,setStudents] =  useState([]);
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Classes</h2>
-          <p className="text-gray-600 mt-2">Manage all your classes and schedules</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Classes
+          </h2>
+          <p className="text-gray-600 mt-2">
+            Manage all your classes and schedules
+          </p>
         </div>
-        <Button onClick={() => openModal("add")} className="flex items-center space-x-2">
+        <Button
+          onClick={() => openModal("add")}
+          className="flex items-center space-x-2"
+        >
           <Plus className="h-4 w-4" />
           <span>Add New Class</span>
         </Button>
       </div>
 
-      {Array.isArray(classes) && classes.length > 0 ? (
+      {error && (
+        <div className="text-red-500 text-sm">
+          ⚠️ Error loading classes: {error.message}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center text-center py-16 px-6 mt-12">
+          <div className="bg-gray-200 rounded-full p-4 mb-4">
+            <GraduationCap className="h-12 w-12 text-primary-700" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-primary-800 mb-2">
+            No Classes Found
+          </h2>
+          <p className="text-gray-600 text-base sm:text-lg max-w-md mb-6">
+            🚀 It looks like you haven’t added any classes yet. Start by
+            creating your first class.
+          </p>
+          <Button
+            onClick={() => openModal("add")}
+            className="flex items-center space-x-2 w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add New Class</span>
+          </Button>
+        </div>
+      ) : Array.isArray(classes) && classes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {classes.map((classItem: ClassItem) => (
-            <Card key={classItem.id} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={classItem.id}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Book className="h-5 w-5 text-primary-600" />
@@ -147,7 +188,9 @@ const [students,setStudents] =  useState([]);
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Total Students:</span>
                   <span className="text-sm font-medium">
-                    {students.filter((student)=>student.classId === classItem.id).length ?? "N/A"}
+                    {students.filter(
+                      (student) => student.classId === classItem.id
+                    ).length ?? "N/A"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -197,32 +240,43 @@ const [students,setStudents] =  useState([]);
             No Classes Found
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-md mb-6">
-            🚀 It looks like you haven’t added any classes yet. Start by creating your first class.
+            🚀 It looks like you haven’t added any classes yet. Start by
+            creating your first class.
           </p>
-          <Button onClick={() => openModal("add")} className="flex items-center space-x-2">
+          <Button
+            onClick={() => openModal("add")}
+            className="flex items-center space-x-2"
+          >
             <Plus className="h-4 w-4" />
             <span>Add New Class</span>
           </Button>
         </div>
       )}
 
+      {/* Modals */}
       {modal === "add" && (
-        <AddClassPopup isOpen={isOpen} onClose={closeModal} onSubmit={handleAdd} />
+        <AddClassPopup
+          isOpen={isOpen}
+          onClose={closeModal}
+          onSubmit={handleAdd}
+        />
       )}
       {modal === "edit" && selectedClass && (
-        <EditClassPopup
-          isOpen={isOpen}
+        <EditClassModal
           classData={selectedClass}
           onClose={closeModal}
           onSubmit={handleEdit}
         />
       )}
       {modal === "view" && selectedClass && (
-        <ViewClassPopup isOpen={isOpen} classData={selectedClass} onClose={closeModal} />
+        <ViewClassPopup
+          isOpen={isOpen}
+          classData={selectedClass}
+          onClose={closeModal}
+        />
       )}
       {modal === "delete" && selectedClass && (
-        <DeleteClassPopup
-          isOpen={isOpen}
+        <DeleteClassModal
           classData={selectedClass}
           onClose={closeModal}
           onConfirm={() => handleDelete(selectedClass.id)}

@@ -9,10 +9,6 @@ import {
   Eye,
   Mail,
   Phone,
-  Users,
-  UserX,
-  UserCheck,
-  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +30,8 @@ import {
 } from "@/components/ui/pagination";
 import { useStudent } from "@/hooks/useStudents";
 import { useClasses } from "@/hooks/useClasses";
-import StudentsSkeleton from "@/skeletons/StudentsSkeleton";
+
+
 
 interface Student {
   id: string;
@@ -151,17 +148,12 @@ const Students: React.FC = () => {
   const studentQuery = useStudent();
   const classQuery = useClasses();
 
-  if (studentQuery.isLoading || classQuery.isLoading)
-    return <StudentsSkeleton />;
-  if (studentQuery.isError || classQuery.isError)
-    return (
-      <h1>
-        "Error:"{studentQuery.isError},{classQuery.isError}
-      </h1>
-    );
+  if(studentQuery.isLoading || classQuery.isLoading) return <h1>Loading....</h1>
+  if(studentQuery.isError || classQuery.isError) return <h1>"Error:"{studentQuery.isError},{classQuery.isError}</h1>
 
   const students = studentQuery.data;
   const classes = classQuery.data;
+
 
   // Filter students based on search term and class filter
   const filteredStudents = students.filter((student) => {
@@ -215,12 +207,12 @@ const Students: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Students</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-gray-900">
                   {students.length}
                 </p>
               </div>
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-5 w-5 text-blue-600" />
+                <Eye className="h-5 w-5 text-blue-600" />
               </div>
             </div>
           </CardContent>
@@ -229,13 +221,13 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Present Students</p>
+                <p className="text-sm text-gray-600">Active Students</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {students.filter((s) => s.status === "Present").length}
+                  {students.filter((s) => s.status === "Active").length}
                 </p>
               </div>
               <div className="p-2 bg-green-100 rounded-lg">
-                <UserCheck className="h-5 w-5 text-green-600" />
+                <Eye className="h-5 w-5 text-green-600" />
               </div>
             </div>
           </CardContent>
@@ -244,15 +236,13 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">
-                  Students in Other Activities
-                </p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-sm text-gray-600">Graduated</p>
+                <p className="text-2xl font-bold text-blue-600">
                   {students.filter((s) => s.status === "Graduated").length}
                 </p>
               </div>
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Activity className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Eye className="h-5 w-5 text-blue-600" />
               </div>
             </div>
           </CardContent>
@@ -261,11 +251,11 @@ const Students: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Absent</p>
-                <p className="text-2xl font-bold text-red-600">3</p>
+                <p className="text-sm text-gray-600">New This Year</p>
+                <p className="text-2xl font-bold text-purple-600">3</p>
               </div>
-              <div className="p-2 bg-red-100 rounded-lg">
-                <UserX className="h-5 w-5 text-red-600" />
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Plus className="h-5 w-5 text-purple-600" />
               </div>
             </div>
           </CardContent>
@@ -325,12 +315,10 @@ const Students: React.FC = () => {
                     <TableCell>
                       <div>
                         <div className="font-medium text-gray-900">
-                          {student.firstName + " " + student.lastName}
+                          {student.firstName +" "+ student.lastName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {student.studentMailId !== null
-                            ? student.studentMailId
-                            : student.parentEmailId}
+                          {student.studentMailId !== null ?student.studentMailId: student.parentEmailId}
                         </div>
                       </div>
                     </TableCell>
@@ -342,24 +330,18 @@ const Students: React.FC = () => {
                       <div className="space-y-1">
                         <div className="flex items-center text-sm text-gray-600">
                           <Phone className="h-3 w-3 mr-1" />
-                          {student.phoneNumber !== null
-                            ? student.phoneNumber
-                            : student.parentPhoneNumber}
+                          {student.phoneNumber !== null ? student.phoneNumber : student.parentPhoneNumber}
                         </div>
                         <div className="flex items-center text-sm text-gray-600">
                           <Mail className="h-3 w-3 mr-1" />
-                          {student.studentMailId !== null
-                            ? student.studentMailId
-                            : student.parentEmailId}
+                          {student.studentMailId !== null ?student.studentMailId: student.parentEmailId}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <div className="text-sm font-medium">
-                          {student.fatherName !== null
-                            ? student.fatherName
-                            : student.motherName}
+                          {student.fatherName !== null ? student.fatherName: student.motherName}
                         </div>
                         <div className="text-sm text-gray-500">
                           {student.parentPhoneNumber}

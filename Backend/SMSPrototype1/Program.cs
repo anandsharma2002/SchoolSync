@@ -36,7 +36,6 @@ namespace SMSPrototype1
             builder.Services.AddTransient<IStudentService, StudentService>();
             builder.Services.AddTransient<IAttendanceService, AttendanceService>();
             builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
-            builder.Services.AddTransient<ICombinedDetailsServices, CombinedDetailsServices>();
 
 
 
@@ -47,7 +46,6 @@ namespace SMSPrototype1
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
             builder.Services.AddTransient<IAttendanceRepository, AttendanceRepository>();
             builder.Services.AddTransient<ITeacherAttendanceRepository, TeacherAttendanceRepository>();
-
             builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
 
             // AutoMapper
