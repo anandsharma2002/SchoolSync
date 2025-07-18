@@ -152,7 +152,7 @@ const Classes: React.FC<ClassesProps> = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Class Teacher:</span>
                   <span className="text-sm font-medium">
-                    {classItem.classTeacher.name ?? "N/A"}
+                    {classItem.classTeacher?.name ?? "N/A"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

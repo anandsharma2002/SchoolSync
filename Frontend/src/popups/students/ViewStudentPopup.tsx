@@ -14,13 +14,25 @@ interface ViewStudentPopupProps {
   onClose: () => void;
   studentData: {
     id: string;
+    srNumber: string;
+    rollNumber: number;
+    email: string;
     firstName: string;
     lastName: string;
-    email: string;
-    rollNumber: string;
-    className: string;
     dob: string;
-    gender: string;
+    gender: number;
+    classId: string;
+    class: {
+      id: string;
+      name: string;
+      section: string;
+      classTeacherId: string;
+      classTeacher: any; // Adjust type if known
+      schoolId: string;
+      school: any; // Adjust type if known
+    };
+    userId: string | null;
+    user: any; // Adjust type if known
   } | null;
 }
 
@@ -30,6 +42,20 @@ const ViewStudentPopup: React.FC<ViewStudentPopupProps> = ({
   studentData,
 }) => {
   if (!studentData) return null;
+
+  // Map gender numeric value to string (adjust mapping based on backend convention)
+  const getGenderLabel = (gender: number) => {
+    switch (gender) {
+      case 0:
+        return "Male";
+      case 1:
+        return "Female";
+      case 2:
+        return "Other";
+      default:
+        return "N/A";
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -45,15 +71,19 @@ const ViewStudentPopup: React.FC<ViewStudentPopupProps> = ({
           <div className="flex items-center gap-3">
             <Mail className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Email</p>
-              <p className="text-sm">{studentData.email}</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Email
+              </p>
+              <p className="text-sm">{studentData.email || "N/A"}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Hash className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Roll Number</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Roll Number
+              </p>
               <p className="text-sm">{studentData.rollNumber || "N/A"}</p>
             </div>
           </div>
@@ -61,15 +91,23 @@ const ViewStudentPopup: React.FC<ViewStudentPopupProps> = ({
           <div className="flex items-center gap-3">
             <ClipboardList className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Class</p>
-              <p className="text-sm">{studentData.class.name + " " +studentData.class.section || "N/A"}</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Class
+              </p>
+              <p className="text-sm">
+                {studentData.class
+                  ? `${studentData.class.name} ${studentData.class.section}`
+                  : "N/A"}
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Date of Birth</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Date of Birth
+              </p>
               <p className="text-sm">
                 {studentData.dob
                   ? new Date(studentData.dob).toLocaleDateString(undefined, {
@@ -85,8 +123,20 @@ const ViewStudentPopup: React.FC<ViewStudentPopupProps> = ({
           <div className="flex items-center gap-3">
             <User className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-xs font-semibold text-muted-foreground">Gender</p>
-              <p className="text-sm">{studentData.gender || "N/A"}</p>
+              <p className="text-xs font-semibold text-muted-foreground">
+                Gender
+              </p>
+              <p className="text-sm">{getGenderLabel(studentData.gender)}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Hash className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground">
+                SR Number
+              </p>
+              <p className="text-sm">{studentData.srNumber || "N/A"}</p>
             </div>
           </div>
         </div>
