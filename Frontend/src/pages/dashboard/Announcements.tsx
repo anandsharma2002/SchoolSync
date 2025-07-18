@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Bell, Calendar, User } from 'lucide-react';
 import { log } from 'console';
+import { useAnnouncement } from '@/hooks/useAnnouncement';
 
 const Announcements: React.FC = () => {
   // const announcements = [
@@ -33,7 +34,7 @@ const Announcements: React.FC = () => {
   //   },
   // ];
 
-  const [announcements, setAnnouncements] = useState([]);
+  // const [announcements, setAnnouncements] = useState([]);
 
   // useEffect(()=>{
   //   try{
@@ -43,6 +44,8 @@ const Announcements: React.FC = () => {
       
   //   }
   // })
+
+  const {data:announcements, isLoading, error} =  useAnnouncement();
 
   const getPriorityColor = (priority: 'high' | 'medium' | 'low') => {
     switch (priority) {
@@ -66,7 +69,7 @@ const Announcements: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        {announcements.map((announcement) => (
+        {announcements?.map((announcement) => (
           <Card key={announcement.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -74,17 +77,17 @@ const Announcements: React.FC = () => {
                   <Bell className="h-5 w-5 text-primary-600" />
                   <span className="text-lg">{announcement.title}</span>
                 </CardTitle>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(announcement.priority)}`}>
+                {/* <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(announcement.priority)}`}>
                   {announcement.priority} priority
-                </span>
+                </span> */}
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-gray-700">{announcement.content}</p>
+              <p className="text-gray-700">{announcement.detail}</p>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm text-gray-500">
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4" />
-                  <span>{announcement.author}</span>
+                  <span>{announcement.announcedBy}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4" />
