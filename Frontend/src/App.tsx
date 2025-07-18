@@ -23,6 +23,7 @@ import Announcements from "./pages/dashboard/Announcements";
 import Payment from "./pages/dashboard/Payment";
 import Leave from "./pages/dashboard/Leave";
 import ScrollToTop from "./components/ScrollToTop";
+import AttendanceTable from "./pages/dashboard/Attendance";
 
 const queryClient = new QueryClient();
 const schoolId = "FDB0E272-D728-4AC6-ADEF-00CA12F0AC15";
@@ -91,6 +92,10 @@ const App: React.FC = () => (
             <Route path="classes" element={<Classes schoolId={schoolId} />} />
             <Route path="teachers" element={<Teachers schoolId={schoolId} />} />
             <Route path="students" element={<Students schoolId={schoolId} />} />
+            <Route
+              path="attendance"
+              element={<AttendanceTable schoolId={schoolId} />}
+            />
             <Route path="schedule" element={<Schedule schoolId={schoolId} />} />
             <Route
               path="announcements"
