@@ -23,11 +23,11 @@ namespace SMSPrototype1
             var builder = WebApplication.CreateBuilder(args);
 
 
-            //builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+            builder.Services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
             //var connectionString = builder.Configuration.GetConnectionString("PostgresSQLConnectionString")
             //    ?? throw new InvalidOperationException("Invalid!! PostgresSQLConnectionString not found");
 
-            builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+            //builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
 
             // Services Transient
             builder.Services.AddTransient<ISchoolService, SchoolService>();
@@ -36,7 +36,6 @@ namespace SMSPrototype1
             builder.Services.AddTransient<IStudentService, StudentService>();
             builder.Services.AddTransient<IAttendanceService, AttendanceService>();
             builder.Services.AddTransient<IAnnouncementService, AnnouncementService>();
-            builder.Services.AddTransient<ICombinedDetailsServices, CombinedDetailsServices>();
 
 
 
@@ -47,7 +46,6 @@ namespace SMSPrototype1
             builder.Services.AddTransient<IStudentRepository, StudentRepository>();
             builder.Services.AddTransient<IAttendanceRepository, AttendanceRepository>();
             builder.Services.AddTransient<ITeacherAttendanceRepository, TeacherAttendanceRepository>();
-
             builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
 
             // AutoMapper
