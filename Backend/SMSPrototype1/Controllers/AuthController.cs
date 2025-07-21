@@ -1,0 +1,33 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using SMSDataModel.Model.RequestDtos;
+using SMSServices.ServicesInterfaces;
+
+namespace SMSPrototype1.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
+        {
+            _authService= authService;
+        }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto model)
+        {
+            var result = await _authService.RegisterAsync(model);
+            return Ok(result);
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
+        {
+            var token = await _authService.LoginAsync(model);
+            if (token == "Invalid email or password!")
+                return Unauthorized();
+
+            return Ok(new { Token = token });
+        }
+    }
+}

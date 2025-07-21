@@ -11,13 +11,12 @@ using SMSDataModel.Model.Models;
 
 namespace SMSDataContext.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<ApplicationUser>
     {
         public DataContext (DbContextOptions<DataContext> options ) : base (options) { }
-
+        public DbSet<SchoolRole> SchoolRoles { get; set; }
+        public DbSet<UserSchoolRole> UserSchoolRoles { get; set; }
         public DbSet<Announcement> Announcements { get; set; }
-        // Application user with Authentication
-        //public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Parents> Parents { get; set; }
         public DbSet<School> Schools { get; set; }

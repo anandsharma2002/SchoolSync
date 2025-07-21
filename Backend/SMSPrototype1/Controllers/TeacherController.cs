@@ -6,11 +6,13 @@ using SMSDataModel.Model.RequestDtos;
 using SMSRepository.RepositoryInterfaces;
 using SMSServices.ServicesInterfaces;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SMSPrototype1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, SuperAdmin")]
     public class TeacherController : ControllerBase
     {
         private readonly ITeacherService _teacherservice;

@@ -9,6 +9,7 @@ using SMSRepository.RepositoryInterfaces;
 using SMSServices.Services;
 using SMSServices.ServicesInterfaces;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SMSPrototype1.Controllers
 {
@@ -24,6 +25,7 @@ namespace SMSPrototype1.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Teacher, Admin")]
         public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync()
         {
 
@@ -46,8 +48,9 @@ namespace SMSPrototype1.Controllers
 
         }
 
-        // Not now
+        
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResult<SchoolClass>> GetClassByIdAsync([FromRoute]Guid id)
         {
             var apiResult = new ApiResult<SchoolClass>();
@@ -70,6 +73,7 @@ namespace SMSPrototype1.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResult<SchoolClass>> CreateClassAsync([FromBody]CreateClassRequestDto newClass)
         {
             var apiResult = new ApiResult<SchoolClass>();
@@ -100,6 +104,7 @@ namespace SMSPrototype1.Controllers
         
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResult<SchoolClass>> UpdateClassAsync([FromRoute] Guid id, [FromBody] UpdateClassRequestDto updatedClass)
         {
             var apiResult = new ApiResult<SchoolClass>();
@@ -122,6 +127,7 @@ namespace SMSPrototype1.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResult<SchoolClass>> DeleteClassAsync([FromRoute] Guid id)
         {
             var apiResult = new ApiResult<SchoolClass>();

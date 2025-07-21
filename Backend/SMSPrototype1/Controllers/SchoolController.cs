@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model;
 using SMSDataModel.Model.ApiResult;
@@ -23,8 +24,7 @@ namespace SMSPrototype1.Controllers
             this.schoolService = schoolService;
         }
 
-
-
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("GetAllSchoolsAsync")]
         public async Task<ApiResult<IEnumerable<School>>> GetAllSchoolsAsync()
         {
@@ -45,7 +45,7 @@ namespace SMSPrototype1.Controllers
             }
         }
 
-
+        [Authorize(Roles = "SuperAdmin")]
         [HttpGet("GetSchoolByIdAsync/{schoolId}")]
         public async Task<ApiResult<School>> GetSchoolByIdAsync([FromRoute] Guid schoolId)
         {
@@ -68,7 +68,7 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }
         }
-
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost("CreateSchoolAsync")]
         public async Task<ApiResult<School>> CreateSchoolAsync([FromBody] CreateSchoolRequestDto createSchoolRequest)
         {
@@ -98,8 +98,8 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }   
         }
-        
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPut("UpdateSchool/{schoolId}")]
         public async Task<ApiResult<School>> UpdateSchool([FromRoute] Guid schoolId, [FromBody] CreateSchoolRequestDto updateSchool)
         {
@@ -120,11 +120,10 @@ namespace SMSPrototype1.Controllers
                    : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
-            }
-
-            
+            }  
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("{schoolId}")]
         public async Task<ApiResult<School>> DeleteSchool([FromRoute] Guid schoolId)
         {
