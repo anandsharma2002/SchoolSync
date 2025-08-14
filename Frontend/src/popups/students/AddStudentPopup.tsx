@@ -20,7 +20,7 @@ interface AddTeacherPopupProps {
 
 interface TeacherFormData {
   srNumber: string;
-  rollNumber:int
+  rollNumber:string;
   firstName: string;
   lastName: string;
   email: string;
@@ -59,12 +59,15 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
       !formData.srNumber ||
       !formData.firstName ||
       !formData.lastName ||
-      !formData.email
+      !formData.email ||
+      !formData.classId||
+      !formData.dob||
+      !formData.gender
     ) {
       toast({
         title: "Error",
         description:
-          "Please fill in all required fields: Sr No, First Name, Last Name, and Email.",
+          "Please fill in all the fields",
         variant: "destructive",
       });
       return;

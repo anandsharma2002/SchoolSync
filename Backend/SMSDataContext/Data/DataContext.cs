@@ -12,13 +12,15 @@ using System.Threading.Tasks;
 
 namespace SMSDataContext.Data
 {
-    public class DataContext : DbContext
-    {
-        public DataContext (DbContextOptions<DataContext> options ) : base (options) { }
+   public class DataContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+{
+        public DataContext(DbContextOptions<DataContext> options)
+            : base(options)
+        {
+        }
 
         public DbSet<Announcement> Announcements { get; set; }
-        // Application user with Authentication
-        //public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+      
         public DbSet<Attendance> Attendance { get; set; }
         public DbSet<Parents> Parents { get; set; }
         public DbSet<School> Schools { get; set; }
@@ -31,6 +33,8 @@ namespace SMSDataContext.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.Entity<Attendance>()
             .Property(a => a.Status)
             .HasConversion<string>();
@@ -39,7 +43,20 @@ namespace SMSDataContext.Data
                .Property(s => s.Gender)
                .HasConversion<string>();
 
-            base.OnModelCreating(builder);
+
+            builder.Entity<School>()
+               .HasOne(s => s.User)
+               .WithMany()
+               .HasForeignKey(s => s.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ApplicationUser>()
+               .HasOne(u => u.School)
+               .WithMany()
+               .HasForeignKey(u => u.SchoolId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+
 
             //// Jab School delete ho, Students auto-delete NA ho
             //builder.Entity<Student>()
