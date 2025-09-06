@@ -1,15 +1,18 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Npgsql.Replication;
+using SMSDataContext.Data;
+using SMSDataModel.Model.Models;
+using SMSDataModel.Model.RequestDtos;
+using SMSDataModel.Model.ResponseDtos;
+using SMSRepository.RepositoryInterfaces;
+using SMSServices.ServicesInterfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using SMSDataContext.Data;
-using SMSDataModel.Model.Models;
-using SMSDataModel.Model.RequestDtos;
-using SMSRepository.RepositoryInterfaces;
-using SMSServices.ServicesInterfaces;
 
 namespace SMSServices.Services
 {
@@ -27,6 +30,12 @@ namespace SMSServices.Services
         public async Task<IEnumerable<School>> GetAllSchoolsAsync()
         {
             return await schoolRepository.GetAllSchoolsAsync();
+        }
+
+        public async Task<List<SchoolDto>> GetAllSchoolsAsync(string name)
+        {
+            var schoolNames = await schoolRepository.GetAllSchoolsAsync(name);
+            return schoolNames;
         }
         public async Task<School> GetSchoolByIdAsync(Guid schoolId)
         {

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SMSDataModel.Model.Models
+﻿namespace SMSDataModel.Model.Models
 {
     public class School
     {
@@ -22,9 +15,7 @@ namespace SMSDataModel.Model.Models
         public DateOnly? SubscriptionDate { get; set; }
         public bool IsSoftDeleted { get; set; } = false;
 
-        public Guid? UserId { get; set; }
-        public ApplicationUser User { get; set; }
-
-
+        // ✅ Navigation property: A school can have many users
+        public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     }
 }

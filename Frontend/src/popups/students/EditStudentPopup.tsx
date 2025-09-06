@@ -80,7 +80,7 @@ const EditStudentPopup: React.FC<EditStudentPopupProps> = ({
       return;
     }
 
-    onSubmit({ ...formData, id: studentData?.id });
+    onSubmit({ ...formData, studentData });
     onClose();
   };
 

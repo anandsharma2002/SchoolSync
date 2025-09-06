@@ -1,8 +1,18 @@
 import React from "react";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 const DashboardHeader: React.FC = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
       <div className="flex items-center justify-between">
@@ -27,10 +37,20 @@ const DashboardHeader: React.FC = () => {
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
-          <button className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <User className="h-5 w-5" />
-            <span className="text-sm font-medium hidden sm:block">Admin</span>
-          </button>
+          <div className="flex items-center space-x-2">
+            <button className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <User className="h-5 w-5" />
+              <span className="text-sm font-medium hidden sm:block">Admin</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-2 p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="text-sm font-medium hidden sm:block">Logout</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>

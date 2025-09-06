@@ -5,7 +5,9 @@ const schoolId = import.meta.env.VITE_SCHOOL_ID;
 
 // Fetch all students
 const fetchStudents = async () => {
-  const res = await fetch(`${server_url}/api/Student`);
+  const res = await fetch(`${server_url}/api/Student`, {
+    credentials: "include", // 👈 send cookies
+  });
   if (!res.ok) throw new Error(res.statusText);
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
@@ -22,40 +24,42 @@ const createStudent = async ({ newStudent }: { newStudent: any }) => {
   const res = await fetch(`${server_url}/api/Student`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 👈 send cookies
     body: JSON.stringify(payload),
   });
 
   const json = await res.json();
-
   console.log("createStudent response:", json);
 
   if (!json.isSuccess) throw new Error(json.errorMessage);
-
   return json.content;
 };
 
-
-
+// Update student
 const updateStudent = async ({ updatedStudent }: { updatedStudent: any }) => {
   const res = await fetch(`${server_url}/api/Student/${updatedStudent.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 👈 send cookies
     body: JSON.stringify(updatedStudent),
   });
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
   return json.content;
 };
- 
+
+// Delete student
 const removeStudent = async ({ id }: { id: string }) => {
   const res = await fetch(`${server_url}/api/Student/${id}`, {
     method: "DELETE",
+    credentials: "include", // 👈 send cookies
   });
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
   return json.content;
 };
 
+// Hook
 export const useStudents = () => {
   const queryClient = useQueryClient();
 
