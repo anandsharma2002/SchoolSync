@@ -1,78 +1,85 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model;
 using SMSDataModel.Model.ApiResult;
 using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
-using SMSRepository.Repository;
-using SMSRepository.RepositoryInterfaces;
-using SMSServices.Services;
 using SMSServices.ServicesInterfaces;
 using System.Net;
+using System.Security.Claims;
 
 namespace SMSPrototype1.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ClassController : ControllerBase
     {
-        private readonly ISchoolClassServices  schoolClassServices;
+        private readonly ISchoolClassServices schoolClassServices;
+
         public ClassController(ISchoolClassServices schoolClassServices)
         {
             this.schoolClassServices = schoolClassServices;
         }
 
-
         [HttpGet]
+        [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
         public async Task<ApiResult<IEnumerable<SchoolClass>>> GetAllClassAsync()
         {
-
             var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
+
             try
             {
-                Guid schoolId = Guid.Parse("742bb760-efe2-4ac4-8ef7-a45819d21bef");
-                apiResult.Content = await schoolClassServices.GetAllClassesAsync(schoolId);
+                // ✅ Extract SchoolId from JWT claims
+                var schoolId = GetSchoolIdFromClaims();
+                if (schoolId == null)
+                    return SetError(apiResult, "Missing or invalid SchoolId in token.", HttpStatusCode.Unauthorized);
+
+
+                var classes = await schoolClassServices.GetAllClassesAsync(schoolId);
+
+                apiResult.Content = classes;
                 apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
-                return apiResult;
+                apiResult.StatusCode = HttpStatusCode.OK;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                apiResult.ErrorMessage = ex.Message;
-                return apiResult;
+                return SetError(apiResult, ex.Message, HttpStatusCode.BadRequest);
             }
 
+            return apiResult;
         }
 
-        // Not now
         [HttpGet("{id}")]
-        public async Task<ApiResult<SchoolClass>> GetClassByIdAsync([FromRoute]Guid id)
+        [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
+        public async Task<ApiResult<SchoolClass>> GetClassByIdAsync([FromRoute] Guid id)
         {
             var apiResult = new ApiResult<SchoolClass>();
             try
             {
                 apiResult.Content = await schoolClassServices.GetClassByIdAsync(id);
                 apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                apiResult.StatusCode = HttpStatusCode.OK;
                 return apiResult;
             }
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
                 apiResult.StatusCode = ex.Message == "Class with this Id not found"
-                   ? HttpStatusCode.NotFound
-                   : HttpStatusCode.BadRequest;
+                    ? HttpStatusCode.NotFound
+                    : HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
         }
 
         [HttpPost]
-        public async Task<ApiResult<SchoolClass>> CreateClassAsync([FromBody]CreateClassRequestDto newClass)
+        [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
+        public async Task<ApiResult<SchoolClass>> CreateClassAsync([FromBody] CreateClassRequestDto newClass)
         {
             var apiResult = new ApiResult<SchoolClass>();
+
             if (!ModelState.IsValid)
             {
                 apiResult.IsSuccess = false;
@@ -82,24 +89,34 @@ namespace SMSPrototype1.Controllers
                     .Select(e => e.ErrorMessage));
                 return apiResult;
             }
+
             try
             {
+                // ✅ Set SchoolId from token if required
+                var schoolIdClaim = User.FindFirst("SchoolId");
+                if (schoolIdClaim == null || !Guid.TryParse(schoolIdClaim.Value, out var schoolId))
+                {
+                    return SetError(apiResult, "Missing or invalid SchoolId in token.", HttpStatusCode.Unauthorized);
+                }
+
+                newClass.SchoolId = schoolId; // Inject schoolId into request
+
                 apiResult.Content = await schoolClassServices.CreateClassAsync(newClass);
                 apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                apiResult.StatusCode = HttpStatusCode.OK;
                 return apiResult;
             }
             catch (Exception ex)
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.StatusCode = HttpStatusCode.BadRequest;
                 apiResult.ErrorMessage = ex.Message;
                 return apiResult;
             }
         }
-        
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
         public async Task<ApiResult<SchoolClass>> UpdateClassAsync([FromRoute] Guid id, [FromBody] UpdateClassRequestDto updatedClass)
         {
             var apiResult = new ApiResult<SchoolClass>();
@@ -107,7 +124,7 @@ namespace SMSPrototype1.Controllers
             {
                 apiResult.Content = await schoolClassServices.UpdateClassAsync(id, updatedClass);
                 apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                apiResult.StatusCode = HttpStatusCode.OK;
                 return apiResult;
             }
             catch (Exception ex)
@@ -122,6 +139,7 @@ namespace SMSPrototype1.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
         public async Task<ApiResult<SchoolClass>> DeleteClassAsync([FromRoute] Guid id)
         {
             var apiResult = new ApiResult<SchoolClass>();
@@ -129,7 +147,7 @@ namespace SMSPrototype1.Controllers
             {
                 apiResult.Content = await schoolClassServices.DeleteClassAsync(id);
                 apiResult.IsSuccess = true;
-                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                apiResult.StatusCode = HttpStatusCode.OK;
                 return apiResult;
             }
             catch (Exception ex)
@@ -143,6 +161,22 @@ namespace SMSPrototype1.Controllers
             }
 
         }
+        private Guid? GetSchoolIdFromClaims()
+        {
+            var schoolIdClaim = User.FindFirst("SchoolId")?.Value;
 
+            if (Guid.TryParse(schoolIdClaim, out var schoolId))
+            {
+                return schoolId;
+            }
+            return null;
+        }
+        private ApiResult<T> SetError<T>(ApiResult<T> result, string message, HttpStatusCode statusCode)
+        {
+            result.IsSuccess = false;
+            result.StatusCode = statusCode;
+            result.ErrorMessage = message;
+            return result;
+        }
     }
 }

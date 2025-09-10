@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model.ApiResult;
 using SMSDataModel.Model.Models;
@@ -6,6 +7,7 @@ using SMSDataModel.Model.RequestDtos;
 using SMSServices.Services;
 using SMSServices.ServicesInterfaces;
 using System.Net;
+using System.Security.Claims;
 
 namespace SMSPrototype1.Controllers
 {
@@ -13,9 +15,11 @@ namespace SMSPrototype1.Controllers
     [ApiController]
     public class AnnouncementController : ControllerBase
     {
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly IAnnouncementService _announcementService;
-        public AnnouncementController(IAnnouncementService announcementService)
+        public AnnouncementController(UserManager<ApplicationUser> userManager,IAnnouncementService announcementService)
         {
+            this.userManager = userManager;
             _announcementService = announcementService;
         }
         [HttpGet]
@@ -25,18 +29,31 @@ namespace SMSPrototype1.Controllers
             var apiResult = new ApiResult<IEnumerable<Announcement>>();
             try
             {
-                Guid schoolId = Guid.Parse("742bb760-efe2-4ac4-8ef7-a45819d21bef");
-                apiResult.Content = await _announcementService.GetAllAnnouncemetsAsync(schoolId);
+                if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+                {
+                    return SetError(apiResult, "Invalid or missing user ID.", HttpStatusCode.Unauthorized);
+                }
+
+                
+                var user = await userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return SetError(apiResult, "User not found.", HttpStatusCode.NotFound);
+                }
+
+
+                var schoolId = GetSchoolIdFromClaims();
+                if (schoolId == null)
+                    return SetError(apiResult, "Invalid or missing SchoolId in token.", HttpStatusCode.Unauthorized);
+
+                apiResult.Content = await _announcementService.GetAllAnnouncemetsAsync(schoolId.Value);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
             }
             catch (Exception ex)
             {
-                apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                apiResult.ErrorMessage = ex.Message;
-                return apiResult;
+                return SetError(apiResult, ex.Message, HttpStatusCode.BadRequest);
             }
 
         }
@@ -79,6 +96,12 @@ namespace SMSPrototype1.Controllers
             }
             try
             {
+                var schoolId = GetSchoolIdFromClaims();
+                if (schoolId == null)
+                    return SetError(apiResult, "Invalid or missing SchoolId in token.", HttpStatusCode.Unauthorized);
+
+                createAnnouncementRqst.SchoolId = schoolId.Value;
+
                 apiResult.Content = await _announcementService.CreateAnnouncementAsync(createAnnouncementRqst);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
@@ -135,6 +158,23 @@ namespace SMSPrototype1.Controllers
             }
 
         }
+        private Guid? GetSchoolIdFromClaims()
+        {
+            var schoolIdClaim = User.FindFirst("SchoolId")?.Value;
 
+            if (Guid.TryParse(schoolIdClaim, out var schoolId))
+            {
+                return schoolId;
+            }
+            return null;
+        }
+
+        private ApiResult<T> SetError<T>(ApiResult<T> result, string message, HttpStatusCode statusCode)
+        {
+            result.IsSuccess = false;
+            result.StatusCode = statusCode;
+            result.ErrorMessage = message;
+            return result;
+        }
     }
 }

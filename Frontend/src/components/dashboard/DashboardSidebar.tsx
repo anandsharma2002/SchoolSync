@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -15,6 +15,7 @@ import {
   Bell,
   GraduationCap
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
   name: string;
@@ -27,6 +28,8 @@ interface NavItem {
 const DashboardSidebar: React.FC = () => {
   const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+const { setAuthenticated } = useAuth();
+const navigate = useNavigate();
 
   const navItems: NavItem[] = [
     { 
@@ -165,19 +168,33 @@ const DashboardSidebar: React.FC = () => {
               );
             })}
             
-            {/* Logout Button */}
-            <li className="border-t border-gray-200 pt-2 mt-3">
-              <button
-                onClick={() => {
-                  // Handle logout logic here
-                  console.log('Logout clicked');
-                }}
-                className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200 text-sm"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="font-medium">Log out</span>
-              </button>
-            </li>
+           <li className="border-t border-gray-200 pt-2 mt-3">
+  <button
+    onClick={async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error("Logout failed");
+        }
+
+        setAuthenticated(false); // 🔐 update context
+        navigate("/"); // 🔁 redirect to home or login
+
+      } catch (err) {
+        console.error("Logout error:", err);
+        alert("Failed to log out. Please try again.");
+      }
+    }}
+    className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200 text-sm"
+  >
+    <LogOut className="h-4 w-4" />
+    <span className="font-medium">Log out</span>
+  </button>
+</li>
           </ul>
         </nav>
       </div>

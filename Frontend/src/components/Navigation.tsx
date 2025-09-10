@@ -1,16 +1,27 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, GraduationCap } from 'lucide-react';
+import { Menu, X, GraduationCap, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
   name: string;
   path: string;
 }
+interface NavigationProps {
+  onLoginClick?: () => void;
+  onRegisterClick?: () => void;
+}
 
-const Navigation: React.FC = () => {
+const Navigation: React.FC<NavigationProps> = ({ onLoginClick, onRegisterClick }) => {
+  const { isAuthenticated, logout } = useAuth();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const location = useLocation();
+
+  const handleLogout = async () => {
+    await logout();
+    setIsOpen(false);
+  };
 
   const navItems: NavItem[] = [
     { name: 'Home', path: '/' },
@@ -30,7 +41,6 @@ const Navigation: React.FC = () => {
           <Link to="/" className="flex items-center space-x-3 text-primary-600 hover:text-primary-700 transition-all duration-300 transform hover:scale-105">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
               <GraduationCap className="h-6 w-6 text-white" />
-              {/* <img className='h-6 w-6 text-white' src=''/> */}
             </div>
             <span className="text-2xl font-bold text-primary-600  bg-clip-text">
               SchoolSync
@@ -43,11 +53,10 @@ const Navigation: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
-                  isActive(item.path)
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                }`}
+                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${isActive(item.path)
+                  ? 'text-primary-600 bg-primary-50'
+                  : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                  }`}
               >
                 {item.name}
                 {isActive(item.path) && (
@@ -55,12 +64,24 @@ const Navigation: React.FC = () => {
                 )}
               </Link>
             ))}
-            <Link
-              to="/pricing"
-              className="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-xl font-medium hover:primary-700 hover:to-primary-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            >
-              Get Started
-            </Link>
+            {!isAuthenticated ? (
+              <button
+                onClick={onLoginClick}
+                className="ml-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-2.5 rounded-xl font-medium  transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                Login/Register
+              </button>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="ml-4 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2.5 rounded-xl font-medium  transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </button>
+            )}
+
+
           </div>
 
           {/* Mobile menu button */}
@@ -83,22 +104,36 @@ const Navigation: React.FC = () => {
                   key={item.name}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 ${
-                    isActive(item.path)
-                      ? 'text-primary-600 bg-primary-50 border-l-4 border-primary-600'
-                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                  }`}
+                  className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 ${isActive(item.path)
+                    ? 'text-primary-600 bg-primary-50 border-l-4 border-primary-600'
+                    : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                    }`}
                 >
                   {item.name}
                 </Link>
               ))}
-              <Link
-                to="/pricing"
-                onClick={() => setIsOpen(false)}
-                className="block w-full text-center bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-3 rounded-xl font-medium hover:from-primary-700 hover:to-primary-800 transition-all duration-300 mt-4"
-              >
-                Get Started
-              </Link>
+              {!isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    onLoginClick?.();
+                    setIsOpen(false);
+                  }}
+                  className="block w-full text-center bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-3 rounded-xl font-medium hover:from-primary-700 hover:to-primary-800 transition-all duration-300 mt-4"
+                >
+                  Login/Register
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                  }}
+                  className="block w-full text-center bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-3 rounded-xl font-medium hover:from-red-700 hover:to-red-800 transition-all duration-300 mt-4 flex items-center justify-center space-x-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              )}
+
             </div>
           </div>
         )}

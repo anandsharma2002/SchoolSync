@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SMSRepository.RepositoryInterfaces;
 using Microsoft.EntityFrameworkCore;
 using SMSDataModel.Model.Models;
+using SMSDataModel.Model.ResponseDtos;
 
 namespace SMSRepository.Repository
 {
@@ -33,6 +34,13 @@ namespace SMSRepository.Repository
         public async Task<IEnumerable<School>> GetAllSchoolsAsync()
         {
             return await _Context.Schools.ToListAsync();
+        }
+        public async Task<List<SchoolDto>> GetAllSchoolsAsync(string schoolName)
+        {
+            return await _Context.Schools
+                .Where(s => EF.Functions.Like(s.Name, $"%{schoolName}%"))
+                .Select(s => new SchoolDto{Id =  s.Id,Name = s.Name } )
+                .ToListAsync();
         }
 
 

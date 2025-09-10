@@ -14,6 +14,7 @@ namespace SMSDataModel.Model.AutoMapper
         public TeacherAutomapper()
         {
             CreateMap<Teacher, CreateTeacherRqstDto>().ReverseMap();
+            CreateMap<Teacher,UpdateTeacherRequestDto>().ReverseMap();
         }
     }
 }

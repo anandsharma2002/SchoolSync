@@ -71,7 +71,7 @@ const EditStudentPopup: React.FC<EditStudentPopupProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.gender || !formData.dob) {
       toast({
         title: "Error",
         description: "First Name, Last Name, and Email are required.",
@@ -80,7 +80,7 @@ const EditStudentPopup: React.FC<EditStudentPopupProps> = ({
       return;
     }
 
-    onSubmit({ ...formData, id: studentData?.id });
+    onSubmit({ ...formData, studentData });
     onClose();
   };
 

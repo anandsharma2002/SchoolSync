@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SMSDataModel.Model.ApiResult;
 using SMSDataModel.Model.Models;
@@ -6,6 +8,7 @@ using SMSDataModel.Model.RequestDtos;
 using SMSRepository.RepositoryInterfaces;
 using SMSServices.ServicesInterfaces;
 using System.Net;
+using System.Security.Claims;
 
 namespace SMSPrototype1.Controllers
 {
@@ -13,9 +16,11 @@ namespace SMSPrototype1.Controllers
     [ApiController]
     public class TeacherController : ControllerBase
     {
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly ITeacherService _teacherservice;
-        public TeacherController(ITeacherService teacherService)
+        public TeacherController(UserManager<ApplicationUser> userManager, ITeacherService teacherService)
         {
+            this.userManager = userManager;
             _teacherservice = teacherService;
         }
         [HttpGet]
@@ -33,8 +38,25 @@ namespace SMSPrototype1.Controllers
             }
             try
             {
-                Guid schoolId = Guid.NewGuid(); // This should be replaced with actual schoolId retrieval logic
-                apiResult.Content = await _teacherservice.GetAllTeachersAsync(schoolId);
+                if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+                {
+                    return SetError(apiResult, "Invalid or missing user ID.", HttpStatusCode.Unauthorized);
+                }
+
+
+                var user = await userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return SetError(apiResult, "User not found.", HttpStatusCode.NotFound);
+                }
+
+
+                if (user.SchoolId == null)
+                {
+                    return SetError(apiResult, "User does not have a SchoolId assigned.", HttpStatusCode.BadRequest);
+                }
+
+                apiResult.Content = await _teacherservice.GetAllTeachersAsync(user.SchoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -69,9 +91,23 @@ namespace SMSPrototype1.Controllers
             }
         }
         [HttpPost]
+        [Authorize]  
         public async Task<ApiResult<Teacher>> CreateTeacherAsync([FromBody] CreateTeacherRqstDto teacherRqstDto)
         {
             var apiResult = new ApiResult<Teacher>();
+
+            var schoolIdClaim = User.FindFirst("SchoolId");
+            if (schoolIdClaim == null || !Guid.TryParse(schoolIdClaim.Value, out var schoolId))
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+                apiResult.ErrorMessage = "Invalid or missing SchoolId claim in token.";
+                return apiResult;
+            }
+
+            
+            teacherRqstDto.SchoolId = schoolId;
+
             try
             {
                 apiResult.Content = await _teacherservice.CreateTeacherAsync(teacherRqstDto);
@@ -87,6 +123,7 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }
         }
+
         [HttpPut("{id}")]
         public async Task<ApiResult<Teacher>> UpdateTeacherAsync([FromRoute] Guid id, [FromBody] UpdateTeacherRequestDto updateTeacherRequestDto)
         {
@@ -130,6 +167,14 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }
         }
-      }
+
+        private ApiResult<T> SetError<T>(ApiResult<T> result, string message, HttpStatusCode statusCode)
+        {
+            result.IsSuccess = false;
+            result.StatusCode = statusCode;
+            result.ErrorMessage = message;
+            return result;
+        }
+    }
 
 }
