@@ -62,7 +62,7 @@ namespace SMSPrototype1.Controllers
                 }
 
                 
-                var classes = await schoolClassServices.GetAllClassesAsync(user.SchoolId.Value);
+                var classes = await schoolClassServices.GetAllClassesAsync(user.SchoolId);
 
                 apiResult.Content = classes;
                 apiResult.IsSuccess = true;

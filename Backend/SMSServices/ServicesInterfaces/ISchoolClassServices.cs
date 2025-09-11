@@ -10,7 +10,7 @@ namespace SMSServices.ServicesInterfaces
 {
     public interface ISchoolClassServices
     {
-        Task<List<SchoolClass>> GetAllClassesAsync(Guid? schoolId);
+        Task<List<SchoolClass>> GetAllClassesAsync(Guid schoolId);
         Task<SchoolClass> GetClassByIdAsync(Guid id);
         Task<SchoolClass> CreateClassAsync(CreateClassRequestDto createClassRequestDto);
         Task<SchoolClass> UpdateClassAsync(Guid id, UpdateClassRequestDto updatedClass);

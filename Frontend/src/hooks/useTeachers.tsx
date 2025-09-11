@@ -8,9 +8,6 @@ const fetchTeachers = async () => {
   const res = await fetch(`${server_url}/api/Teacher`, {
     credentials: "include", // 👈 Include auth cookies
   });
-  const res = await fetch(`${server_url}/api/Teacher`, {
-    credentials: "include", // 👈 Include auth cookies
-  });
   if (!res.ok) throw new Error(res.statusText);
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
