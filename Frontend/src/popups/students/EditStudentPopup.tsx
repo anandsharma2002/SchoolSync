@@ -25,7 +25,7 @@ interface EditStudentPopupProps {
     rollNumber: string;
     classId: string;
     dob: string;
-    gender: string;
+    gender: number;
   } | null;
 }
 
@@ -46,7 +46,7 @@ const EditStudentPopup: React.FC<EditStudentPopupProps> = ({
     rollNumber: "",
     classId: "",
     dob: "",
-    gender: "",
+    gender: null,
   });
 
   useEffect(() => {
@@ -80,10 +80,21 @@ const EditStudentPopup: React.FC<EditStudentPopupProps> = ({
       return;
     }
 
-    onSubmit({ ...formData, id: studentData?.id });
+    onSubmit({ ...formData, studentData });
     onClose();
   };
-
+  const getGenderLabel = (gender: number) => {
+    switch (gender) {
+      case 0:
+        return "Male";
+      case 1:
+        return "Female";
+      case 2:
+        return "Other";
+      default:
+        return "N/A";
+    }
+  };
   if (!studentData) return null;
 
   return (
@@ -175,7 +186,7 @@ const EditStudentPopup: React.FC<EditStudentPopupProps> = ({
               onValueChange={(value) => handleChange("gender", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder={studentData.gender}/>
+                <SelectValue placeholder={getGenderLabel(studentData.gender)}/>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Male">Male</SelectItem>

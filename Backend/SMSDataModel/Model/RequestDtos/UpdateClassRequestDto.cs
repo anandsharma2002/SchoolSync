@@ -9,10 +9,10 @@ namespace SMSDataModel.Model.RequestDtos
 {
     public class UpdateClassRequestDto
     {
-        [Required]
+       
         [MaxLength(50)]
         public string Name { get; set; }
-        [Required]
+       
         [MaxLength(5)]
         public string Section { get; set; }
         public Guid? ClassTeacherId { get; set; }

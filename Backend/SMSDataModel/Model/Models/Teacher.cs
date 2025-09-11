@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SMSDataModel.Model.enums;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace SMSDataModel.Model.Models
         public string Email { get; set; }
         public DateOnly JoiningDate { get; set; }
         public string Phone { get; set; }
+        public Gender Gender { get; set; }
         public string Address { get; set; }
         // School
         public Guid SchoolId { get; set; }

@@ -4,6 +4,7 @@ using SMSDataModel.Model;
 using SMSDataModel.Model.ApiResult;
 using SMSDataModel.Model.Models;
 using SMSDataModel.Model.RequestDtos;
+using SMSDataModel.Model.ResponseDtos;
 using SMSRepository.Repository;
 using SMSRepository.RepositoryInterfaces;
 using SMSServices.Services;
@@ -25,7 +26,7 @@ namespace SMSPrototype1.Controllers
 
 
 
-        [HttpGet("GetAllSchoolsAsync")]
+        [HttpGet]
         public async Task<ApiResult<IEnumerable<School>>> GetAllSchoolsAsync()
         {
             var apiResult = new ApiResult<IEnumerable<School>>();
@@ -44,9 +45,30 @@ namespace SMSPrototype1.Controllers
                 return apiResult;
             }
         }
+        [HttpGet("search")]
+        public async Task<ApiResult<IEnumerable<SchoolDto>>> GetAllSchoolsAsync([FromQuery] string schoolName)
+        {
+            var apiResult = new ApiResult<IEnumerable<SchoolDto>>();
+
+            try
+            {
+                apiResult.Content = await schoolService.GetAllSchoolsAsync(schoolName);
+                apiResult.IsSuccess = true;
+                apiResult.StatusCode = System.Net.HttpStatusCode.OK;
+                return apiResult;
+            }
+            catch (Exception ex)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = ex.Message;
+                return apiResult;
+            }
+        }
 
 
-        [HttpGet("GetSchoolByIdAsync/{schoolId}")]
+
+        [HttpGet("getbyId/{schoolId}")]
         public async Task<ApiResult<School>> GetSchoolByIdAsync([FromRoute] Guid schoolId)
         {
 

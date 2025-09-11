@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useStudents } from "@/hooks/useStudents";
+import EmptyState from "@/components/EmptyState";
 const server_url = import.meta.env.VITE_API_URL;
 
 interface ClassesProps {
@@ -40,7 +41,7 @@ interface ClassItem {
   schoolId: string;
 }
 
-const Classes: React.FC<ClassesProps> = () => {
+const Classes: React.FC = () => {
   const {
     data: classes,
     isLoading,
@@ -214,7 +215,7 @@ const Classes: React.FC<ClassesProps> = () => {
                             >
                               <Link
                                 to="/dashboard/attendance"
-                                state={{ classId: classItem.id }} // <-- pass your prop here
+                                state={{ classId: classItem.id }}
                                 className="flex w-full h-full items-center justify-center px-2"
                               >
                                 <CalendarCheck className="w-4 h-4 mr-1" />
@@ -249,25 +250,13 @@ const Classes: React.FC<ClassesProps> = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center text-center py-16 px-6 mt-12">
-          <div className="bg-gray-200 rounded-full p-4 mb-4">
-            <GraduationCap className="h-12 w-12 text-primary-700" />
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-primary-800 mb-2">
-            No Classes Found
-          </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-md mb-6">
-            🚀 It looks like you haven’t added any classes yet. Start by
-            creating your first class.
-          </p>
-          <Button
-            onClick={() => openModal("add")}
-            className="flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add New Class</span>
-          </Button>
-        </div>
+        <EmptyState
+          icon={<GraduationCap className="h-12 w-12 text-primary-700" />}
+          title="No Classes Found"
+          description="🚀 It looks like you haven’t added any classes yet. Start by creating your first class."
+          buttonText="Add New Class"
+          onClick={() => openModal("add")}
+        />
       )}
 
       {modal === "add" && (

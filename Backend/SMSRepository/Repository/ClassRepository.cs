@@ -23,7 +23,7 @@ namespace SMSRepository.Repository
 
         public async Task<List<SchoolClass>> GetAllClassesAsync(Guid schoolId)
         {
-            var result = await _context.Classes.Where(x=>x.SchoolId==schoolId).ToListAsync();
+            var result = await _context.Classes.Include("ClassTeacher").Where(x=>x.SchoolId==schoolId).ToListAsync();
             return result;
         }
 

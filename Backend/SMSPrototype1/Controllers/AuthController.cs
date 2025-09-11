@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +31,26 @@ namespace SMSPrototype1.Controllers
         }
 
 
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
 
+            if (user == null)
+                return NotFound("User not found");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+                id = user.Id,
+                username = user.UserName,
+                email = user.Email,
+                roles = roles
+            });
+        }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto model)
         {
@@ -41,17 +62,28 @@ namespace SMSPrototype1.Controllers
                 CreatedDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
 
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new
+                {
+                    isSuccess = false,
+                    errorMessage = string.Join("; ", result.Errors.Select(e => e.Description))
+                });
+            }
+
+
+            await _userManager.AddToRoleAsync(user, model.Role);
+
             
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors);
-
-                await _userManager.AddToRoleAsync(user, model.Role);
-            
-
-            return Ok("Registration successful");
+            return Ok(new
+            {
+                isSuccess = true,
+                message = "Registration successful!"
+            });
         }
+
 
 
         [HttpPost("login")]
@@ -64,11 +96,17 @@ namespace SMSPrototype1.Controllers
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                };
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            
+            if (user.SchoolId != null)
+            {
+                authClaims.Add(new Claim("SchoolId", user.SchoolId.ToString()));
+            }
 
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
@@ -83,12 +121,41 @@ namespace SMSPrototype1.Controllers
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
-            return Ok(new
+            /* Used when working with swagger */
+
+            //return Ok(new
+            //{
+            //    token = new JwtSecurityTokenHandler().WriteToken(token),
+            //    expiration = token.ValidTo
+            //});
+
+            /* Used for frontend only */
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            Response.Cookies.Append("auth_token", tokenString, new CookieOptions
             {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None, // if you're using cross-origin (localhost:8080 <-> 7266)
+                Expires = token.ValidTo
             });
+
+            return Ok(new { message = "Login successful" });
+
         }
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            // Remove the cookie
+            Response.Cookies.Delete("auth_token");
+
+            // Optionally, sign out the identity (if using Identity cookies)
+            _signInManager.SignOutAsync();
+
+            return Ok(new { message = "Logout successful" });
+        }
+
     }
 
 }

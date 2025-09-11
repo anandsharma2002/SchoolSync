@@ -67,7 +67,9 @@ const AddClassPopup: React.FC<AddClassPopupProps> = ({
   const [teachers, setTeachers] = useState([]);
 
   const fetchTeachers = async () => {
-    const res = await fetch(`${server_url}/api/Teacher`);
+    const res = await fetch(`${server_url}/api/Teacher`,{
+    credentials: "include", 
+  });
     if (!res.ok) throw new Error(res.statusText);
     const json = await res.json();
     if (!json.isSuccess) throw new Error(json.errorMessage);

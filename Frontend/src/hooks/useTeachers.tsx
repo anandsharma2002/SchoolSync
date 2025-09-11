@@ -1,10 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const server_url = import.meta.env.VITE_API_URL;
-const schoolId = import.meta.env.VITE_SCHOOL_ID;
 
+
+// Fetch all teachers
 const fetchTeachers = async () => {
-  const res = await fetch(`${server_url}/api/Teacher`);
+  const res = await fetch(`${server_url}/api/Teacher`, {
+    credentials: "include", // 👈 Include auth cookies
+  });
   if (!res.ok) throw new Error(res.statusText);
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
@@ -12,43 +15,51 @@ const fetchTeachers = async () => {
   return json.content ?? [];
 };
 
+// Create teacher
 const createTeacher = async ({ newTeacher }: { newTeacher: any }) => {
   const payload = {
     ...newTeacher,
-    schoolId,
   };
+
   const res = await fetch(`${server_url}/api/Teacher`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 👈 Include auth cookies
     body: JSON.stringify(payload),
   });
+
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
   return json.content;
 };
 
+// Update teacher
 const updateTeacher = async ({ updatedTeacher }: { updatedTeacher: any }) => {
-  console.log(updatedTeacher);
-
   const res = await fetch(`${server_url}/api/Teacher/${updatedTeacher.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 👈 Include auth cookies
     body: JSON.stringify(updatedTeacher),
   });
+
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
   return json.content;
 };
 
+// Delete teacher
 const removeTeacher = async ({ id }: { id: string }) => {
   const res = await fetch(`${server_url}/api/Teacher/${id}`, {
     method: "DELETE",
+    credentials: "include", // 👈 Include auth cookies
   });
+
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
   return json.content;
 };
 
+// Hook
 export const useTeachers = () => {
   const queryClient = useQueryClient();
 

@@ -41,14 +41,12 @@ namespace SMSPrototype1.Controllers
                     return SetError(apiResult, "User not found.", HttpStatusCode.NotFound);
                 }
 
-                
-                if (user.SchoolId == null)
-                {
-                    return SetError(apiResult, "User does not have a SchoolId assigned.", HttpStatusCode.BadRequest);
-                }
 
-               
-                apiResult.Content = await _announcementService.GetAllAnnouncemetsAsync(user.SchoolId.Value);
+                var schoolId = GetSchoolIdFromClaims();
+                if (schoolId == null)
+                    return SetError(apiResult, "Invalid or missing SchoolId in token.", HttpStatusCode.Unauthorized);
+
+                apiResult.Content = await _announcementService.GetAllAnnouncemetsAsync(schoolId.Value);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;
@@ -98,6 +96,12 @@ namespace SMSPrototype1.Controllers
             }
             try
             {
+                var schoolId = GetSchoolIdFromClaims();
+                if (schoolId == null)
+                    return SetError(apiResult, "Invalid or missing SchoolId in token.", HttpStatusCode.Unauthorized);
+
+                createAnnouncementRqst.SchoolId = schoolId.Value;
+
                 apiResult.Content = await _announcementService.CreateAnnouncementAsync(createAnnouncementRqst);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
@@ -154,6 +158,17 @@ namespace SMSPrototype1.Controllers
             }
 
         }
+        private Guid? GetSchoolIdFromClaims()
+        {
+            var schoolIdClaim = User.FindFirst("SchoolId")?.Value;
+
+            if (Guid.TryParse(schoolIdClaim, out var schoolId))
+            {
+                return schoolId;
+            }
+            return null;
+        }
+
         private ApiResult<T> SetError<T>(ApiResult<T> result, string message, HttpStatusCode statusCode)
         {
             result.IsSuccess = false;

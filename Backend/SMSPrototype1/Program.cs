@@ -40,19 +40,36 @@ namespace SMSPrototype1
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                 .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+                 .AddJwtBearer(options =>
                  {
-                     ValidateIssuer = true,
-                     ValidateAudience = true,
-                     ValidateLifetime = true,
-                     ValidateIssuerSigningKey = true,
-                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                     IssuerSigningKey = new SymmetricSecurityKey(
-                         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                     options.TokenValidationParameters = new TokenValidationParameters
+                     {
+                         ValidateIssuer = true,
+                         ValidateAudience = true,
+                         ValidateLifetime = true,
+                         ValidateIssuerSigningKey = true,
+                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                         ValidAudience = builder.Configuration["Jwt:Audience"],
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                     };
+
+                     options.Events = new JwtBearerEvents
+                     {
+                         OnMessageReceived = context =>
+                         {
+                             var accessToken = context.Request.Cookies["auth_token"];
+
+                             if (!string.IsNullOrEmpty(accessToken))
+                             {
+                                 context.Token = accessToken;
+                             }
+
+                             return Task.CompletedTask;
+                         }
+                     };
                  });
 
-           
+
             // Swagger setup with JWT bearer auth
             builder.Services.AddSwaggerGen(options =>
             {
@@ -119,13 +136,19 @@ namespace SMSPrototype1
             builder.Services.AddEndpointsApiExplorer();
 
             // CORS setup (consider restricting in production)
-            builder.Services.AddCors(policy =>
+            builder.Services.AddCors(options =>
             {
-                policy.AddPolicy("corspolicy", builder =>
+                options.AddPolicy("corspolicy", builder =>
                 {
-                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    builder
+                        .WithOrigins("http://localhost:8080") 
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
+
+
 
             var app = builder.Build();
 

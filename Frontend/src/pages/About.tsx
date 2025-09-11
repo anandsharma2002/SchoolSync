@@ -24,15 +24,9 @@ const About: React.FC = () => {
   const teamMembers: TeamMember[] = [
     {
       name: "Anand Sharma",
-      role: "CEO & Founder",
+      role: "Ex-CEO & Fraudstor",
       image: anandImg,
       bio: "Vision-driven founder with a strong focus on product strategy and full stack development. Committed to building scalable tech that solves real-world problems effectively.",
-    },
-    {
-      name: "Rohit Jain",
-      role: "Co-Founder & Frontend Lead",
-      image: rohitImg,
-      bio: "Creative technologist focused on delivering intuitive and user-friendly digital solutions. Passionate about bringing ideas to life through clean code and purposeful design.",
     },
     {
       name: "Vinisha Rathod",
@@ -40,6 +34,14 @@ const About: React.FC = () => {
       image: vinishaImg,
       bio: "Product-focused engineer with a knack for turning complex problems into simple, elegant systems. Brings clarity and structure to every stage of development.",
     },
+    {
+      name: "Rohit Jain",
+      role: "CEO & Frontend Lead",
+      image: rohitImg,
+      bio: "Creative technologist focused on delivering intuitive and user-friendly digital solutions. Passionate about bringing ideas to life through clean code and purposeful design.",
+    },
+    
+    
   ];
 
   const values: Value[] = [
