@@ -24,6 +24,7 @@ namespace SMSPrototype1.Controllers
             _teacherservice = teacherService;
         }
         [HttpGet]
+        [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
         public async Task <ApiResult<IEnumerable<Teacher>>> GetAllTeachersAsync()
         {
             var apiResult = new ApiResult<IEnumerable<Teacher>>();
@@ -100,8 +101,10 @@ namespace SMSPrototype1.Controllers
             if (schoolIdClaim == null || !Guid.TryParse(schoolIdClaim.Value, out var schoolId))
             {
                 apiResult.IsSuccess = false;
-                apiResult.StatusCode = System.Net.HttpStatusCode.Unauthorized;
-                apiResult.ErrorMessage = "Invalid or missing SchoolId claim in token.";
+                apiResult.StatusCode = HttpStatusCode.Unauthorized;
+                apiResult.ErrorMessage = string.Join(" | ", ModelState.Values
+                    .SelectMany(x => x.Errors)
+                    .Select(e => e.ErrorMessage));
                 return apiResult;
             }
 

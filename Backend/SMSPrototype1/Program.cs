@@ -39,76 +39,34 @@ namespace SMSPrototype1
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
-                    };
+                 .AddJwtBearer(options =>
+                 {
+                     options.TokenValidationParameters = new TokenValidationParameters
+                     {
+                         ValidateIssuer = true,
+                         ValidateAudience = true,
+                         ValidateLifetime = true,
+                         ValidateIssuerSigningKey = true,
+                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                         ValidAudience = builder.Configuration["Jwt:Audience"],
+                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                     };
 
-                    // ✅ Read JWT from cookie
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            Console.WriteLine($"=== JWT Message Received ===");
-                            Console.WriteLine($"Request Path: {context.Request.Path}");
-                            Console.WriteLine($"Request Method: {context.Request.Method}");
-                            Console.WriteLine($"Cookies Count: {context.Request.Cookies.Count}");
-                            
-                            foreach (var cookie in context.Request.Cookies)
-                            {
-                                Console.WriteLine($"Cookie: {cookie.Key} = {cookie.Value?.Substring(0, Math.Min(50, cookie.Value?.Length ?? 0))}...");
-                            }
-                            
-                            if (context.Request.Cookies.ContainsKey("auth_token"))
-                            {
-                                context.Token = context.Request.Cookies["auth_token"];
-                                Console.WriteLine($"JWT Token found in cookie: {context.Token?.Substring(0, Math.Min(50, context.Token?.Length ?? 0))}...");
-                            }
-                            else
-                            {
-                                Console.WriteLine("No auth_token cookie found!");
-                            }
-                            
-                            return Task.CompletedTask;
-                        },
-                        OnAuthenticationFailed = context =>
-                        {
-                            Console.WriteLine($"=== JWT Authentication Failed ===");
-                            Console.WriteLine($"Exception: {context.Exception?.Message}");
-                            Console.WriteLine($"Exception Type: {context.Exception?.GetType().Name}");
-                            if (context.Exception?.InnerException != null)
-                            {
-                                Console.WriteLine($"Inner Exception: {context.Exception.InnerException.Message}");
-                            }
-                            return Task.CompletedTask;
-                        },
-                        OnTokenValidated = context =>
-                        {
-                            Console.WriteLine("=== JWT Token Validated Successfully ===");
-                            Console.WriteLine($"User ID: {context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value}");
-                            Console.WriteLine($"User Name: {context.Principal?.FindFirst(ClaimTypes.Name)?.Value}");
-                            return Task.CompletedTask;
-                        },
-                        OnChallenge = context =>
-                        {
-                            Console.WriteLine($"=== JWT Challenge ===");
-                            Console.WriteLine($"Error: {context.Error}");
-                            Console.WriteLine($"Error Description: {context.ErrorDescription}");
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
+                     options.Events = new JwtBearerEvents
+                     {
+                         OnMessageReceived = context =>
+                         {
+                             var accessToken = context.Request.Cookies["auth_token"];
 
+                             if (!string.IsNullOrEmpty(accessToken))
+                             {
+                                 context.Token = accessToken;
+                             }
 
+                             return Task.CompletedTask;
+                         }
+                     };
+                 });
 
 
             // Swagger setup with JWT bearer auth
@@ -182,7 +140,7 @@ namespace SMSPrototype1
                 options.AddPolicy("corspolicy", builder =>
                 {
                     builder
-                        .WithOrigins("http://localhost:8081", "http://localhost:3000", "http://localhost:8080") 
+                        .WithOrigins("http://localhost:8080") 
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

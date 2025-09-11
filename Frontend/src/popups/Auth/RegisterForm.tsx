@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 
-const server_url = import.meta.env.VITE_API_URL || "https://localhost:7266";
-const roles = ["admin", "principal", "schoolIncharge", "teacher", "student", "parent"];
+const server_url = import.meta.env.VITE_API_URL;
+
+const roles = ["Admin", "SuperAdmin", "Teacher", "Student", "Parent"];
 
 interface Props {
   onClose: () => void;
@@ -22,6 +24,7 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
     schoolId: "",
   });
 
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [schoolSearch, setSchoolSearch] = useState("");
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
   const [schools, setSchools] = useState<School[]>([]);
@@ -42,11 +45,16 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
     clearTimeout(debounceTimeout.current);
 
     debounceTimeout.current = setTimeout(() => {
-      fetch(`${server_url}/api/School/search?schoolName=${encodeURIComponent(schoolSearch)}`)
+      fetch(
+        `${server_url}/api/School/search?schoolName=${encodeURIComponent(
+          schoolSearch
+        )}`
+      )
         .then(async (res) => {
           if (!res.ok) throw new Error(res.statusText);
           const json = await res.json();
-          if (!json.isSuccess) throw new Error(json.errorMessage || "Failed to fetch schools");
+          if (!json.isSuccess)
+            throw new Error(json.errorMessage || "Failed to fetch schools");
           setSchools(json.content || []);
           setLoading(false);
         })
@@ -62,7 +70,9 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
     };
   }, [schoolSearch]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -81,10 +91,22 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.schoolId) {
-      alert("Please select a school.");
+    // Validate form
+    const errors: { [key: string]: string } = {};
+    if (!formData.username.trim()) errors.username = "Username is required.";
+    if (!formData.email.trim()) errors.email = "Email is required.";
+    if (!formData.password.trim()) errors.password = "Password is required.";
+    else if (formData.password.length < 6)
+      errors.password = "Password must be at least 6 characters.";
+    if (!formData.role) errors.role = "Please select a role.";
+    if (!formData.schoolId) errors.schoolId = "Please select a school.";
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
+
+    setFormErrors({});
 
     try {
       const payload = {
@@ -109,38 +131,37 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
         throw new Error(json.errorMessage || "Registration failed.");
       }
 
-      alert("Registration successful!");
-
-
-      onSwitch(); // <- opens login form
+      toast.success("🎉 Registration successful! You can now log in.");
+      onSwitch(); // Show login form
     } catch (err: any) {
-      alert(err.message || "Something went wrong. Please try again.");
+      toast.error(err.message || "Something went wrong. Please try again.");
     }
   };
-
 
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-4 relative px-4 sm:px-6 md:px-0 max-w-md mx-auto"
-      aria-label="Register Form"
       autoComplete="off"
     >
       <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center sm:text-left">
         Register
       </h2>
 
+      {/* Username */}
       <input
         name="username"
         placeholder="Username"
         value={formData.username}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
-        autoComplete="username"
-        aria-label="Username"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl"
       />
+      {formErrors.username && (
+        <p className="text-sm text-red-600">{formErrors.username}</p>
+      )}
 
+      {/* Email */}
       <input
         name="email"
         type="email"
@@ -148,11 +169,13 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
         value={formData.email}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
-        autoComplete="email"
-        aria-label="Email"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl"
       />
+      {formErrors.email && (
+        <p className="text-sm text-red-600">{formErrors.email}</p>
+      )}
 
+      {/* Password */}
       <input
         name="password"
         type="password"
@@ -160,18 +183,19 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
         value={formData.password}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
-        autoComplete="new-password"
-        aria-label="Password"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl"
       />
+      {formErrors.password && (
+        <p className="text-sm text-red-600">{formErrors.password}</p>
+      )}
 
+      {/* Role */}
       <select
         name="role"
         value={formData.role}
         onChange={handleChange}
         required
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
-        aria-label="Select Role"
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl"
       >
         <option value="">Select Role</option>
         {roles.map((r) => (
@@ -180,7 +204,11 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
           </option>
         ))}
       </select>
+      {formErrors.role && (
+        <p className="text-sm text-red-600">{formErrors.role}</p>
+      )}
 
+      {/* School Search */}
       <div className="relative">
         <input
           type="text"
@@ -188,76 +216,68 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
           value={schoolSearch}
           onChange={handleSchoolSearchChange}
           onFocus={() => setShowSchoolDropdown(true)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
-          autoComplete="off"
-          required={!formData.schoolId}
-          aria-label="Search and select school"
-          aria-autocomplete="list"
-          aria-controls="school-listbox"
-          aria-expanded={showSchoolDropdown}
-          role="combobox"
+          onBlur={() => setTimeout(() => setShowSchoolDropdown(false), 150)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl"
+          required
         />
+        {formErrors.schoolId && (
+          <p className="text-sm text-red-600">{formErrors.schoolId}</p>
+        )}
 
         {showSchoolDropdown && (
-          <>
+          <div
+            className="absolute z-10 w-full bg-white border border-gray-300 rounded-xl mt-1 shadow"
+            onMouseDown={(e) => e.stopPropagation()} // prevent fall-through
+          >
             {!schoolSearch.trim() && (
-              <div className="absolute z-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl mt-1 text-gray-400 text-base sm:text-sm">
-                Type school name
-              </div>
+              <div className="px-4 py-3 text-gray-400">Type school name</div>
             )}
 
             {loading && (
-              <div className="absolute z-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl mt-1 text-gray-500 text-base sm:text-sm">
-                Loading...
-              </div>
+              <div className="px-4 py-3 text-gray-500">Loading...</div>
             )}
 
             {error && (
-              <div className="absolute z-10 w-full px-4 py-3 bg-red-100 border border-red-300 rounded-xl mt-1 text-red-700 text-base sm:text-sm">
+              <div className="px-4 py-3 text-red-600 bg-red-50 rounded-xl">
                 {error}
               </div>
             )}
 
-            {!loading && !error && schoolSearch.trim() && schools.length > 0 && (
-              <ul
-                id="school-listbox"
-                role="listbox"
-                className="absolute z-10 w-full max-h-48 overflow-auto bg-white border border-gray-300 rounded-xl mt-1 shadow-lg"
-              >
-                {schools.map((school) => (
-                  <li
-                    key={school.id}
-                    role="option"
-                    aria-selected={formData.schoolId === school.id}
-                    className="px-4 py-3 cursor-pointer hover:bg-primary-600 hover:text-white rounded-xl text-base sm:text-sm"
-                    onClick={() => handleSchoolSelect(school)}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
+            {!loading &&
+              !error &&
+              schoolSearch.trim() &&
+              schools.length > 0 && (
+                <ul className="max-h-48 overflow-auto">
+                  {schools.map((school) => (
+                    <li
+                      key={school.id}
+                      className="px-4 py-3 cursor-pointer hover:bg-primary-600 hover:text-white"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // prevent input blur
+                        e.stopPropagation(); // stop bubbling to register button
                         handleSchoolSelect(school);
-                      }
-                    }}
-                  >
-                    {school.name}
-                  </li>
-                ))}
-              </ul>
-            )}
+                      }}
+                    >
+                      {school.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            {!loading && !error && schoolSearch.trim() && schools.length === 0 && (
-              <div className="absolute z-10 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl mt-1 text-gray-500 text-base sm:text-sm">
-                No schools found
-              </div>
-            )}
-          </>
+            {!loading &&
+              !error &&
+              schoolSearch.trim() &&
+              schools.length === 0 && (
+                <div className="px-4 py-3 text-gray-500">No schools found</div>
+              )}
+          </div>
         )}
-
       </div>
 
+      {/* Submit */}
       <button
         type="submit"
-        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 rounded-xl font-bold hover:scale-105 transition text-lg sm:text-base focus:outline-none focus:ring-4 focus:ring-primary-500"
+        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 rounded-xl font-bold hover:scale-105 transition"
       >
         Register
       </button>
@@ -267,7 +287,7 @@ const RegisterForm: React.FC<Props> = ({ onClose, onSwitch }) => {
         <button
           type="button"
           onClick={onSwitch}
-          className="text-primary-600 hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary-600"
+          className="text-primary-600 hover:underline font-medium"
         >
           Login
         </button>

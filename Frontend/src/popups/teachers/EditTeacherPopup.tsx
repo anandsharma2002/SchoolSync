@@ -9,7 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface EditTeacherPopupProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface EditTeacherPopupProps {
     joiningDate: string;
     phone: string;
     address: string;
+    gender: number;
   } | null;
 }
 
@@ -31,14 +33,15 @@ const EditTeacherPopup: React.FC<EditTeacherPopupProps> = ({
   onSubmit,
   teacherData,
 }) => {
-  const { toast } = useToast();
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
+    gender: null
   });
+
+  const [errors, setErrors] = useState<Partial<typeof formData>>({});
 
   useEffect(() => {
     if (teacherData) {
@@ -46,31 +49,62 @@ const EditTeacherPopup: React.FC<EditTeacherPopupProps> = ({
         name: teacherData.name || "",
         email: teacherData.email || "",
         phone: teacherData.phone || "",
+        gender: teacherData.gender || null,
         address: teacherData.address || "",
       });
+      setErrors({});
     }
   }, [teacherData]);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  const validate = () => {
+    const newErrors: Partial<typeof formData> = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email is not valid";
+    }
+
+    if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone must be 10 digits";
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const validationErrors = validate();
 
-    if (!formData.name || !formData.email) {
-      toast({
-        title: "Error",
-        description: "Name and Email are required.",
-        variant: "destructive",
-      });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
-    onSubmit({ ...formData, id: teacherData?.id });
+    if (teacherData?.id) {
+      onSubmit({ ...formData, id: teacherData.id });
+    }
+
     onClose();
   };
-
+  const getGenderLabel = (gender: number) => {
+    switch (gender) {
+      case 0:
+        return "Male";
+      case 1:
+        return "Female";
+      case 2:
+        return "Other";
+      default:
+        return "N/A";
+    }
+  };
   if (!teacherData) return null;
 
   return (
@@ -79,47 +113,77 @@ const EditTeacherPopup: React.FC<EditTeacherPopupProps> = ({
         <DialogHeader>
           <DialogTitle>Edit Teacher</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          {/* Name */}
+          <div className="space-y-1">
             <Label htmlFor="name">Name *</Label>
+            {errors.name && (
+              <p className="text-sm text-red-500 -mb-2">{errors.name}</p>
+            )}
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              required
               placeholder="Teacher's full name"
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Email */}
+          <div className="space-y-1">
             <Label htmlFor="email">Email *</Label>
+            {errors.email && (
+              <p className="text-sm text-red-500 -mb-2">{errors.email}</p>
+            )}
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
-              required
               placeholder="teacher@example.com"
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Phone */}
+          <div className="space-y-1">
             <Label htmlFor="phone">Phone</Label>
+            {errors.phone && (
+              <p className="text-sm text-red-500 -mb-2">{errors.phone}</p>
+            )}
             <Input
               id="phone"
               value={formData.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
-              placeholder="Optional"
+              placeholder="e.g., 1234567890"
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Address */}
+          <div className="space-y-1">
             <Label htmlFor="address">Address</Label>
             <Input
               id="address"
               value={formData.address}
               onChange={(e) => handleChange("address", e.target.value)}
-              placeholder="Optional"
+              placeholder="e.g., 123 Main St"
             />
           </div>
-
+          <div className="space-y-1">
+            <Label htmlFor="gender">Gender</Label>
+            <Select
+              value={formData.gender}
+              onValueChange={(value) => handleChange("gender", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={getGenderLabel(teacherData.gender)} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

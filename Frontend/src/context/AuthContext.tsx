@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+const server_url = import.meta.env.VITE_API_URL;
+
 interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
-  setAuthenticated: (auth: boolean) => void;
-  logout: () => Promise<void>;
+  setIsAuthenticated: (value: boolean) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,18 +19,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkAuth = async () => {
     try {
-      const server_url = import.meta.env.VITE_API_URL || "https://localhost:7266";
       const res = await fetch(`${server_url}/api/Auth/me`, {
-        method: "GET",
         credentials: "include",
       });
 
       if (res.ok) {
+        const data = await res.json();
+        console.log("Auth check:", data);
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Auth check failed:", error);
       setIsAuthenticated(false);
     } finally {
       setLoading(false);
@@ -37,13 +40,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      const server_url = import.meta.env.VITE_API_URL || "https://localhost:7266";
       await fetch(`${server_url}/api/Auth/logout`, {
         method: "POST",
         credentials: "include",
       });
     } catch (error) {
-      console.error("Logout error:", error);
+      console.warn("Logout failed:", error);
     } finally {
       setIsAuthenticated(false);
     }
@@ -55,7 +57,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loading, setAuthenticated: setIsAuthenticated, logout }}
+      value={{
+        isAuthenticated,
+        loading,
+        setIsAuthenticated,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -63,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 };

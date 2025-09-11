@@ -6,6 +6,7 @@ import {
   Edit,
   Eye,
   Trash2,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,7 +117,18 @@ const Students: React.FC = () => {
     { studentId: 2, status: "Absent", date: "2025-07-18" },
     { studentId: 3, status: "Late", date: "2025-07-18" },
   ];
-
+  const getGenderLabel = (gender: number) => {
+    switch (gender) {
+      case 0:
+        return "Male";
+      case 1:
+        return "Female";
+      case 2:
+        return "Other";
+      default:
+        return "N/A";
+    }
+  };
   if (isLoading) return <StudentsSkeleton />;
   if (isError) return <h1>Error: {JSON.stringify(error)}</h1>;
 
@@ -136,129 +148,150 @@ const Students: React.FC = () => {
         </Button>
       </div>
 
-      {/* Table */}
-      <Card>
-        <CardHeader><CardTitle>Student List</CardTitle></CardHeader>
-        <CardContent>
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search students..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                className="pl-10 pr-4 py-2 border rounded-lg w-full"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-400" />
-              <select
-                value={filterClass}
-                onChange={(e) => { setFilterClass(e.target.value); setCurrentPage(1); }}
-                className="px-3 py-2 border rounded-lg"
-              >
-                <option value="all">All Classes</option>
-                {classes.map((cls: any) => (
-                  <option key={cls.id} value={cls.name}>
-                    {cls.name} {cls.section}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Student Records */}
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Sr.No.</TableHead>
-                  <TableHead>Roll Number</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Class</TableHead>
-                  <TableHead>DOB</TableHead>
-                  <TableHead>Gender</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentStudents.map((student: any, idx: number) => {
-                  const attendance = staticAttendance.find(a => a.studentId === student.id);
-                  return (
-                    <TableRow key={student.id}>
-                      <TableCell>{startIndex + idx + 1}</TableCell>
-                      <TableCell>{student.rollNumber}</TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{student.firstName} {student.lastName}</div>
-                          <div className="text-sm text-gray-500">{student.email || "N/A"}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{student?.class ? `${student.class.name} ${student.class.section}` : "N/A"}</TableCell>
-                      <TableCell>{student.dob ? new Date(student.dob).toLocaleDateString("en-GB") : "N/A"}</TableCell>
-                      <TableCell>{student.gender || "N/A"}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendance ? getStatusColor(attendance.status) : "bg-gray-100 text-gray-800"}`}>
-                          {attendance ? attendance.status : "Unknown"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => openModal("view", student)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const fullStudent = {
-                                ...student,
-                                class: classes.find((c: any) => c.id === student.class.id),
-                              };
-                              openModal("edit", fullStudent);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => openModal("delete", student)}>
-                            <Trash2 className="h-4 w-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-6">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious onClick={() => setCurrentPage(current => Math.max(1, current - 1))} />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                    <PaginationItem key={page}>
-                      <PaginationLink onClick={() => setCurrentPage(page)} isActive={currentPage === page}>
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
+      {Array.isArray(students) && students.length > 0 ? (
+        <Card>
+          <CardHeader><CardTitle>Student List</CardTitle></CardHeader>
+          <CardContent>
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  value={searchTerm}
+                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                  className="pl-10 pr-4 py-2 border rounded-lg w-full"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-400" />
+                <select
+                  value={filterClass}
+                  onChange={(e) => { setFilterClass(e.target.value); setCurrentPage(1); }}
+                  className="px-3 py-2 border rounded-lg"
+                >
+                  <option value="all">All Classes</option>
+                  {classes.map((cls: any) => (
+                    <option key={cls.id} value={cls.name}>
+                      {cls.name} {cls.section}
+                    </option>
                   ))}
-                  <PaginationItem>
-                    <PaginationNext onClick={() => setCurrentPage(current => Math.min(totalPages, current + 1))} />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+                </select>
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            {/* Student Records */}
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Sr.No.</TableHead>
+                    <TableHead>Roll Number</TableHead>
+                    <TableHead>Student</TableHead>
+                    <TableHead>Class</TableHead>
+                    <TableHead>DOB</TableHead>
+                    <TableHead>Gender</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentStudents.map((student: any, idx: number) => {
+                    const attendance = staticAttendance.find(a => a.studentId === student.id);
+                    return (
+                      <TableRow key={student.id}>
+                        <TableCell>{startIndex + idx + 1}</TableCell>
+                        <TableCell>{student.rollNumber}</TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{student.firstName} {student.lastName}</div>
+                            <div className="text-sm text-gray-500">{student.email || "N/A"}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{student?.class ? `${student.class.name} ${student.class.section}` : "N/A"}</TableCell>
+                        <TableCell>{student.dob ? new Date(student.dob).toLocaleDateString("en-GB") : "N/A"}</TableCell>
+                        <TableCell>{getGenderLabel(student.gender) || "N/A"}</TableCell>
+                        <TableCell>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${attendance ? getStatusColor(attendance.status) : "bg-gray-100 text-gray-800"}`}>
+                            {attendance ? attendance.status : "Unknown"}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => openModal("view", student)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const fullStudent = {
+                                  ...student,
+                                  class: classes.find((c: any) => c.id === student.class.id),
+                                };
+                                openModal("edit", fullStudent);
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => openModal("delete", student)}>
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious onClick={() => setCurrentPage(current => Math.max(1, current - 1))} />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                      <PaginationItem key={page}>
+                        <PaginationLink onClick={() => setCurrentPage(page)} isActive={currentPage === page}>
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext onClick={() => setCurrentPage(current => Math.min(totalPages, current + 1))} />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="flex flex-col items-center justify-center text-center py-16 px-6 mt-12">
+          <div className="bg-gray-200 rounded-full p-4 mb-4">
+            <Users className="h-12 w-12 text-primary-700" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-primary-800 mb-2">
+            No Students Found
+          </h2>
+          <p className="text-gray-600 text-base sm:text-lg max-w-md mb-6">
+            🎓 Looks like your student list is empty. Add your first student to get started.
+          </p>
+          <Button
+            onClick={() => openModal("add")}
+            className="flex items-center space-x-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add New Student</span>
+          </Button>
+        </div>
+
+      )}
 
       {/* Modals */}
       {modal === "add" && <AddStudentPopup isOpen={isOpen} onClose={closeModal} onSubmit={handleAdd} />}

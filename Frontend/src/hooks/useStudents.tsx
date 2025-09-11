@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const server_url = import.meta.env.VITE_API_URL;
-const schoolId = import.meta.env.VITE_SCHOOL_ID;
+
 
 // Fetch all students
 const fetchStudents = async () => {
@@ -18,7 +18,6 @@ const fetchStudents = async () => {
 const createStudent = async ({ newStudent }: { newStudent: any }) => {
   const payload = {
     ...newStudent,
-    schoolId,
   };
 
   const res = await fetch(`${server_url}/api/Student`, {

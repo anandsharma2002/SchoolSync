@@ -33,66 +33,25 @@ namespace SMSPrototype1.Controllers
         }
 
 
-        [HttpGet("test-cookies")]
-        public IActionResult TestCookies()
-        {
-            var cookies = Request.Cookies;
-            var cookieInfo = new Dictionary<string, string>();
-            
-            foreach (var cookie in cookies)
-            {
-                cookieInfo[cookie.Key] = cookie.Value?.Substring(0, Math.Min(50, cookie.Value?.Length ?? 0)) + "...";
-            }
-            
-            return Ok(new
-            {
-                message = "Cookie test endpoint",
-                cookies = cookieInfo,
-                hasAuthToken = cookies.ContainsKey("auth_token"),
-                authTokenValue = cookies.ContainsKey("auth_token") ? cookies["auth_token"]?.Substring(0, Math.Min(50, cookies["auth_token"]?.Length ?? 0)) + "..." : "Not found"
-            });
-        }
-
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
-            try
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return NotFound("User not found");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
             {
-                // Debug: Check if user is authenticated
-                if (!User.Identity.IsAuthenticated)
-                {
-                    return Unauthorized("User is not authenticated");
-                }
-
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                Console.WriteLine($"User ID from token: {userId}");
-
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized("User ID not found in token");
-                }
-
-                var user = await _userManager.FindByIdAsync(userId);
-
-                if (user == null)
-                    return NotFound("User not found");
-
-                var roles = await _userManager.GetRolesAsync(user);
-
-                return Ok(new
-                {
-                    id = user.Id,
-                    username = user.UserName,
-                    email = user.Email,
-                    roles = roles
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetCurrentUser: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
+                id = user.Id,
+                username = user.UserName,
+                email = user.Email,
+                roles = roles
+            });
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto model)
@@ -116,29 +75,16 @@ namespace SMSPrototype1.Controllers
                 });
             }
 
-            // ✅ Only assign role if it exists
-            if (!string.IsNullOrEmpty(model.Role))
-            {
-                var roleExists = await _roleManager.RoleExistsAsync(model.Role);
-                if (!roleExists)
-                {
-                    return BadRequest(new
-                    {
-                        isSuccess = false,
-                        errorMessage = $"Role '{model.Role}' does not exist."
-                    });
-                }
 
-                await _userManager.AddToRoleAsync(user, model.Role);
-            }
+            await _userManager.AddToRoleAsync(user, model.Role);
 
+            
             return Ok(new
             {
                 isSuccess = true,
                 message = "Registration successful!"
             });
         }
-
 
 
 
@@ -199,10 +145,8 @@ namespace SMSPrototype1.Controllers
             Response.Cookies.Append("auth_token", tokenString, new CookieOptions
             {
                 HttpOnly = true,
-                // Development settings
-                Secure = false,
-                SameSite = SameSiteMode.Lax,   // Use Lax for same-site requests
-                Path = "/",                    // Explicitly set path
+                Secure = true,
+                SameSite = SameSiteMode.None, // if you're using cross-origin (localhost:8080 <-> 7266)
                 Expires = token.ValidTo
             });
 

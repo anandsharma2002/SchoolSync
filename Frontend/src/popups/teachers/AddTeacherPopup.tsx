@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
+
 interface AddTeacherPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +24,7 @@ interface TeacherFormData {
   phone: string;
   address: string;
   joiningDate: string;
+  gender: string;
 }
 
 const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
@@ -30,29 +32,57 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const { toast } = useToast();
+  const {toast} = useToast();
   const [formData, setFormData] = useState<TeacherFormData>({
     name: "",
     email: "",
     phone: "",
     address: "",
     joiningDate: "",
+    gender: ""
   });
+
+  const [errors, setErrors] = useState<Partial<TeacherFormData>>({});
 
   const handleChange = (field: keyof TeacherFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" })); // clear error on change
+  };
+
+  const validate = () => {
+    const newErrors: Partial<TeacherFormData> = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email is not valid";
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone must be 10 digits";
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = "Gender  is required";
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const validationErrors = validate();
 
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.phone) {
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+          title: "Validation Error",
+          description: "Please correct the highlighted fields.",
+          variant: "destructive",
+        });
       return;
     }
 
@@ -63,7 +93,9 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
       phone: "",
       address: "",
       joiningDate: "",
+      gender: ""
     });
+    setErrors({});
     onClose();
   };
 
@@ -73,39 +105,53 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
         <DialogHeader>
           <DialogTitle>Add New Teacher</DialogTitle>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          {/* Name */}
+          <div className="space-y-1">
             <Label htmlFor="name">Name *</Label>
+            {errors.name && (
+              <p className="text-sm text-red-500 -mb-2">{errors.name}</p>
+            )}
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
               placeholder="e.g., John Doe"
-              required
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Email */}
+          <div className="space-y-1">
             <Label htmlFor="email">Email *</Label>
+            {errors.email && (
+              <p className="text-sm text-red-500 -mb-2">{errors.email}</p>
+            )}
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
               placeholder="e.g., john@example.com"
-              required
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Phone */}
+          <div className="space-y-1">
             <Label htmlFor="phone">Phone *</Label>
+            {errors.phone && (
+              <p className="text-sm text-red-500 -mb-2">{errors.phone}</p>
+            )}
             <Input
               id="phone"
               value={formData.phone}
               onChange={(e) => handleChange("phone", e.target.value)}
               placeholder="e.g., 1234567890"
-              required
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Address */}
+          <div className="space-y-1">
             <Label htmlFor="address">Address</Label>
             <Input
               id="address"
@@ -114,7 +160,29 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
               placeholder="e.g., 123 Main St"
             />
           </div>
-          <div className="space-y-2">
+
+          {/* Gender */}
+          <div className="space-y-1">
+            <Label htmlFor="gender">Gender *</Label>
+            {errors.gender && (
+              <p className="text-sm text-red-500 -mb-2">{errors.gender}</p>
+            )}
+            <select
+              id="gender"
+              value={formData.gender.toString()} // to match select's string-based value
+              onChange={(e) => handleChange("gender",   (e.target.value))}
+              className="w-full rounded-md border border-gray-300 px-3 py-2"
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+
+          </div>
+
+          {/* Joining D>ate */}
+          <div className="space-y-1">
             <Label htmlFor="joiningDate">Joining Date</Label>
             <Input
               id="joiningDate"
@@ -124,7 +192,7 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="pt-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -135,4 +203,5 @@ const AddTeacherPopup: React.FC<AddTeacherPopupProps> = ({
     </Dialog>
   );
 };
-export default AddTeacherPopup; 
+
+export default AddTeacherPopup;

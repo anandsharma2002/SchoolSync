@@ -15,6 +15,7 @@ interface ClassItem {
 interface EditClassModalProps {
   classData: ClassItem;
   onClose: () => void;
+  
   onSave: (updatedClass: ClassItem) => void;
 }
 

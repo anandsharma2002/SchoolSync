@@ -1,8 +1,10 @@
-import { useAuth } from "@/context/AuthContext";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
-const server_url = import.meta.env.VITE_API_URL || "https://localhost:7266";
+const server_url = import.meta.env.VITE_API_URL;
+
 interface Props {
   onClose: () => void;
   onSwitch: () => void;
@@ -10,98 +12,159 @@ interface Props {
 
 const LoginForm: React.FC<Props> = ({ onClose, onSwitch }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const { setAuthenticated } = useAuth(); // ⬅️ get auth setter from context
-  const navigate = useNavigate(); // ⬅️ navigate after login
+  const [errors, setErrors] = useState<{
+    username?: string;
+    password?: string;
+    general?: string;
+  }>({});
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const { setIsAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({}); // clear errors on input change
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    setLoading(true);
+
+    // Basic form validation
+    if (!formData.username.trim() || !formData.password) {
+      setErrors({
+        username: !formData.username.trim()
+          ? "Username is required."
+          : undefined,
+        password: !formData.password ? "Password is required." : undefined,
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const payload = {
         username: formData.username,
         password: formData.password,
       };
 
-      // 🔐 Step 1: Send login request
       const res = await fetch(`${server_url}/api/Auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Required for HttpOnly cookies
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Login failed.");
+      const json = await res.json();
+
+      // Safer check for success
+      const success =
+        res.ok &&
+        (json.isSuccess === undefined ||
+          json.isSuccess === true ||
+          (typeof json.message === "string" &&
+            json.message.toLowerCase().includes("success")));
+
+      if (!success) {
+        setErrors({
+          general:
+            json?.errorMessage ||
+            json?.message ||
+            "Invalid username or password.",
+        });
+        toast.error(json?.errorMessage || json?.message || "Login failed.");
+        setLoading(false);
+        return;
       }
 
-      const json = await res.json();
-      console.log("Login Response:", json);
-
-      // ✅ If using cookies for auth (HttpOnly), token is auto-stored by the browser.
-      // No need to save it manually in localStorage.
-      // However, if switching to token-based auth, uncomment this:
-      // localStorage.setItem("token", json.token);
-
-      // ✅ Optional: Verify login by hitting a protected endpoint
-      const protectedRes = await fetch(`${server_url}/api/Auth/me`, {
+      // Fetch user info after successful login
+      const meRes = await fetch(`${server_url}/api/Auth/me`, {
         method: "GET",
-        credentials: "include", // Required to send cookie
-        // If using token manually: 
-        // headers: { Authorization: `Bearer ${json.token}` },
+        credentials: "include",
       });
 
-      if (!protectedRes.ok) {
-        throw new Error("Authenticated request failed");
+      if (!meRes.ok) {
+        throw new Error("Authentication verification failed after login.");
       }
 
-      const protectedData = await protectedRes.json();
-      console.log("Authenticated user info:", protectedData);
+      const meData = await meRes.json();
+      console.log("Authenticated user:", meData);
 
-      // ✅ Update auth context
-      setAuthenticated(true);
-      alert("Login successful!");
-      onClose(); // close modal
-      navigate("/dashboard"); // ✅ navigate to dashboard
+      setIsAuthenticated(true);
 
+      toast.success("✅ Logged in successfully!");
+      onClose();
+
+      navigate("/dashboard");
     } catch (err: any) {
-      alert(err.message || "Something went wrong. Please try again.");
+      console.error(err);
+      toast.error(err.message || "Something went wrong.");
+      setErrors({ general: err.message || "Something went wrong." });
+    } finally {
+      setLoading(false);
     }
   };
-
-
-
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Login</h2>
-      <input
-        name="username"
-        value={formData.username}
-        onChange={handleChange}
-        required
-        placeholder="Username"
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl"
-      />
-      <input
-        name="password"
-        type="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-        placeholder="Password"
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl"
-      />
+
+      {/* General error */}
+      {errors.general && (
+        <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-2 rounded-md">
+          {errors.general}
+        </div>
+      )}
+
+      {/* Username */}
+      <div className="space-y-1">
+        {errors.username && (
+          <p className="text-sm text-red-600">{errors.username}</p>
+        )}
+        <input
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          required
+          placeholder="Username"
+          autoComplete="username"
+          className={`w-full px-4 py-3 border rounded-xl ${
+            errors.username ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+      </div>
+
+      {/* Password */}
+      <div className="space-y-1">
+        {errors.password && (
+          <p className="text-sm text-red-600">{errors.password}</p>
+        )}
+        <input
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          placeholder="Password"
+          autoComplete="current-password"
+          className={`w-full px-4 py-3 border rounded-xl ${
+            errors.password ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+      </div>
+
+      {/* Submit */}
       <button
         type="submit"
-        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 rounded-xl font-bold hover:scale-105 transition"
+        disabled={loading}
+        className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 rounded-xl font-bold hover:scale-105 transition disabled:opacity-60"
       >
-        Login
+        {loading ? "Logging in..." : "Login"}
       </button>
+
+      {/* Switch to Register */}
       <p className="text-sm text-center text-gray-600 mt-4">
         Don't have an account?{" "}
         <button

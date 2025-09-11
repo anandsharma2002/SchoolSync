@@ -17,10 +17,11 @@ namespace SMSPrototype1.Controllers
     public class ClassController : ControllerBase
     {
         private readonly ISchoolClassServices schoolClassServices;
-
-        public ClassController(ISchoolClassServices schoolClassServices)
+        private readonly UserManager<ApplicationUser> userManager;
+        public ClassController(ISchoolClassServices schoolClassServices, UserManager<ApplicationUser> userManager)
         {
             this.schoolClassServices = schoolClassServices;
+            this.userManager = userManager;
         }
 
         [HttpGet]
@@ -29,27 +30,51 @@ namespace SMSPrototype1.Controllers
         {
             var apiResult = new ApiResult<IEnumerable<SchoolClass>>();
 
+            if (!ModelState.IsValid)
+            {
+                apiResult.IsSuccess = false;
+                apiResult.StatusCode = HttpStatusCode.BadRequest;
+                apiResult.ErrorMessage = string.Join(" | ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return apiResult;
+            }
+
             try
             {
-                // ✅ Extract SchoolId from JWT claims
-                var schoolId = GetSchoolIdFromClaims();
-                if (schoolId == null)
-                    return SetError(apiResult, "Missing or invalid SchoolId in token.", HttpStatusCode.Unauthorized);
+                
+                if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+                {
+                    return SetError(apiResult, "Invalid or missing user ID.", HttpStatusCode.Unauthorized);
+                }
 
+                
+                var user = await userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return SetError(apiResult, "User not found.", HttpStatusCode.NotFound);
+                }
 
-                var classes = await schoolClassServices.GetAllClassesAsync(schoolId);
+               
+                if (user.SchoolId == null)
+                {
+                    return SetError(apiResult, "User does not have a SchoolId assigned.", HttpStatusCode.BadRequest);
+                }
+
+                
+                var classes = await schoolClassServices.GetAllClassesAsync(user.SchoolId.Value);
 
                 apiResult.Content = classes;
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = HttpStatusCode.OK;
+                return apiResult;
             }
             catch (Exception ex)
             {
                 return SetError(apiResult, ex.Message, HttpStatusCode.BadRequest);
             }
-
-            return apiResult;
         }
+
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Principal,SchoolIncharge")]
