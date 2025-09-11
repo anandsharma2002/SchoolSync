@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,8 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
-import Modal from "./components/Modal";
-
 import Modal from "./components/Modal";
 
 import Home from "./pages/Home";

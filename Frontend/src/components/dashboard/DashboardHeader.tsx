@@ -3,7 +3,6 @@ import { Bell, Search, User, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-
 const DashboardHeader: React.FC = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -41,14 +40,6 @@ const DashboardHeader: React.FC = () => {
             <button className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors">
               <User className="h-5 w-5" />
               <span className="text-sm font-medium hidden sm:block">Admin</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-2 p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Logout"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="text-sm font-medium hidden sm:block">Logout</span>
             </button>
           </div>
         </div>
