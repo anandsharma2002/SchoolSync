@@ -5,14 +5,18 @@ interface ProtectedRouteProps {
   allowedRoles?: string[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles = [] }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  allowedRoles = [],
+}) => {
   const { isAuthenticated, user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <span className="text-gray-600 text-lg">Checking authentication...</span>
+        <span className="text-gray-600 text-lg">
+          Checking authentication...
+        </span>
       </div>
     );
   }

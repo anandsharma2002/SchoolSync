@@ -12,7 +12,11 @@ interface Props {
 
 const LoginForm: React.FC<Props> = ({ onClose, onSwitch }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const [errors, setErrors] = useState<{ username?: string; password?: string; general?: string }>({});
+  const [errors, setErrors] = useState<{
+    username?: string;
+    password?: string;
+    general?: string;
+  }>({});
   const [loading, setLoading] = useState(false);
 
   const { setIsAuthenticated } = useAuth();
@@ -31,7 +35,9 @@ const LoginForm: React.FC<Props> = ({ onClose, onSwitch }) => {
     // Basic form validation
     if (!formData.username.trim() || !formData.password) {
       setErrors({
-        username: !formData.username.trim() ? "Username is required." : undefined,
+        username: !formData.username.trim()
+          ? "Username is required."
+          : undefined,
         password: !formData.password ? "Password is required." : undefined,
       });
       setLoading(false);
@@ -56,15 +62,17 @@ const LoginForm: React.FC<Props> = ({ onClose, onSwitch }) => {
       // Safer check for success
       const success =
         res.ok &&
-        (
-          json.isSuccess === undefined ||
+        (json.isSuccess === undefined ||
           json.isSuccess === true ||
-          (typeof json.message === "string" && json.message.toLowerCase().includes("success"))
-        );
+          (typeof json.message === "string" &&
+            json.message.toLowerCase().includes("success")));
 
       if (!success) {
         setErrors({
-          general: json?.errorMessage || json?.message || "Invalid username or password.",
+          general:
+            json?.errorMessage ||
+            json?.message ||
+            "Invalid username or password.",
         });
         toast.error(json?.errorMessage || json?.message || "Login failed.");
         setLoading(false);
@@ -112,7 +120,9 @@ const LoginForm: React.FC<Props> = ({ onClose, onSwitch }) => {
 
       {/* Username */}
       <div className="space-y-1">
-        {errors.username && <p className="text-sm text-red-600">{errors.username}</p>}
+        {errors.username && (
+          <p className="text-sm text-red-600">{errors.username}</p>
+        )}
         <input
           name="username"
           value={formData.username}
@@ -128,7 +138,9 @@ const LoginForm: React.FC<Props> = ({ onClose, onSwitch }) => {
 
       {/* Password */}
       <div className="space-y-1">
-        {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+        {errors.password && (
+          <p className="text-sm text-red-600">{errors.password}</p>
+        )}
         <input
           name="password"
           type="password"

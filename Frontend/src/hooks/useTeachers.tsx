@@ -2,9 +2,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const server_url = import.meta.env.VITE_API_URL;
 
-
+// Fetch all teachers
 // Fetch all teachers
 const fetchTeachers = async () => {
+  const res = await fetch(`${server_url}/api/Teacher`, {
+    credentials: "include", // 👈 Include auth cookies
+  });
   const res = await fetch(`${server_url}/api/Teacher`, {
     credentials: "include", // 👈 Include auth cookies
   });
@@ -16,6 +19,7 @@ const fetchTeachers = async () => {
 };
 
 // Create teacher
+// Create teacher
 const createTeacher = async ({ newTeacher }: { newTeacher: any }) => {
   const payload = {
     ...newTeacher,
@@ -24,6 +28,7 @@ const createTeacher = async ({ newTeacher }: { newTeacher: any }) => {
   const res = await fetch(`${server_url}/api/Teacher`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 👈 Include auth cookies
     credentials: "include", // 👈 Include auth cookies
     body: JSON.stringify(payload),
   });
@@ -34,10 +39,12 @@ const createTeacher = async ({ newTeacher }: { newTeacher: any }) => {
 };
 
 // Update teacher
+// Update teacher
 const updateTeacher = async ({ updatedTeacher }: { updatedTeacher: any }) => {
   const res = await fetch(`${server_url}/api/Teacher/${updatedTeacher.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 👈 Include auth cookies
     credentials: "include", // 👈 Include auth cookies
     body: JSON.stringify(updatedTeacher),
   });
@@ -48,9 +55,11 @@ const updateTeacher = async ({ updatedTeacher }: { updatedTeacher: any }) => {
 };
 
 // Delete teacher
+// Delete teacher
 const removeTeacher = async ({ id }: { id: string }) => {
   const res = await fetch(`${server_url}/api/Teacher/${id}`, {
     method: "DELETE",
+    credentials: "include", // 👈 Include auth cookies
     credentials: "include", // 👈 Include auth cookies
   });
 
@@ -59,6 +68,7 @@ const removeTeacher = async ({ id }: { id: string }) => {
   return json.content;
 };
 
+// Hook
 // Hook
 export const useTeachers = () => {
   const queryClient = useQueryClient();

@@ -11,6 +11,10 @@ interface NavigationProps {
   onLoginClick?: () => void;
   onRegisterClick?: () => void;
 }
+interface NavigationProps {
+  onLoginClick?: () => void;
+  onRegisterClick?: () => void;
+}
 
 const Navigation: React.FC<NavigationProps> = ({
   onLoginClick,
@@ -68,10 +72,11 @@ const Navigation: React.FC<NavigationProps> = ({
               <Link
                 key={item.name}
                 to={item.path}
-                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${isActive(item.path)
-                  ? "text-primary-600 bg-primary-50"
-                  : "text-gray-700 hover:text-primary-600 hover:bg-gray-50"
-                  }`}
+                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
+                  isActive(item.path)
+                    ? "text-primary-600 bg-primary-50"
+                    : "text-gray-700 hover:text-primary-600 hover:bg-gray-50"
+                }`}
               >
                 {item.name}
                 {isActive(item.path) && (
@@ -103,7 +108,11 @@ const Navigation: React.FC<NavigationProps> = ({
               onClick={() => setIsOpen(!isOpen)}
               className="text-gray-700 hover:text-primary-600 transition-colors duration-300 p-2 rounded-lg hover:bg-gray-50"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -117,10 +126,11 @@ const Navigation: React.FC<NavigationProps> = ({
                   key={item.name}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 ${isActive(item.path)
-                    ? "text-primary-600 bg-primary-50 border-l-4 border-primary-600"
-                    : "text-gray-700 hover:text-primary-600 hover:bg-gray-50"
-                    }`}
+                  className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 ${
+                    isActive(item.path)
+                      ? "text-primary-600 bg-primary-50 border-l-4 border-primary-600"
+                      : "text-gray-700 hover:text-primary-600 hover:bg-gray-50"
+                  }`}
                 >
                   {item.name}
                 </Link>
@@ -155,8 +165,6 @@ const Navigation: React.FC<NavigationProps> = ({
                   <LogOut className="w-5 h-5" />
                   Logout
                 </button>
-
-
               )}
             </div>
           </div>

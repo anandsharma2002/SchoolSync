@@ -57,7 +57,7 @@ namespace SMSPrototype1.Controllers
                     return SetError(apiResult, "User does not have a SchoolId assigned.", HttpStatusCode.BadRequest);
                 }
 
-                apiResult.Content = await _teacherservice.GetAllTeachersAsync(user.SchoolId.Value);
+                apiResult.Content = await _teacherservice.GetAllTeachersAsync(user.SchoolId);
                 apiResult.IsSuccess = true;
                 apiResult.StatusCode = System.Net.HttpStatusCode.OK;
                 return apiResult;

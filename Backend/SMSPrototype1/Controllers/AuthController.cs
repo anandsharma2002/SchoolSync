@@ -19,15 +19,17 @@ namespace SMSPrototype1.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
-
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         public AuthController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole<Guid>> roleManager,
             IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
 
@@ -111,11 +113,19 @@ namespace SMSPrototype1.Controllers
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var jwtKey = _configuration["Jwt:Key"];
+            var jwtIssuer = _configuration["Jwt:Issuer"];
+            var jwtAudience = _configuration["Jwt:Audience"];
+            
+            Console.WriteLine($"=== JWT Configuration ===");
+            Console.WriteLine($"Key: {jwtKey?.Substring(0, Math.Min(10, jwtKey?.Length ?? 0))}...");
+            Console.WriteLine($"Issuer: {jwtIssuer}");
+            Console.WriteLine($"Audience: {jwtAudience}");
+            
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: jwtIssuer,
+                audience: jwtAudience,
                 expires: DateTime.UtcNow.AddHours(3),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)

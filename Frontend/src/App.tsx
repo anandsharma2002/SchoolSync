@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
+import Modal from "./components/Modal";
+
 import Modal from "./components/Modal";
 
 import Home from "./pages/Home";
@@ -66,10 +69,16 @@ const App: React.FC = () => {
           <AuthProvider>
             <Modal isOpen={modalOpen} onClose={closeModal}>
               {modalType === "register" && (
-                <RegisterForm onClose={closeModal} onSwitch={() => setModalType("login")} />
+                <RegisterForm
+                  onClose={closeModal}
+                  onSwitch={() => setModalType("login")}
+                />
               )}
               {modalType === "login" && (
-                <LoginForm onClose={closeModal} onSwitch={() => setModalType("register")} />
+                <LoginForm
+                  onClose={closeModal}
+                  onSwitch={() => setModalType("register")}
+                />
               )}
             </Modal>
 
@@ -78,7 +87,10 @@ const App: React.FC = () => {
               <Route
                 path="/"
                 element={
-                  <PageLayout onLoginClick={openLogin} onRegisterClick={openRegister}>
+                  <PageLayout
+                    onLoginClick={openLogin}
+                    onRegisterClick={openRegister}
+                  >
                     <Home />
                   </PageLayout>
                 }
@@ -86,7 +98,10 @@ const App: React.FC = () => {
               <Route
                 path="/about"
                 element={
-                  <PageLayout onLoginClick={openLogin} onRegisterClick={openRegister}>
+                  <PageLayout
+                    onLoginClick={openLogin}
+                    onRegisterClick={openRegister}
+                  >
                     <About />
                   </PageLayout>
                 }
@@ -94,7 +109,10 @@ const App: React.FC = () => {
               <Route
                 path="/pricing"
                 element={
-                  <PageLayout onLoginClick={openLogin} onRegisterClick={openRegister}>
+                  <PageLayout
+                    onLoginClick={openLogin}
+                    onRegisterClick={openRegister}
+                  >
                     <Pricing />
                   </PageLayout>
                 }
@@ -102,14 +120,17 @@ const App: React.FC = () => {
               <Route
                 path="/contact"
                 element={
-                  <PageLayout onLoginClick={openLogin} onRegisterClick={openRegister}>
+                  <PageLayout
+                    onLoginClick={openLogin}
+                    onRegisterClick={openRegister}
+                  >
                     <Contact />
                   </PageLayout>
                 }
               />
 
               {/* Protected Dashboard Routes */}
-              <Route element={<ProtectedRoute/>}>
+              <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />}>
                   <Route index element={<DashboardHome />} />
                   <Route path="classes" element={<Classes />} />
@@ -144,7 +165,11 @@ interface PageLayoutProps {
   children: React.ReactNode;
 }
 
-const PageLayout: React.FC<PageLayoutProps> = ({ onLoginClick, onRegisterClick, children }) => (
+const PageLayout: React.FC<PageLayoutProps> = ({
+  onLoginClick,
+  onRegisterClick,
+  children,
+}) => (
   <div className="min-h-screen flex flex-col">
     <Navigation onLoginClick={onLoginClick} onRegisterClick={onRegisterClick} />
     <main className="flex-1">{children}</main>
@@ -153,7 +178,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({ onLoginClick, onRegisterClick, 
 );
 
 export default App;
-
 
 // This is how we will upgrade the protected routes later on
 

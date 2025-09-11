@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace SMSDataModel.Model.Models
 {
@@ -11,7 +6,11 @@ namespace SMSDataModel.Model.Models
     {
         public DateOnly CreatedDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-        public Guid? SchoolId { get; set; }
+        // ✅ Foreign key: each user belongs to one school
+        public Guid SchoolId { get; set; }
         public School School { get; set; }
+
+        // Optional: define role inside the school (Teacher, Admin, Student, etc.)
+        public string Role { get; set; }
     }
 }

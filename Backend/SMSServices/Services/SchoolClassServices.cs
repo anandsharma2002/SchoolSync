@@ -62,5 +62,10 @@ namespace SMSServices.Services
             }
             throw new Exception("Class with this Id not found");
         }
+
+        public Task<List<SchoolClass>> GetAllClassesAsync(Guid? schoolId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

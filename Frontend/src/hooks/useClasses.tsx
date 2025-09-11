@@ -10,8 +10,10 @@ const fetchClasses = async () => {
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
   return json.content ?? [];
+  return json.content ?? [];
 };
 
+const createClass = async ({ newClass }: { newClass: any }) => {
 const createClass = async ({ newClass }: { newClass: any }) => {
   const payload = {
     ...newClass,
@@ -21,8 +23,10 @@ const createClass = async ({ newClass }: { newClass: any }) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // 🔐 Include cookies
+    credentials: "include", // 🔐 Include cookies
     body: JSON.stringify(payload),
   });
+
 
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
@@ -33,6 +37,7 @@ const updateClass = async ({ updatedClass }: { updatedClass: any }) => {
   const res = await fetch(`${server_url}/api/Class/${updatedClass.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // 🔐 Include cookies
     credentials: "include", // 🔐 Include cookies
     body: JSON.stringify(updatedClass),
   });
@@ -45,6 +50,7 @@ const removeClass = async ({ id }: { id: string }) => {
   const res = await fetch(`${server_url}/api/Class/${id}`, {
     method: "DELETE",
     credentials: "include", // 🔐 Include cookies
+    credentials: "include", // 🔐 Include cookies
   });
   const json = await res.json();
   if (!json.isSuccess) throw new Error(json.errorMessage);
@@ -56,10 +62,12 @@ export const useClasses = () => {
 
   const query = useQuery({
     queryKey: ["classes"],
+    queryKey: ["classes"],
     queryFn: fetchClasses,
   });
 
   const addClass = useMutation({
+    mutationFn: ({ newClass }: { newClass: any }) => createClass({ newClass }),
     mutationFn: ({ newClass }: { newClass: any }) => createClass({ newClass }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["classes"] });
@@ -67,6 +75,8 @@ export const useClasses = () => {
   });
 
   const editClass = useMutation({
+    mutationFn: ({ updatedClass }: { updatedClass: any }) =>
+      updateClass({ updatedClass }),
     mutationFn: ({ updatedClass }: { updatedClass: any }) =>
       updateClass({ updatedClass }),
     onSuccess: () => {
@@ -88,3 +98,4 @@ export const useClasses = () => {
     deleteClass: deleteClass.mutateAsync,
   };
 };
+
