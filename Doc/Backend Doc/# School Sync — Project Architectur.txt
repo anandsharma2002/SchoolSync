@@ -1,0 +1,251 @@
+# School Sync — Project Architecture (Backend)
+
+## Overview
+ASP.NET Core 8 Web API with a clean layered architecture:
+- API (`SMSPrototype1`): Controllers, middleware, versioning, Swagger, auth.
+- Services (`SMSServices`): Domain logic.
+- Repositories (`SMSRepository`): Data access abstractions.
+- Data Context (`SMSDataContext`): EF Core DbContext, migrations, seeding.
+- Models (`SMSDataModel`): Entities, DTOs, AutoMapper.
+
+Auth: ASP.NET Identity (Guid keys) + JWT (HttpOnly cookie) with policy-based authorization.
+DB: PostgreSQL (Npgsql). Documentation via Swagger/OpenAPI.
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart LR
+  subgraph API ["API (SMSPrototype1)"]
+    C[Controllers] --> POL[Authorization Policies]
+    C --> SVC[Services (SMSServices)]
+    APIAUTH[JWT Auth + Cookies] --> C
+    SWAG[Swagger/OpenAPI] --> C
+    HC[Health Checks] --> C
+  end
+
+  subgraph Domain ["Domain Layer"]
+    SVC --> REPO[Repositories (SMSRepository)]
+    SVC --> MAP[AutoMapper (SMSDataModel)]
+  end
+
+  subgraph Data ["Data Layer (SMSDataContext)"]
+    REPO --> DC[EF Core DataContext]
+    DC --> PG[(PostgreSQL)]
+    SEED[SeedData] --> DC
+    MIG[EF Migrations] --> DC
+  end
+
+  FE[Frontend SPA] == HTTPS (credentials: include) ==> API
+```
+
+---
+
+## Request Flow (Sequence)
+
+```mermaid
+sequenceDiagram
+  participant FE as Frontend SPA
+  participant API as ASP.NET API
+  participant AUTH as Identity/JWT
+  participant DB as PostgreSQL
+
+  FE->>API: POST /api/v1/auth/login { email, password }
+  API->>AUTH: Validate credentials (Identity)
+  AUTH-->>API: ClaimsPrincipal + roles
+  API-->>FE: 200 OK + Set-Cookie: auth_token (HttpOnly, Secure)
+  FE->>API: GET /api/v1/schools (include credentials)
+  API->>API: Authorize (policy/role); Model validation
+  API->>DB: EF query via Repository/DataContext
+  DB-->>API: Rows
+  API-->>FE: 200 OK JSON
+```
+
+---
+
+## Components
+
+- Controllers: Thin, HTTP orchestration, validation, ProblemDetails responses.
+- Services: Business logic, transactional workflows, authorization checks where needed.
+- Repositories: Query composition and persistence via EF Core.
+- DataContext: Entity configuration, relationships, indexes, migrations.
+- Identity: `ApplicationUser : IdentityUser<Guid>`; role seeding via `SeedData`.
+- Middleware: Authentication, Authorization, HTTPS redirection, CORS, (optional) Correlation IDs.
+- Swagger: Security scheme for Bearer JWT, v1 API docs.
+
+Key references in repo:
+- `Backend/SMSPrototype1/Program.cs` — JWT, Swagger, CORS, DI, seeding.
+- `Backend/SMSDataContext/Migrations/*` — schema history.
+
+---
+
+## Dependency Injection
+
+- Services and repositories registered via `AddTransient`/`AddScoped` (prefer scoped for repositories/DbContext usage).
+- AutoMapper profiles registered centrally:
+  - `SchoolAutoMapper`, `SchoolClassAutoMapper`, `TeacherAutomapper`, `StudentAutomapper`, `AttendanceAutomapper`.
+
+Example:
+```csharp
+// Program.cs (excerpt)
+builder.Services.AddDbContext<DataContext>(o =>
+    o.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+  .AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters {
+      ValidateIssuer = true, ValidateAudience = true, ValidateLifetime = true,
+      ValidateIssuerSigningKey = true,
+      ValidIssuer = builder.Configuration["Jwt:Issuer"],
+      ValidAudience = builder.Configuration["Jwt:Audience"],
+      IssuerSigningKey = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+    options.Events = new JwtBearerEvents {
+      OnMessageReceived = ctx => {
+        var token = ctx.Request.Cookies["auth_token"];
+        if (!string.IsNullOrEmpty(token)) ctx.Token = token;
+        return Task.CompletedTask;
+      }
+    };
+  });
+
+builder.Services.AddSwaggerGen(o => {
+  o.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme {
+    Name = "Authorization", Type = SecuritySchemeType.ApiKey, Scheme = "Bearer",
+    In = ParameterLocation.Header, BearerFormat = "JWT", Description = "JWT Bearer token"
+  });
+});
+```
+
+---
+
+## API Versioning & Swagger
+
+Add versioning (recommended):
+```csharp
+builder.Services.AddApiVersioning(o => {
+  o.DefaultApiVersion = new ApiVersion(1,0);
+  o.AssumeDefaultVersionWhenUnspecified = true;
+  o.ReportApiVersions = true;
+});
+builder.Services.AddVersionedApiExplorer(o => {
+  o.GroupNameFormat = "'v'VVV";
+  o.SubstituteApiVersionInUrl = true;
+});
+```
+
+Group controllers by version using route attributes: `[Route("api/v{version:apiVersion}/[controller]")]`.
+
+---
+
+## Persistence and Migrations
+
+- EF Core 8 + Npgsql provider.
+- Recommended indices:
+  - FKs: `SchoolId`, `ClassId`, `StudentId`, `TeacherId`, `UserId`.
+  - Attendance: UNIQUE `(ClassId, StudentId, Date)`.
+  - Case-insensitive search: `LOWER(name)` functional indices (or normalize column).
+- Migrations:
+```bash
+dotnet ef migrations add Initial_Creation --project Backend/SMSDataContext --startup-project Backend/SMSPrototype1
+dotnet ef database update --project Backend/SMSDataContext --startup-project Backend/SMSPrototype1
+dotnet ef migrations script --idempotent --project Backend/SMSDataContext --startup-project Backend/SMSPrototype1 -o migrate.sql
+```
+
+---
+
+## Security
+
+- JWT validation: issuer, audience, signing key; short token lifetime; rotation policy (future).
+- Cookies: `auth_token` is HttpOnly, Secure; SameSite Lax/Strict to reduce CSRF risk.
+- CSRF Protection (for cookie-based auth):
+  - Require `X-CSRF-Token` header for mutating endpoints; validate server-side token.
+- CORS:
+  - Dev allowlist (e.g., `http://localhost:5173`).
+  - Prod: explicit origins; disallow `*` with credentials.
+- Secrets:
+  - Move DB connection and JWT key to environment or secret manager (no plaintext in `appsettings.json`).
+
+---
+
+## Caching & Performance
+
+- Short-term (API level):
+  - Use `AsNoTracking()` for reads.
+  - DTO projections to limit payloads.
+  - Pagination on lists, server-side filtering/sorting.
+- Future:
+  - Response caching for public GETs where applicable.
+  - Application-level caching of reference data (e.g., schools list) with invalidation.
+- Database:
+  - Proper indices; analyze execution plans for hot queries.
+
+---
+
+## Health, Observability, and Diagnostics
+
+- Health Checks:
+```csharp
+builder.Services.AddHealthChecks()
+  .AddNpgSql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")!);
+app.MapHealthChecks("/health");
+```
+
+- Structured Logging:
+  - Log correlation ID middleware (custom/future).
+  - Include `TraceIdentifier` in responses or logs.
+
+- Problem Details:
+  - Return RFC 7807 for errors; unify validation and server errors across controllers.
+
+---
+
+## Environments & Configuration
+
+- Config sources: `appsettings.{Environment}.json` + environment variables.
+- Non-dev:
+  - Secrets from env/key vault.
+  - Swagger UI disabled or protected; OpenAPI JSON still available for clients.
+- HTTPS: Enforce on reverse proxy/ingress; HSTS at edge.
+
+---
+
+## Deployment
+
+- Build:
+```bash
+dotnet publish Backend/SMSPrototype1 -c Release -o out
+```
+- Migrate DB before or during startup (script-based in prod).
+- Reverse proxy adds security headers (CSP, HSTS, X-Frame-Options).
+
+---
+
+## Scaling
+
+- Stateless API; scale horizontally.
+- DB vertically and with optimized indices; connection pooling (Npgsql defaults).
+- Add rate limiting middleware (ASP.NET 8) to protect from abuse.
+
+Example:
+```csharp
+builder.Services.AddRateLimiter(options => {
+  options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+      partitionKey: httpContext.User.Identity?.Name ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
+      factory: _ => new FixedWindowRateLimiterOptions {
+        PermitLimit = 100, Window = TimeSpan.FromMinutes(1), QueueProcessingOrder = QueueProcessingOrder.OldestFirst, QueueLimit = 0
+      }));
+});
+app.UseRateLimiter();
+```
+
+---
+
+## Folder Structure (Backend)

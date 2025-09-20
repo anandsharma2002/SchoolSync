@@ -1,0 +1,15 @@
+
+---
+
+## Risks
+
+- CORS or cookie misconfiguration causing silent auth failures → verify `withCredentials` and SameSite attributes with HTTPS.
+- Stale cache rendering outdated data → set sensible `staleTime` and use invalidation on mutations.
+- Large bundles → audit with `vite-bundle-visualizer`, code split aggressively.
+
+---
+
+## Next actions
+- Implement API base URL and HTTP client wrapper with CSRF header for writes.
+- Add route guards and role-aware navigation.
+- Configure React Query (QueryClient) with sane defaults and devtools in development.

@@ -1,0 +1,125 @@
+# School Sync — Project Architecture (Frontend)
+
+## Overview
+The frontend is a React 18 + Vite + TypeScript SPA using TailwindCSS and shadcn/ui. Data is fetched from the ASP.NET Web API via HTTPS using React Query. Authentication is cookie-based (HttpOnly `auth_token` set by backend), with client-side route guards and role-aware UI.
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart LR
+  subgraph Browser [User's Browser]
+    A[React SPA<br/>Vite+TS] -- React Router --> R[Routes]
+    R --> C[Components<br/>shadcn/ui]
+    C <---> S[State & Data<br/>React Query]
+    C <---> V[Forms<br/>RHF + Zod]
+    A --> L[Local State<br/>Context/Store]
+  end
+
+  subgraph Backend [ASP.NET Web API]
+    API[(Controllers<br/>v1 endpoints)]
+  end
+
+  S -- HTTPS fetch (credentials: include) --> API
+  API -- Set-Cookie: auth_token --> Browser
+```
+
+---
+
+## Components
+
+- UI Layer: shadcn/ui + TailwindCSS for accessible, consistent components.
+- Routing: React Router v6; protected routes based on session/role.
+- Data Layer: React Query for caching, revalidation, mutations, and optimistic updates.
+- Forms: React Hook Form + Zod for schema-driven validation.
+- State: Minimal app-level context (theme, session), otherwise local state/hooks.
+- Utilities: Typed API client wrapper for fetch with `credentials: 'include'`.
+
+---
+
+## Request Flow (Sequence)
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant FE as React SPA
+  participant API as ASP.NET API
+
+  U->>FE: Navigate to /login
+  FE->>API: POST /api/v1/auth/login { email, password }
+  API-->>FE: 200 OK + Set-Cookie: auth_token=...; HttpOnly; Secure
+  FE->>FE: Update session state (role, profile)
+  U->>FE: Navigate to protected route (/dashboard)
+  FE->>API: GET /api/v1/... (credentials: include)
+  API-->>FE: 200 OK (JSON)
+  FE->>FE: Cache via React Query, render UI
+```
+
+---
+
+## Authentication & Authorization
+
+- Session: Backend manages JWT in HttpOnly cookie. Frontend stores only non-sensitive profile/role data in memory or local storage (if required for UX).
+- Route Guard: On protected routes, check session (e.g., call `/auth/me` once, then cache). Redirect to `/login` if unauthenticated.
+- Role-Aware UI: Conditionally render menu items and page sections based on `roles` array.
+
+---
+
+## Error Handling
+
+- Global Error Boundary: Renders fallback UI for unexpected errors.
+- API Errors: Map ProblemDetails to form errors and toasts. Provide retry actions for transient failures.
+- Network Strategy: React Query retry policies (e.g., 2-3 attempts with exponential backoff) for idempotent GETs; no automatic retries for mutations unless safe.
+
+---
+
+## Caching Strategy
+
+- React Query:
+  - Query Keys: Namespaced (e.g., `['schools', { search, page }]`).
+  - Stale Times: 30–60s for lists; 0 for highly dynamic.
+  - Prefetch: On navigation hover to perceived-hot routes.
+- Optimistic Updates:
+  - CRUD (create/edit/delete) for UI snappiness, with rollback on failure.
+
+---
+
+## Performance
+
+- Code Splitting: Route-level dynamic imports for pages (announcements, attendance).
+- Memoization: `memo`, `useMemo`, `useCallback` on heavy components.
+- Virtualization: Large lists/grids (e.g., long rosters).
+- Images/Icons: Tree-shake lucide icons; use CSS where possible.
+
+---
+
+## Accessibility
+
+- Forms: Labels, `aria-invalid`, `aria-describedby` for errors.
+- Navigation: Keyboard accessible menus and dialogs; focus management on route changes.
+- Color & Contrast: Tailwind theme tokens meeting WCAG AA.
+
+---
+
+## Security Considerations
+
+- HTTPS-only; `credentials: 'include'` on fetch.
+- CSRF: Include anti-CSRF header on all mutating requests (provided by backend).
+- No secrets in frontend source; use Vite env variables (`VITE_API_BASE_URL`).
+- Avoid storing JWT; rely on HttpOnly cookie set by backend.
+
+---
+
+## Observability (Frontend)
+
+- Error Monitoring: Integrate a client-side error tracker (e.g., Sentry).
+- Logging: Avoid verbose console logs in production; sanitize PII.
+- UX Metrics: Optionally collect Web Vitals for performance monitoring.
+
+---
+
+## Local/Env Configuration
+
+- Base URL: Configure via `VITE_API_BASE_URL` and prepend to all API calls.
+- Example `.env`:

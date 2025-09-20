@@ -1,0 +1,245 @@
+# School Sync — User Stories (Backend)
+
+## Overview
+Prioritized backend user stories expressed as API capabilities with clear acceptance criteria and Gherkin where valuable. Targets ASP.NET Core 8, EF Core 8 (Npgsql), Identity (Guid), JWT in HttpOnly cookie, versioned endpoints (`/api/v1/...`).
+
+---
+
+## Epic: Authentication & Authorization
+
+### Story B-AUTH-01: Login issues JWT cookie
+- As a user, I want to authenticate and receive a secure session cookie so I can access protected APIs.
+- Acceptance Criteria:
+  - POST `/api/v1/auth/login` accepts `{ email, password }`.
+  - Valid credentials → `Set-Cookie: auth_token=...; HttpOnly; Secure; SameSite=Lax|Strict`.
+  - Response payload contains minimal profile `{ id, name, roles }`.
+  - Invalid credentials → 401 with ProblemDetails.
+- Gherkin:
+```gherkin
+Feature: API login
+  Scenario: Issue JWT cookie on valid credentials
+    Given a user "admin@example.com" with a valid password
+    When POST /api/v1/auth/login with valid credentials
+    Then response status is 200
+    And "Set-Cookie" contains "auth_token" with HttpOnly and Secure flags
+```
+
+### Story B-AUTH-02: Me endpoint returns profile and roles
+- As an authenticated user, I can retrieve my profile.
+- Acceptance Criteria:
+  - GET `/api/v1/auth/me` returns { id, email, roles, claims? }.
+  - Unauthorized → 401.
+  - Integration test validates cookie path.
+
+### Story B-AUTH-03: Logout clears cookie
+- As a user, I can logout to invalidate the session.
+- Acceptance Criteria:
+  - POST `/api/v1/auth/logout` clears `auth_token`.
+  - Always returns 200 and is idempotent.
+
+### Story B-AUTH-04: Policy-based authorization
+- As an admin/teacher/student, access is enforced according to role.
+- Acceptance Criteria:
+  - Attribute-based `[Authorize(Policy="RequireAdmin")]`, etc.
+  - Unauthorized/Forbidden → 401/403 with ProblemDetails.
+
+---
+
+## Epic: Schools
+
+### Story B-SCH-01: List, search, and paginate schools
+- Acceptance Criteria:
+  - GET `/api/v1/schools?search=&page=&pageSize=` returns paginated list.
+  - `search` is case-insensitive by name.
+  - Include total count in pagination metadata (via headers or response).
+
+### Story B-SCH-02: Create/Update/Delete school
+- Acceptance Criteria:
+  - POST/PUT/DELETE endpoints return 201/200/204 as appropriate.
+  - Validation: name 2–200 chars; address optional.
+  - 404 when updating/deleting non-existent id.
+  - Concurrency token or updated timestamp returned.
+
+---
+
+## Epic: Classes
+
+### Story B-CLS-01: List/filter classes
+- Acceptance Criteria:
+  - GET `/api/v1/classes?schoolId=&teacherId=&page=&pageSize=`.
+  - Validates `schoolId` exists if provided.
+
+### Story B-CLS-02: Manage classes
+- Acceptance Criteria:
+  - POST `/api/v1/classes` requires `schoolId` and `name`.
+  - Optional `teacherId` sets relationship; on teacher delete, sets null.
+  - Unique constraint optional per `(SchoolId, Name)`.
+
+---
+
+## Epic: Teachers
+
+### Story B-TCH-01: CRUD teachers linked to users
+- Acceptance Criteria:
+  - `Teacher.UserId` references `AspNetUsers.Id`.
+  - Create requires `SchoolId`, `FirstName`, `LastName`, `Email`.
+  - Enforce unique `UserId`; 409 on duplicates.
+
+### Story B-TCH-02: Query teachers by school
+- Acceptance Criteria:
+  - GET `/api/v1/teachers?schoolId=&search=&page=&pageSize=`.
+  - Search matches name/email (case-insensitive).
+
+---
+
+## Epic: Students
+
+### Story B-STD-01: CRUD students with class mapping
+- Acceptance Criteria:
+  - Create requires `ClassId`, `SchoolId`, `FirstName`, `LastName`, `Dob`.
+  - GuardianEmail optional; validate if present.
+  - Deleting class cascades to students or is blocked per policy (define: cascade recommended).
+
+### Story B-STD-02: List by class and search
+- Acceptance Criteria:
+  - GET `/api/v1/students?classId=&search=&page=&pageSize=`.
+  - Default sort by last name ASC.
+
+---
+
+## Epic: Attendance
+
+### Story B-ATT-01: Mark attendance (idempotent)
+- Acceptance Criteria:
+  - POST `/api/v1/attendance/mark` accepts `{ classId, date, entries: [{ studentId, present }] }`.
+  - Enforce `UNIQUE (ClassId, StudentId, Date)`.
+  - On duplicate submit, returns 200 and no duplicates created.
+  - Validates students belong to class/school.
+- Gherkin:
+```gherkin
+Feature: Attendance idempotency
+  Scenario: Duplicate submission for same date
+    Given attendance for class "10A" and date "2025-09-10" was submitted
+    When the same payload is posted again
+    Then the API returns 200
+    And no duplicate attendance rows are created
+```
+
+### Story B-ATT-02: Query attendance with date range
+- Acceptance Criteria:
+  - GET `/api/v1/attendance?classId=&studentId=&from=&to=&page=&pageSize=`.
+  - Validates from<=to; returns summaries efficiently (indexed queries).
+
+---
+
+## Epic: Announcements
+
+### Story B-ANN-01: Create/list announcements by scope
+- Acceptance Criteria:
+  - POST `/api/v1/announcements` with `{ title, body, audienceScope, schoolId?, classId? }`.
+  - `audienceScope in ('school','class','role')`.
+  - GET supports filters: scope, classId, schoolId, from/to.
+
+### Story B-ANN-02: Delete announcement
+- Acceptance Criteria:
+  - DELETE returns 204; 404 if not found.
+  - Only creator or admin can delete (policy enforced).
+
+---
+
+## Epic: Observability & Health
+
+### Story B-OBS-01: Health checks
+- Acceptance Criteria:
+  - `/health` returns 200 when API is up and DB reachable.
+  - Includes `Npgsql` check.
+
+### Story B-OBS-02: Structured logging & correlation
+- Acceptance Criteria:
+  - All requests log correlation id; include in responses header.
+
+---
+
+## Epic: Security & Compliance
+
+### Story B-SEC-01: Secrets externalized
+- Acceptance Criteria:
+  - No secrets in `appsettings.json` (dev-only ok).
+  - Env variables or Secret Manager used in dev; Key Vault in prod.
+
+### Story B-SEC-02: CORS per environment
+- Acceptance Criteria:
+  - Only whitelisted origins allowed; no wildcard in prod.
+  - Preflight behaves correctly with credentials.
+
+### Story B-SEC-03: CSRF for cookie-auth writes
+- Acceptance Criteria:
+  - Mutating requests require `X-CSRF-Token` header validated server-side.
+
+---
+
+## Epic: Data & Migrations
+
+### Story B-DB-01: Initial migration and indices
+- Acceptance Criteria:
+  - FK indices for `SchoolId`, `ClassId`, `StudentId`, `UserId`.
+  - Functional index for case-insensitive searches where used.
+  - Attendance unique composite enforced.
+
+### Story B-DB-02: Seed baseline data
+- Acceptance Criteria:
+  - Roles: Admin, Teacher, Student.
+  - Optional dev seed: sample school, classes, students, attendance, announcements.
+
+---
+
+## Error Handling & Validation (Global)
+
+### Story B-ERR-01: ProblemDetails responses
+- Acceptance Criteria:
+  - Validation errors return 400 with ProblemDetails `errors{}`.
+  - 404/409/500 follow consistent ProblemDetails shapes.
+  - TraceId/correlation id included.
+
+---
+
+## Performance Stories
+
+### Story B-PERF-01: Eliminate N+1 on hot paths
+- Acceptance Criteria:
+  - Use projections or `Include` appropriately.
+  - Verify query count via integration test or logging.
+
+### Story B-PERF-02: Index-backed attendance queries
+- Acceptance Criteria:
+  - `(ClassId, Date)` and `(StudentId, Date)` indexed, BRIN on `Date` for large tables (optional).
+
+---
+
+## Operational Stories
+
+### Story B-OPS-01: Idempotent migration script
+- Acceptance Criteria:
+  - Generate idempotent script for production deployment.
+  - Dry-run validated in staging.
+
+### Story B-OPS-02: Backup and restore runbook
+- Acceptance Criteria:
+  - Document `pg_dump`/`pg_restore`.
+  - Verify restore on staging quarterly.
+
+---
+
+## Definition of Done (Backend)
+- Versioned endpoints with Swagger docs and examples.
+- Policy-based authorization; tests for role restrictions.
+- EF migrations up-to-date; indices and constraints enforced.
+- Unit tests for services (≥ 70% coverage on services/repositories).
+- Health checks green; logs structured; secrets externalized.
+
+---
+
+## Next actions
+- Implement attendance unique constraint and endpoint idempotency.
+- Add ProblemDetails middleware and consistent error shapes.
+- Wire `/health` with Npgsql check and correlation id middleware.

@@ -1,0 +1,16 @@
+
+---
+
+## Risks
+
+- Secrets in `appsettings.json` → Move to env/secret store.
+- Overly permissive CORS → Restrict per environment.
+- N+1 queries → Use projections/Include; add indices.
+- Missing idempotency → Enforce unique constraints (attendance).
+
+---
+
+## Next actions
+- Add API versioning and `/health` with Npgsql check.
+- Externalize JWT/DB secrets; tighten CORS per environment.
+- Implement rate limiting and consistent ProblemDetails across controllers.

@@ -1,0 +1,382 @@
+# School Sync — Unit Tests and CI (Frontend)
+
+A practical guide to implement unit/integration tests using Jest + React Testing Library for the React (Vite + TS) frontend, plus CI pipeline steps to run tests, measure coverage, lint, and build.
+
+---
+
+## Testing Strategy
+
+### Levels
+- Unit tests: Pure functions, small UI components.
+- Integration tests: Component + hooks + data interactions (React Query), routing guards.
+- Contract tests (lightweight): Validate API client behavior for expected shapes and error handling (mocked fetch).
+
+### Scope & Targets
+- Critical paths prioritized:
+  - Auth: login form and route guards
+  - CRUD forms: validation and submit logic
+  - Lists: pagination/filter interactions
+  - Attendance: marking toggles, “Mark All Present”, submission flow
+  - Announcements: create/list
+- Coverage targets:
+  - Statements/Branches/Functions ≥ 70% on critical areas; overall ≥ 60% initially.
+
+### General Practices
+- Test user-visible behavior, not implementation details.
+- Prefer queries by role, label text, placeholder, test-id as last resort.
+- Avoid snapshot testing for dynamic content; assert specific text/roles/states.
+
+---
+
+## Dependencies
+
+Install testing dependencies:
+```bash
+npm i -D jest @types/jest ts-jest jest-environment-jsdom \
+       @testing-library/react @testing-library/user-event @testing-library/jest-dom \
+       whatwg-fetch
+```
+
+If using React 18 + Vite:
+```bash
+# Ensure jsdom env and ESM support via ts-jest
+```
+
+---
+
+## Configuration
+
+### tsconfig adjustments
+Ensure `jsx: "react-jsx"` and `"types": ["jest", "node"]` in your test tsconfig or root `tsconfig.json` (or `tsconfig.test.json` if you prefer a separate config).
+
+Example `tsconfig.test.json`:
+```json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["jest", "node", "@testing-library/jest-dom"]
+  },
+  "include": ["src", "tests", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+}
+```
+
+### jest.config.ts
+```ts
+// jest.config.ts
+import type { Config } from 'jest';
+
+const config: Config = {
+  preset: 'ts-jest',
+  testEnvironment: 'jest-environment-jsdom',
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  setupFiles: ['whatwg-fetch'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }]
+  },
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+  },
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'cobertura'],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/',
+    'src/main.tsx',
+    'src/vite-env.d.ts'
+  ],
+  testMatch: ['**/?(*.)+(spec|test).[tj]s?(x)']
+};
+
+export default config;
+```
+
+### tests/setupTests.ts
+```ts
+// tests/setupTests.ts
+import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
+(global as any).TextEncoder = TextEncoder;
+(global as any).TextDecoder = TextDecoder as any;
+
+// Optional: mock matchMedia if needed by UI libs
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false
+  })
+});
+```
+
+### package.json scripts
+Add or update scripts:
+```json
+{
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:ci": "jest --coverage --runInBand",
+    "lint": "eslint .",
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  }
+}
+```
+
+---
+
+## Testing Examples
+
+### 1) Login Form (integration)
+```tsx
+// src/components/__tests__/LoginForm.spec.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import LoginForm from '../LoginForm';
+
+beforeEach(() => {
+  // Mock fetch for login
+  (global as any).fetch = vi.fn(async (url: string, init: RequestInit) => {
+    if (url.endsWith('/api/auth/login')) {
+      const body = JSON.parse(init.body as string);
+      if (body.email === 'admin@example.com' && body.password === 'Pass123!') {
+        return new Response(JSON.stringify({ id: '1', name: 'Admin', roles: ['Admin'] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      return new Response(JSON.stringify({ title: 'Unauthorized' }), { status: 401 });
+    }
+    return new Response(null, { status: 404 });
+  });
+});
+
+test('logs in with valid credentials', async () => {
+  render(<LoginForm />);
+  await userEvent.type(screen.getByLabelText(/email/i), 'admin@example.com');
+  await userEvent.type(screen.getByLabelText(/password/i), 'Pass123!');
+  await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+  });
+});
+
+test('shows error on invalid credentials', async () => {
+  render(<LoginForm />);
+  await userEvent.type(screen.getByLabelText(/email/i), 'admin@example.com');
+  await userEvent.type(screen.getByLabelText(/password/i), 'wrong');
+  await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+  await waitFor(() => {
+    expect(screen.getByText(/unauthorized/i)).toBeInTheDocument();
+  });
+});
+```
+
+### 2) Schools List (React Query + fetch)
+```tsx
+// src/pages/__tests__/SchoolsPage.spec.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import SchoolsPage from '../SchoolsPage';
+
+function renderWithRQ(ui: React.ReactNode) {
+  const qc = new QueryClient();
+  return render(<QueryClientProvider client={qc}>{ui}</QueryClientProvider>);
+}
+
+beforeEach(() => {
+  (global as any).fetch = vi.fn(async (url: string) => {
+    if (url.includes('/api/schools')) {
+      return new Response(JSON.stringify([{ id: 's1', name: 'Sunrise High' }]), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    return new Response(null, { status: 404 });
+  });
+});
+
+test('renders schools list', async () => {
+  renderWithRQ(<SchoolsPage />);
+  expect(screen.getByText(/loading/i)).toBeInTheDocument();
+
+  await waitFor(() => {
+    expect(screen.getByText(/sunrise high/i)).toBeInTheDocument();
+  });
+});
+```
+
+### 3) Attendance Mark All Present
+```tsx
+// src/components/__tests__/AttendanceGrid.spec.tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import AttendanceGrid from '../AttendanceGrid';
+
+test('mark all present toggles all students', async () => {
+  const students = [
+    { id: 'st1', firstName: 'A', lastName: 'One' },
+    { id: 'st2', firstName: 'B', lastName: 'Two' }
+  ];
+  render(<AttendanceGrid students={students} onChange={() => {}} />);
+
+  await userEvent.click(screen.getByRole('button', { name: /mark all present/i }));
+  expect(screen.getAllByRole('checkbox', { checked: true })).toHaveLength(2);
+});
+```
+
+---
+
+## Mocks & Test Data
+
+- Fetch mocking via global `fetch` stub (as above) or `msw` for more robust API mocks.
+- Use factory functions for entities to reduce duplication:
+```ts
+export const makeStudent = (overrides?: Partial<any>) => ({
+  id: crypto.randomUUID(),
+  firstName: 'Test',
+  lastName: 'Student',
+  classId: 'c1',
+  ...overrides
+});
+```
+- For React Query:
+  - Reset QueryClient between tests to avoid stale cache cross-contamination.
+
+---
+
+## Running Tests & Coverage
+
+Local:
+```bash
+npm test
+npm run test:watch
+npm run test:ci
+```
+
+Inspect coverage:
+- HTML report at `coverage/lcov-report/index.html`
+- CI thresholds can be enforced in `jest.config.ts` (optional):
+```ts
+coverageThreshold: {
+  global: { statements: 60, branches: 60, functions: 60, lines: 60 }
+}
+```
+
+---
+
+## Linting
+
+Run:
+```bash
+npm run lint
+```
+
+Recommended rules (excerpt):
+```js
+// eslint.config.js
+export default [
+  {
+    rules: {
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/consistent-type-imports': 'error'
+    }
+  }
+];
+```
+
+---
+
+## CI Pipeline (GitHub Actions example)
+
+`.github/workflows/frontend-ci.yml`:
+```yaml
+name: Frontend CI
+
+on:
+  push:
+    paths:
+      - 'Frontend/**'
+  pull_request:
+    paths:
+      - 'Frontend/**'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload coverage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: Frontend/coverage
+```
+
+---
+
+## Flakiness and Stability
+
+- Avoid real timers; rely on RTL async utilities.
+- Reset DOM and mocks with `afterEach(cleanup)` when needed (RTL v14 auto-cleans).
+- Run in-band on CI to reduce concurrency issues: `jest --runInBand`.
+
+---
+
+## Security Notes for Tests
+
+- Do not log secrets; use dummy values.
+- Validate that mutating requests include CSRF header in API client tests (mocked).
+
+---
+
+## Troubleshooting
+
+- ESM and ts-jest: Ensure `preset: 'ts-jest'` and `transform` are configured; keep Jest on CommonJS (jest.config.ts) even if project uses ESM modules with Vite.
+- JSDOM missing globals: add to `setupTests.ts` (TextEncoder, matchMedia).
+
+---
+
+## Next actions
+- Add Jest config files and setup scripts to the repo.
+- Write tests for the Login form, Schools list, and Attendance grid.
+- Wire the CI workflow file and enforce coverage thresholds on PRs.
