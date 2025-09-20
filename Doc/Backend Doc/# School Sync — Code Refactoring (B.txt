@@ -1,0 +1,324 @@
+# School Sync — Code Refactoring (Backend)
+
+Practical, actionable refactoring guidance for the ASP.NET Core 8 backend. Aligns with SOLID, SRP, clean DI, async patterns, EF Core best practices, and consistent error handling. Includes repo-wide checklists and before/after examples for a typical controller and service/repository pair.
+
+---
+
+## Objectives
+- Enforce SRP and dependency inversion across controllers, services, and repositories.
+- Adopt consistent async and cancellation token patterns.
+- Strengthen validation and ProblemDetails usage.
+- Reduce EF Core N+1 queries and promote projection-based reads.
+- Improve testability with interfaces, pure services, and smaller units.
+
+---
+
+## Repo-wide Refactor Checklist
+
+### Architecture & Boundaries
+- [ ] Controllers are thin: validation → service call → map to HTTP result.
+- [ ] Services encapsulate business rules; no data access in controllers.
+- [ ] Repositories encapsulate EF Core access; return entities or DTO projections.
+- [ ] AutoMapper used at boundaries (entity↔DTO); mapping configuration validated by tests.
+- [ ] API versioning applied on controllers: `api/v{version:apiVersion}/...`.
+
+### Async & Cancellation
+- [ ] All public service/repository methods are async and accept `CancellationToken`.
+- [ ] Controllers pass `HttpContext.RequestAborted` to services.
+- [ ] Avoid `.Result` / `.Wait()` and synchronous EF APIs.
+
+### EF Core & Performance
+- [ ] Use `AsNoTracking()` for read-only queries.
+- [ ] Use projection (`Select`) to DTOs to avoid over-fetching.
+- [ ] Ensure indices for FKs and hot filters; enforce unique constraints (attendance).
+- [ ] Eliminate N+1 with `Include` or projections; prefer query composition.
+
+### Validation & Errors
+- [ ] Use FluentValidation or minimal validation helpers in services.
+- [ ] Return ProblemDetails consistently for validation/authorization/domain errors.
+- [ ] Map domain exceptions to ProblemDetails (global filter or middleware).
+
+### Security & Config
+- [ ] Secrets are externalized (connection strings, JWT).
+- [ ] CORS per environment; no wildcard with credentials.
+- [ ] Authorization policies on protected endpoints.
+
+### Testing
+- [ ] Service unit tests cover business rules (≥ 70%).
+- [ ] Integration tests for controllers with `WebApplicationFactory`.
+- [ ] AutoMapper configuration test and basic repository tests (in-memory or Postgres testcontainer).
+
+---
+
+## Common Anti-Patterns and Fixes
+
+- Anti-pattern: Controllers contain data access or business logic.
+  - Fix: Move logic to services; repository boundaries for persistence.
+- Anti-pattern: Returning entity models directly.
+  - Fix: Map to DTOs; never leak entity internals (navigation props/PII).
+- Anti-pattern: Missing cancellation tokens and synchronous EF calls.
+  - Fix: Async all the way; accept and pass `CancellationToken`.
+- Anti-pattern: Unbounded lists without pagination.
+  - Fix: Always paginate and filter on list endpoints.
+- Anti-pattern: Try/catch swallowing exceptions or returning 200 on errors.
+  - Fix: Use ProblemDetails; proper status codes (400/401/403/404/409/422/500).
+
+---
+
+## Patterns and Templates
+
+### Service Interface Pattern
+```csharp
+public interface ISchoolService
+{
+    Task<PagedResult<SchoolDto>> ListAsync(string? search, int page, int pageSize, CancellationToken ct);
+    Task<SchoolDto?> GetAsync(Guid id, CancellationToken ct);
+    Task<SchoolDto> CreateAsync(SchoolCreateRequest req, CancellationToken ct);
+    Task<SchoolDto> UpdateAsync(Guid id, SchoolUpdateRequest req, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
+}
+```
+
+### Repository Interface Pattern
+```csharp
+public interface ISchoolRepository
+{
+    Task<(IReadOnlyList<School> Items, int Total)> ListAsync(string? search, int page, int pageSize, CancellationToken ct);
+    Task<School?> FindAsync(Guid id, CancellationToken ct);
+    Task AddAsync(School entity, CancellationToken ct);
+    Task SaveChangesAsync(CancellationToken ct);
+    Task RemoveAsync(School entity, CancellationToken ct);
+}
+```
+
+### Controller Pattern
+```csharp
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+public sealed class SchoolsController : ControllerBase
+{
+    private readonly ISchoolService _service;
+    public SchoolsController(ISchoolService service) => _service = service;
+
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<SchoolDto>>> List([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var result = await _service.ListAsync(search, page, pageSize, HttpContext.RequestAborted);
+        Response.Headers.Append("X-Total-Count", result.Total.ToString());
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "RequireAdmin")]
+    public async Task<ActionResult<SchoolDto>> Create([FromBody] SchoolCreateRequest req)
+    {
+        var created = await _service.CreateAsync(req, HttpContext.RequestAborted);
+        return CreatedAtAction(nameof(Get), new { id = created.Id, version = "1.0" }, created);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<SchoolDto>> Get(Guid id)
+    {
+        var dto = await _service.GetAsync(id, HttpContext.RequestAborted);
+        if (dto is null) return NotFound(Problem(title: "Not Found", statusCode: StatusCodes.Status404NotFound));
+        return Ok(dto);
+    }
+
+    [HttpPut("{id:guid}")]
+    [Authorize(Policy = "RequireAdmin")]
+    public async Task<ActionResult<SchoolDto>> Update(Guid id, [FromBody] SchoolUpdateRequest req)
+    {
+        var updated = await _service.UpdateAsync(id, req, HttpContext.RequestAborted);
+        return Ok(updated);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Policy = "RequireAdmin")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _service.DeleteAsync(id, HttpContext.RequestAborted);
+        return NoContent();
+    }
+}
+```
+
+---
+
+## Before & After (Controller and Service)
+
+### Before: Controller with mixed concerns
+```csharp
+// BEFORE: Mixed data access, no pagination, no cancellation, raw entity return
+[HttpGet]
+public async Task<IActionResult> Get(string? search)
+{
+    var list = await _context.Schools
+        .Where(s => string.IsNullOrEmpty(search) || s.Name.ToLower().Contains(search.ToLower()))
+        .ToListAsync(); // tracking by default
+    return Ok(list); // entity leakage
+}
+```
+
+### After: Controller delegates to service, DTOs, pagination, cancellation
+```csharp
+[HttpGet]
+public async Task<ActionResult<PagedResult<SchoolDto>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+{
+    var result = await _service.ListAsync(search, page, pageSize, HttpContext.RequestAborted);
+    Response.Headers.Append("X-Total-Count", result.Total.ToString());
+    return Ok(result);
+}
+```
+
+### Before: Service doing too little, repository leakage into controller
+```csharp
+public class SchoolService
+{
+    private readonly DataContext _ctx;
+    public SchoolService(DataContext ctx) => _ctx = ctx;
+
+    public Task<List<School>> ListAsync(string? search)
+        => _ctx.Schools.Where(...).ToListAsync();
+}
+```
+
+### After: Service owns business logic, uses repository, returns DTOs
+```csharp
+public sealed class SchoolService : ISchoolService
+{
+    private readonly ISchoolRepository _repo;
+    private readonly IMapper _mapper;
+
+    public SchoolService(ISchoolRepository repo, IMapper mapper)
+    {
+        _repo = repo;
+        _mapper = mapper;
+    }
+
+    public async Task<PagedResult<SchoolDto>> ListAsync(string? search, int page, int pageSize, CancellationToken ct)
+    {
+        if (page < 1 || pageSize is < 1 or > 200)
+            throw new ValidationException("Invalid paging parameters");
+
+        var (items, total) = await _repo.ListAsync(search, page, pageSize, ct);
+        var dtos = items.Select(s => _mapper.Map<SchoolDto>(s)).ToList();
+        return new PagedResult<SchoolDto>(dtos, total, page, pageSize);
+    }
+}
+```
+
+---
+
+## EF Core Refactor Examples
+
+### Read-only queries: AsNoTracking + Projections
+```csharp
+var dtos = await _ctx.Students
+    .AsNoTracking()
+    .Where(s => s.ClassId == classId)
+    .OrderBy(s => s.LastName)
+    .Select(s => new StudentDto { Id = s.Id, FirstName = s.FirstName, LastName = s.LastName })
+    .ToListAsync(ct);
+```
+
+### Attendance idempotency via unique index (enforce at model)
+```csharp
+modelBuilder.Entity<Attendance>()
+    .HasIndex(a => new { a.ClassId, a.StudentId, a.Date })
+    .IsUnique();
+```
+
+### Upsert-like behavior (simplified)
+```csharp
+foreach (var e in entries)
+{
+    var existing = await _ctx.Attendance
+        .FirstOrDefaultAsync(a => a.ClassId == classId && a.StudentId == e.StudentId && a.Date == date, ct);
+
+    if (existing is null)
+        _ctx.Attendance.Add(new Attendance { ClassId = classId, StudentId = e.StudentId, Date = date, Present = e.Present });
+    else
+        existing.Present = e.Present; // update in-place
+}
+
+await _ctx.SaveChangesAsync(ct);
+```
+
+---
+
+## ProblemDetails Consistency
+
+Add an exception-to-ProblemDetails filter or middleware:
+- ValidationException → 400
+- NotFoundException → 404
+- ConflictException → 409
+- UnauthorizedAccessException → 401/403
+
+Ensure errors include `traceId` and optionally correlation id.
+
+---
+
+## DI Lifetimes
+
+- DbContext: Scoped
+- Repositories: Scoped
+- Services: Scoped
+- AutoMapper: Singleton for configuration, instance resolved per request
+
+Registration check (Program.cs):
+```csharp
+builder.Services.AddScoped<ISchoolRepository, SchoolRepository>();
+builder.Services.AddScoped<ISchoolService, SchoolService>();
+builder.Services.AddAutoMapper(typeof(SchoolAutoMapper).Assembly);
+```
+
+---
+
+## Analyzer & Formatting Rules
+
+`Directory.Build.props` (recommendation):
+```xml
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
+```
+
+CI formatting and quality gates:
+```bash
+dotnet format --verify-no-changes
+dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
+```
+
+---
+
+## Refactor Workflow (Step-by-step)
+1) Identify heavy controllers and list endpoints without paging.
+2) Create service interfaces; move logic from controllers to services.
+3) Extract repository interfaces; centralize EF queries; add AsNoTracking for reads.
+4) Introduce DTOs and AutoMapper profiles; stop returning entities from controllers.
+5) Add cancellation tokens, validation (FluentValidation or custom exceptions).
+6) Add ProblemDetails mapping; unify error shapes.
+7) Write/adjust unit and integration tests.
+8) Run analyzers, format, and verify performance on hot paths.
+
+---
+
+## Quick Wins (High Impact, Low Effort)
+- Add `AsNoTracking()` for all GET list queries.
+- Enforce pagination on all list endpoints.
+- Introduce DTOs for Schools/Classes responses to reduce payloads.
+- Wire `HttpContext.RequestAborted` through services.
+- Add the attendance unique index and enforce idempotent writes.
+
+---
+
+## Next actions
+- Refactor `SchoolsController` and `SchoolService` to the pattern above (DTOs, paging, CT).
+- Add ProblemDetails middleware/filter and replace ad-hoc error returns.
+- Apply `AsNoTracking + projection` to list endpoints; add missing indices in migrations.

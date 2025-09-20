@@ -1,0 +1,15 @@
+# School Sync — Folder Structure (Backend)
+
+A maintainable, testable layout for the ASP.NET Core 8 solution with clean separation of concerns, DI, and test projects. Optimized for EF Core with PostgreSQL, Identity, Swagger, and layered architecture.
+
+---
+
+## Principles
+- Separation of concerns: API (controllers) ↔ Services ↔ Repositories ↔ DataContext ↔ Database.
+- Testability: small units, clear interfaces, isolated tests (unit/integration/database).
+- Explicit contracts: DTOs and AutoMapper profiles live in a shared models project.
+- Conventions over configuration: consistent naming, consistent DI lifetimes.
+
+---
+
+## Recommended Solution Layout

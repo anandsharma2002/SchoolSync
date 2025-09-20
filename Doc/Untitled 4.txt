@@ -1,0 +1,197 @@
+
+Notes:
+- Existing repo already follows similar layering; add `Tests/` tree for clarity.
+- Keep migrations only in `SMSDataContext`.
+
+---
+
+## App Configuration Files
+
+- `appsettings.json`: non-secret defaults.
+- `appsettings.Development.json`: dev overrides (no secrets!).
+- Use environment variables for secrets (connection string, JWT key).
+
+Examples (PowerShell):
+```powershell
+$env:ASPNETCORE_ENVIRONMENT="Development"
+$env:ConnectionStrings__PostgresSQLConnectionString="Host=localhost;Database=SchoolSync;Username=postgres;Password=***"
+$env:Jwt__Key="change-me"
+$env:Jwt__Issuer="https://localhost:7266"
+$env:Jwt__Audience="https://localhost:7266"
+```
+
+---
+
+## Where to Put Things
+
+- Controllers: `SMSPrototype1/Controllers/*Controller.cs`
+  - Use `[ApiController]`, attribute routing, API version attributes.
+  - Thin controllers; delegate to services.
+
+- Services: `SMSServices/Services/*Service.cs`
+  - Business logic, transactional boundaries.
+  - Return DTOs or result objects; handle validation that is business-specific.
+
+- Repositories: `SMSRepository/Repository/*Repository.cs`
+  - EF Core queries and persistence.
+  - Avoid business rules; return entities or projections.
+
+- EF Core Config: `SMSDataContext/Data/DataContext.cs`
+  - Fluent configuration: relationships, indices, constraints.
+  - Example: unique `(ClassId, StudentId, Date)` for attendance.
+
+- AutoMapper: `SMSDataModel/Model/AutoMapper/*`
+  - Profiles mapping entities ↔ DTOs.
+  - Keep mappings in one place per domain.
+
+- DTOs: `SMSDataModel/Model/RequestDtos` and `ResponseDtos`
+  - Avoid leaking entities through controllers.
+
+- Middleware & Filters: `SMSPrototype1/Middleware`, `SMSPrototype1/Filters`
+  - Cross-cutting concerns (ProblemDetails, correlation ids).
+
+---
+
+## DI & Lifetimes
+
+- DbContext: Scoped
+- Repositories: Scoped
+- Services: Scoped or Transient (Scoped preferred when using DbContext)
+- Automapper: Add profiles via `AddAutoMapper(...)`
+
+Example registration (`Program.cs`):
+```csharp
+builder.Services.AddDbContext<DataContext>(opts =>
+  opts.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnectionString")));
+
+builder.Services.AddScoped<ISchoolRepository, SchoolRepository>();
+builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+builder.Services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
+
+builder.Services.AddScoped<ISchoolService, SchoolService>();
+builder.Services.AddScoped<ISchoolClassServices, SchoolClassServices>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+```
+
+---
+
+## Versioning and Swagger
+
+- Version controllers: `[ApiVersion("1.0")]` + `Route("api/v{version:apiVersion}/[controller]")`
+- Swagger security scheme for Bearer/JWT.
+
+---
+
+## Logging, Health, and Middleware
+
+- Health Checks: `app.MapHealthChecks("/health");` with Npgsql.
+- Correlation IDs: middleware adds `X-Correlation-ID` if absent.
+- ProblemDetails: global exception filter maps exceptions to RFC7807.
+
+---
+
+## Tests — Placement & Conventions
+
+- Unit tests per service or mapper class: `Tests/UnitTests/...`
+- Controller integration tests: `Tests/IntegrationTests/Controllers/...`
+- DB integration: `Tests/IntegrationTests/Database` with Testcontainers.
+- Naming:
+  - `ClassNameTests.cs`
+  - Methods: `MethodName_Scenario_ExpectedResult`
+
+Run:
+```bash
+dotnet test -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
+```
+
+---
+
+## Build & Publish
+
+- Build:
+```bash
+dotnet restore
+dotnet build -c Release
+```
+
+- Publish:
+```bash
+dotnet publish Backend/SMSPrototype1 -c Release -o out
+```
+
+- EF Migrations (from API dir):
+```bash
+dotnet ef migrations add <Name> --project ..\SMSDataContext --startup-project .
+dotnet ef database update --project ..\SMSDataContext --startup-project .
+```
+
+---
+
+## Linting & Analyzers
+
+Add `Directory.Build.props` at `Backend/`:
+```xml
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+  </PropertyGroup>
+</Project>
+```
+
+Formatting:
+```bash
+dotnet format --verify-no-changes
+```
+
+---
+
+## Security-by-Structure
+
+- Keep secrets out of repo (no secrets in `appsettings.*.json`).
+- Lock CORS per environment in `Program.cs`.
+- Centralize JWT configuration (`Configuration/JwtOptions.cs`) and bind via `builder.Configuration.Bind("Jwt", ...)`.
+- Use policies on controllers (`[Authorize(Policy="RequireAdmin")]`), not only roles.
+
+---
+
+## Migration/Refactor Tips
+
+- If controllers gain logic: extract to services and keep controllers thin.
+- If repositories grow: split by aggregate (e.g., AttendanceQueryRepository vs AttendanceCommandRepository).
+- DTO bloat: segregate `Request` vs `Response` DTOs; use projection DTOs for lists.
+
+---
+
+## Checklist
+
+- Structure
+  - [ ] Controllers thin; services contain business logic
+  - [ ] EF configuration centralizes relationships & indices
+  - [ ] AutoMapper profiles per domain type
+  - [ ] DTOs confined to `SMSDataModel`
+
+- Operations
+  - [ ] Health endpoint returns 200 and DB check
+  - [ ] Migrations under `SMSDataContext/Migrations`
+  - [ ] Secrets from env/KeyVault, not in repo
+
+- Quality
+  - [ ] Unit & integration tests organized under `Tests/`
+  - [ ] .NET analyzers enabled; `dotnet format` clean
+  - [ ] Swagger with JWT security scheme configured
+
+---
+
+## Next actions
+- Add `Tests/UnitTests` and `Tests/IntegrationTests` projects to the solution.
+- Introduce correlation id middleware and ProblemDetails filter folders.
+- Move any business logic from controllers to services and enforce DI lifetimes (Scoped).

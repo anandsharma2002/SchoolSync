@@ -1,0 +1,118 @@
+
+- Never commit secrets. Use only non-sensitive values (e.g., public base URLs).
+- Access via `import.meta.env.VITE_*`.
+
+---
+
+## API Layer Guidelines
+
+- `*.api.ts` for raw fetchers:
+  - Export low-level `getSchools`, `createSchool`, etc.
+- `*.queries.ts` for React Query hooks:
+  - `useSchools`, `useCreateSchool`, etc.
+- Base wrapper `http.ts` sets:
+  - `credentials: 'include'`, JSON headers, and CSRF header for mutations.
+
+Example:
+```ts
+// src/api/http.ts
+export async function http<T>(path: string, init?: RequestInit): Promise<T> {
+  const base = import.meta.env.VITE_API_BASE_URL || '';
+  const isMut = !!init?.method && init.method !== 'GET';
+  const res = await fetch(`${base}${path}`, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(isMut ? { 'x-csrf-token': (window as any).__CSRF__ } : {})
+    },
+    ...init
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    try { throw JSON.parse(text); } catch { throw new Error(text || res.statusText); }
+  }
+  return res.json() as Promise<T>;
+}
+```
+
+---
+
+## Pattern Examples
+
+- Feature slice (`pages/schools`):
+  - `SchoolsPage.tsx`: table + toolbar + pagination.
+  - `SchoolForm.tsx`: RHF + Zod schema; used for create/edit dialogs.
+  - Hooks use `schools.queries.ts`.
+
+- Shared UI (`components/ui`):
+  - Wrap shadcn/ui to standardize props and theming.
+  - Expose only project-approved primitives to avoid duplication.
+
+---
+
+## Linting and Conventions
+
+Enforce with ESLint:
+```js
+// eslint.config.js (excerpt)
+export default [
+  {
+    rules: {
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'import/order': ['error', { 'newlines-between': 'always' }],
+      '@typescript-eslint/consistent-type-imports': 'error',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn'
+    }
+  }
+];
+```
+
+TypeScript:
+- `strict` mode ON.
+- Centralize DTOs in `src/types/api.ts` or colocate near feature if specific.
+
+---
+
+## Where to Place…
+
+- Tests: next to component or under `__tests__` inside feature folder.
+- Assets: under `src/assets` and import in components/pages.
+- APIs: `src/api/*` with separate files per domain.
+- Env files: root-level `.env*` read by Vite.
+- Global providers: `src/context/*` and wired in `main.tsx`.
+
+---
+
+## Migration/Refactor Tips
+
+- If a feature grows:
+  - Create subfolders: `components/`, `hooks/`, `__tests__/` under the feature folder.
+- If `components/ui` grows:
+  - Separate into logical groups: `forms/`, `data-display/`, `feedback/`, `layout/`.
+
+---
+
+## Checklists
+
+- Structure
+  - [ ] Features are under `pages/<feature>/`
+  - [ ] Reusable components are in `components/` with `ui/` for primitives
+  - [ ] API calls split into `*.api.ts` and `*.queries.ts`
+  - [ ] Tests co-located with code or under `__tests__`
+
+- Quality
+  - [ ] Types are explicit; DTOs documented
+  - [ ] ESLint and Prettier clean
+  - [ ] React Query keys are stable and descriptive
+
+- Security
+  - [ ] Only non-secret env vars in `.env*`
+  - [ ] `http.ts` uses `credentials: 'include'` and CSRF header for writes
+
+---
+
+## Next actions
+- Create `src/api/*` files per domain and wire `http.ts`.
+- Move feature-specific components under `pages/<feature>/`.
+- Add co-located tests for Schools and Attendance pages.

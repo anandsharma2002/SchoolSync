@@ -1,0 +1,52 @@
+
+---
+
+## Example API Client Wrapper
+
+```ts
+// src/lib/http.ts
+export async function http<T>(path: string, init?: RequestInit): Promise<T> {
+  const base = import.meta.env.VITE_API_BASE_URL || '';
+  const res = await fetch(`${base}${path}`, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.method && init.method !== 'GET' ? { 'x-csrf-token': (window as any).__CSRF__ } : {})
+    },
+    ...init
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    try { throw JSON.parse(text); } catch { throw new Error(text); }
+  }
+  return res.json() as Promise<T>;
+}
+```
+
+---
+
+## Deployment
+
+- Build: `npm run build` produces static assets served by a CDN or reverse proxy.
+- Reverse Proxy: Attach security headers (CSP, HSTS, X-Content-Type-Options).
+- Cache-Control: Static assets with immutable hashes; HTML with no-store or short TTL.
+- SRI (optional): Use subresource integrity for critical vendor assets (if not bundled).
+
+---
+
+## Scaling
+
+- Horizontal: SPA is static; scale via CDN edge distribution.
+- Backend: Independent scaling; frontend remains stateless.
+- API Throttling: Backend rate limits; frontend handles 429 gracefully (backoff).
+
+---
+
+## Health & Resilience
+
+- Health: Poll backend `/health` periodically or upon critical actions to surface downtime.
+- Offline Degradation (Optional): Basic caching for static assets; display read-only cached screens with clear banners if desired in a future PWA phase.
+
+---
+
+## Folder Structure (Frontend)

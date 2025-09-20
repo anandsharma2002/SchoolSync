@@ -1,0 +1,151 @@
+# School Sync — Folder Structure (Frontend)
+
+A clear, scalable folder structure for the React 18 + Vite + TypeScript frontend. Optimized for feature-first organization, co-located tests, and long-term maintainability.
+
+---
+
+## Principles
+- Feature-first: keep pages, components, hooks, tests, and styles near each feature.
+- Co-location: tests, types, and styles next to implementation.
+- Explicit boundaries: shared primitives go to `components/ui`, cross-cutting to `lib` and `hooks`.
+- Clear test placement: `*.spec.tsx` next to code or under `__tests__`.
+
+---
+
+## Recommended Layout
+
+```text
+Frontend/
+  .env                     # local env (NEVER commit secrets)
+  .env.development         # dev env vars
+  .env.production          # prod env vars (non-secret)
+  index.html
+  package.json
+  tsconfig.json
+  vite.config.ts
+  eslint.config.js
+  postcss.config.js
+  tailwind.config.ts
+
+  public/                  # static assets (favicons, manifest, robots)
+    favicon.ico
+    site.webmanifest
+
+  src/
+    main.tsx               # app entry
+    App.tsx                # router and layout shell (or routes setup)
+    index.css
+    App.css
+
+    routes/                # central route definitions (if not in App)
+      index.tsx
+
+    pages/                 # route-level components (by feature)
+      dashboard/
+        DashboardPage.tsx
+        DashboardCards.tsx
+        __tests__/DashboardPage.spec.tsx
+      schools/
+        SchoolsPage.tsx
+        SchoolForm.tsx
+        __tests__/SchoolsPage.spec.tsx
+      classes/
+        ClassesPage.tsx
+        ClassForm.tsx
+      teachers/
+        TeachersPage.tsx
+        TeacherForm.tsx
+      students/
+        StudentsPage.tsx
+        StudentForm.tsx
+      attendance/
+        AttendancePage.tsx
+        AttendanceGrid.tsx
+        __tests__/AttendanceGrid.spec.tsx
+      announcements/
+        AnnouncementsPage.tsx
+        AnnouncementForm.tsx
+      auth/
+        LoginPage.tsx
+
+    components/            # reusable components (not route-specific)
+      ui/                  # shadcn/ui wrapped or shared UI primitives
+        Button.tsx
+        Input.tsx
+        Dialog.tsx
+      layout/
+        Sidebar.tsx
+        Topbar.tsx
+        ProtectedRoute.tsx
+      feedback/
+        Toast.tsx
+        EmptyState.tsx
+        ErrorBoundary.tsx
+      charts/
+        AttendanceMiniChart.tsx
+
+    hooks/                 # cross-cutting hooks
+      useAuth.ts
+      usePagination.ts
+      useDebounce.ts
+
+    context/               # React context providers
+      AuthProvider.tsx
+      ThemeProvider.tsx
+      QueryClientProvider.tsx
+
+    api/                   # typed API clients + React Query hooks
+      http.ts              # base fetch wrapper (credentials: include)
+      auth.api.ts          # low-level REST functions
+      auth.queries.ts      # React Query hooks (useLogin, useMe)
+      schools.api.ts
+      schools.queries.ts
+      classes.api.ts
+      classes.queries.ts
+      attendance.api.ts
+      attendance.queries.ts
+      announcements.api.ts
+      announcements.queries.ts
+
+    lib/                   # utilities and cross-cutting concerns
+      utils.ts
+      constants.ts
+      zodSchemas.ts
+      csp.ts (optional)
+
+    assets/                # images, icons, fonts (imported in code)
+      logo.svg
+
+    styles/                # tailwind/global styles (optional if index.css)
+      tailwind.css
+
+    tests/                 # test helpers (test-specific util/setup)
+      setupTests.ts
+      factories/
+        studentFactory.ts
+        schoolFactory.ts
+
+    types/                 # shared TypeScript types (if not colocated)
+      index.ts
+      api.ts               # DTOs for backend responses/requests
+```
+
+---
+
+## Test Placement
+
+- Co-locate:
+  - `FeatureX.tsx` → `FeatureX.spec.tsx` in the same folder or under `__tests__`.
+- Shared test utilities:
+  - `src/tests/setupTests.ts`: RTL/Jest setup.
+  - `src/tests/factories/*`: data builders.
+
+Naming:
+- Unit tests: `*.spec.ts(x)` or `*.test.ts(x)`.
+- Keep tests small and focused; use `@testing-library/react` queries by role/label.
+
+---
+
+## Environment Files
+
+- `.env` and `.env.development` for local config:

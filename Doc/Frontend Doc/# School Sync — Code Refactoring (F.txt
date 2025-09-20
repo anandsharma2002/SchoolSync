@@ -1,0 +1,323 @@
+# School Sync — Code Refactoring (Frontend)
+
+Comprehensive, actionable refactoring guidance to improve readability, maintainability, and performance for the React frontend. Includes repo-wide checklists, patterns, and before/after examples (React component and a .NET controller reference to coordinate with backend interfaces).
+
+---
+
+## Objectives
+- Enforce SOLID and SRP at the component/hook level.
+- Standardize async patterns with React Query and typed API clients.
+- Remove prop drilling; introduce cohesive feature slices.
+- Eliminate duplicate styles and logic; prefer composable primitives.
+- Improve performance via memoization, code-splitting, and virtualization.
+
+---
+
+## Repo-wide Refactor Checklist
+
+### Architecture & Structure
+- [ ] Adopt feature-first folders under `src/pages/<feature>/`.
+- [ ] Split API access into `*.api.ts` (fetchers) and `*.queries.ts` (React Query hooks).
+- [ ] Keep components pure; push side effects to hooks.
+- [ ] Co-locate tests next to source files (`*.spec.tsx`).
+
+### TypeScript & API Contracts
+- [ ] Enable TS strict mode; remove all `any`.
+- [ ] Centralize DTOs (or colocate near feature if only used there).
+- [ ] Prefer discriminated unions or enums for state/status variants.
+- [ ] Ensure API functions return typed results (never `unknown`).
+
+### Components & Hooks (SRP)
+- [ ] Extract complex form logic into custom hooks (`useSchoolForm`).
+- [ ] Move reusable UI to `components/ui`.
+- [ ] Avoid massive “God components”; split into “container + presentational”.
+
+### Async & Caching
+- [ ] Use React Query for data fetching, retries, and cache invalidation.
+- [ ] Use optimistic updates cautiously; always provide rollback.
+- [ ] Keep fetch wrapper with `credentials: 'include'` and CSRF on writes.
+
+### Performance
+- [ ] Code-split route pages with `lazy` and `Suspense`.
+- [ ] Memoize heavy components; use `useMemo` and `useCallback`.
+- [ ] Virtualize large lists when > 100 rows.
+
+### Accessibility & UI
+- [ ] Use accessible labels, roles, and error descriptions.
+- [ ] Ensure keyboard access for dialogs and menus.
+- [ ] Conform to WCAG AA color contrast with Tailwind tokens.
+
+### Testing
+- [ ] Prefer behavioral tests with RTL, not snapshots for dynamic views.
+- [ ] Test validation logic in forms (zod + RHF).
+- [ ] Add tests for query/mutation hooks with mocked fetch.
+
+---
+
+## Anti-Patterns to Eliminate
+- Overloaded components with internal fetch + render + forms together.
+- Reimplementing fetch/axios logic per page; create a typed wrapper once.
+- Imperative DOM manipulation; rely on React state instead.
+- Storing server data in Context if React Query can manage it.
+- Using indexes as React list keys; use stable ids.
+
+---
+
+## Async Patterns
+
+### Recommended: fetch wrapper + React Query
+```ts
+// src/api/http.ts
+export async function http<T>(path: string, init?: RequestInit): Promise<T> {
+  const base = import.meta.env.VITE_API_BASE_URL ?? '';
+  const isWrite = init?.method && init.method !== 'GET';
+  const res = await fetch(`${base}${path}`, {
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(isWrite ? { 'x-csrf-token': (window as any).__CSRF__ } : {})
+    },
+    ...init
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    try { throw JSON.parse(text); } catch { throw new Error(text || res.statusText); }
+  }
+  return res.json() as Promise<T>;
+}
+```
+
+---
+
+## Example Refactor — React Component (Before → After)
+
+### Before: Bloated component mixing fetch, state, and render
+```tsx
+// BEFORE: src/pages/schools/SchoolsPage.tsx
+import { useEffect, useState } from 'react';
+
+export default function SchoolsPage() {
+  const [schools, setSchools] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let canceled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/schools?search=${encodeURIComponent(search)}`, { credentials: 'include' });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        if (!canceled) setSchools(data);
+      } catch (e: any) {
+        if (!canceled) setError(e.message ?? 'Failed to load');
+      } finally {
+        if (!canceled) setLoading(false);
+      }
+    }
+    load();
+    return () => { canceled = true; };
+  }, [search]);
+
+  return (
+    <div>
+      <input placeholder="Search" value={search} onChange={e => setSearch(e.target.value)} />
+      {loading && <p>Loading...</p>}
+      {error && <p role="alert">{error}</p>}
+      <ul>
+        {schools.map((s, i) => <li key={i}>{s.name}</li>)}
+      </ul>
+    </div>
+  );
+}
+```
+
+### After: Split into API + query hook + presentational component
+```tsx
+// src/api/schools.api.ts
+import { http } from '../api/http';
+export type School = { id: string; name: string; address?: string };
+export function getSchools(search: string) {
+  const q = new URLSearchParams();
+  if (search) q.set('search', search);
+  return http<School[]>(`/api/schools?${q.toString()}`);
+}
+
+// src/api/schools.queries.ts
+import { useQuery } from '@tanstack/react-query';
+import { getSchools } from './schools.api';
+export function useSchools(search: string) {
+  return useQuery({
+    queryKey: ['schools', search],
+    queryFn: () => getSchools(search),
+    staleTime: 60_000
+  });
+}
+
+// src/pages/schools/SchoolsPage.tsx
+import { useState, useMemo } from 'react';
+import { useSchools } from '../../api/schools.queries';
+
+export default function SchoolsPage() {
+  const [search, setSearch] = useState('');
+  const trimmed = useMemo(() => search.trim(), [search]);
+  const { data, isLoading, error } = useSchools(trimmed);
+
+  return (
+    <section>
+      <input
+        aria-label="Search schools"
+        placeholder="Search"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
+      {isLoading && <p>Loading...</p>}
+      {error && <p role="alert">{(error as any).message ?? 'Failed to load'}</p>}
+      <ul>
+        {(data ?? []).map(s => <li key={s.id}>{s.name}</li>)}
+      </ul>
+    </section>
+  );
+}
+```
+
+Benefits:
+- SRP: Component only renders; data logic in hook; HTTP in a single place.
+- Caching and re-tries handled by React Query.
+- Reliable keys (`s.id`) instead of array index.
+
+---
+
+## Example Refactor — Backend Controller Coordination (Reference)
+
+Even though this is a frontend guide, aligning with backend improves contracts and reduces UI conditionals.
+
+### Before: Controller returns entities directly and lacks pagination metadata
+```csharp
+// BEFORE: SchoolsController.cs
+[HttpGet]
+public async Task<IActionResult> Get(string? search)
+{
+    var schools = await _repo.ListAsync(search);
+    return Ok(schools); // returns entity model directly
+}
+```
+
+### After: Controller returns DTOs with paging and stable casing
+```csharp
+// AFTER: SchoolsController.cs
+[HttpGet]
+public async Task<ActionResult<PagedResult<SchoolDto>>> Get([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+{
+    var result = await _service.ListAsync(search, page, pageSize);
+    Response.Headers.Append("X-Total-Count", result.Total.ToString());
+    return Ok(result);
+}
+```
+
+Frontend impact:
+- Strongly typed DTOs reduce null checks and branching in UI.
+- `X-Total-Count` header enables simple pagination controls.
+
+---
+
+## Pattern Library: Forms with RHF + Zod
+
+```ts
+// src/pages/schools/SchoolForm.tsx
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const schema = z.object({
+  name: z.string().min(2).max(200),
+  address: z.string().optional()
+});
+type SchoolFormData = z.infer<typeof schema>;
+
+export function SchoolForm({ onSubmit }: { onSubmit: (data: SchoolFormData) => void }) {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SchoolFormData>({ resolver: zodResolver(schema) });
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} aria-busy={isSubmitting}>
+      <label>
+        Name
+        <input {...register('name')} aria-invalid={!!errors.name} />
+      </label>
+      {errors.name && <p role="alert">{errors.name.message}</p>}
+
+      <label>
+        Address
+        <input {...register('address')} />
+      </label>
+
+      <button type="submit" disabled={isSubmitting}>Save</button>
+    </form>
+  );
+}
+```
+
+---
+
+## Diff-Style Summary (Key Transformations)
+
+```diff
+- Component fetches and manages server state locally
++ Use React Query hooks for caching, retries, and loading states
+
+- Direct entity usage in UI
++ Typed DTOs; map backend data to UI-safe models
+
+- Inline, repeated fetch logic
++ Centralized `http()` wrapper with CSRF header for writes
+
+- Large monolithic component
++ Container + presentational split; reusable UI primitives
+
+- Non-deterministic keys for lists
++ Use stable `id` keys from DTOs
+```
+
+---
+
+## Tooling & Rules
+
+- ESLint rules (excerpt):
+```js
+export default [{
+  rules: {
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    '@typescript-eslint/consistent-type-imports': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn'
+  }
+}];
+```
+
+- Formatting: Prettier; avoid long inline JSX expressions—extract small components.
+
+- Performance guardrails:
+  - Use `useMemo` when derived data is costly.
+  - Wrap heavy child lists with `memo`.
+  - Virtualize large tables (e.g., `react-virtual`).
+
+---
+
+## Refactor Workflow
+
+1) Identify candidates: large components, duplicate fetch code, missing types.
+2) Write basic RTL tests around current behavior (safety net).
+3) Extract HTTP calls to `api/*.api.ts` and React Query hooks to `api/*.queries.ts`.
+4) Split component into container + presentational parts.
+5) Add types and remove `any`.
+6) Optimize rendering paths; add memoization if needed.
+7) Validate with tests and Lighthouse.
+
+---
+
+## Next actions
+- Extract HTTP calls into `src/api/http.ts` and per-domain `*.api.ts`.
+- Introduce React Query hooks and migrate 1–2 pages (Schools, Classes).
+- Add RTL tests for the refactored pages and enforce ESLint rules in CI.

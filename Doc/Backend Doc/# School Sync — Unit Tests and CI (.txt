@@ -1,0 +1,390 @@
+# School Sync — Unit Tests and CI (Backend)
+
+Guidance for xUnit-based unit/integration tests for the ASP.NET Core 8 Web API, using Moq (or NSubstitute), EF Core test strategies, Testcontainers for PostgreSQL, and CI steps to enforce quality, coverage, and analyzers.
+
+---
+
+## Testing Strategy
+
+### Levels
+- Unit tests (fast): Services, repositories, validators, AutoMapper profiles.
+- Integration tests (medium): In-memory test server with `WebApplicationFactory<TProgram>` hitting real controllers, filters, and middleware.
+- Database integration tests (slower): Against ephemeral PostgreSQL via Testcontainers; runs EF Core migrations, executes real queries.
+- Security tests: AuthZ policies on endpoints, JWT validation paths.
+
+### Coverage Targets
+- Services/Repositories: ≥ 70%
+- Controllers (integration happy paths + validation): representative coverage
+- Critical auth and attendance flows: explicit tests
+
+---
+
+## Test Projects Layout
+
+Recommended solution structure:
+- `Backend/Tests/UnitTests` — pure unit tests (services, repos with mocks)
+- `Backend/Tests/IntegrationTests` — WebApplicationFactory-based HTTP-level tests
+- `Backend/Tests/DatabaseTests` — Testcontainers PostgreSQL-backed tests (optional but recommended)
+
+Example solution references:
+```bash
+dotnet new xunit -o Backend/Tests/UnitTests
+dotnet new xunit -o Backend/Tests/IntegrationTests
+dotnet sln Backend/SMSPrototype1.sln add Backend/Tests/UnitTests/UnitTests.csproj
+dotnet sln Backend/SMSPrototype1.sln add Backend/Tests/IntegrationTests/IntegrationTests.csproj
+
+dotnet add Backend/Tests/UnitTests/UnitTests.csproj reference Backend/SMSRepository/SMSRepository.csproj Backend/SMSServices/SMSServices.csproj Backend/SMSDataModel/SMSDataModel.csproj
+dotnet add Backend/Tests/IntegrationTests/IntegrationTests.csproj reference Backend/SMSPrototype1/SMSPrototype1.csproj
+```
+
+NuGet packages (add as needed):
+```bash
+dotnet add Backend/Tests/UnitTests/UnitTests.csproj package xunit xunit.runner.visualstudio Moq FluentAssertions AutoFixture AutoFixture.AutoMoq
+dotnet add Backend/Tests/IntegrationTests/IntegrationTests.csproj package Microsoft.AspNetCore.Mvc.Testing Microsoft.NET.Test.Sdk FluentAssertions Coverlet.Collector
+dotnet add Backend/Tests/IntegrationTests/IntegrationTests.csproj package Testcontainers PostgreSql
+```
+
+---
+
+## Unit Testing Patterns
+
+### Example: Service with Repository Mock
+```csharp
+// Services/SchoolService.cs (example signature)
+public interface ISchoolService { Task<IEnumerable<SchoolDto>> ListAsync(string? search, int page, int pageSize); }
+
+public class SchoolServiceTests
+{
+    private readonly Mock<ISchoolRepository> _repo = new();
+    private readonly IMapper _mapper;
+
+    public SchoolServiceTests()
+    {
+        var config = new MapperConfiguration(cfg => cfg.AddProfile(new SchoolAutoMapper()));
+        _mapper = config.CreateMapper();
+    }
+
+    [Fact]
+    public async Task ListAsync_ReturnsPagedSchools()
+    {
+        // Arrange
+        _repo.Setup(r => r.ListAsync(It.IsAny<string?>(), It.IsAny<int>(), It.IsAny<int>()))
+             .ReturnsAsync(new List<School> { new() { Id = Guid.NewGuid(), Name = "Sunrise High" } });
+
+        var svc = new SchoolService(_repo.Object, _mapper);
+
+        // Act
+        var result = await svc.ListAsync("sun", 1, 20);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().ContainSingle(s => s.Name == "Sunrise High");
+    }
+}
+```
+
+### Example: Attendance Idempotency (Service)
+```csharp
+[Fact]
+public async Task MarkAttendance_IsIdempotent_ForSameClassStudentDate()
+{
+    // Arrange: entries contain same student/date twice
+    var classId = Guid.NewGuid();
+    var studentId = Guid.NewGuid();
+    var date = DateOnly.FromDateTime(DateTime.UtcNow);
+    var repo = new Mock<IAttendanceRepository>();
+
+    repo.Setup(r => r.ExistsAsync(classId, studentId, date))
+        .ReturnsAsync(true);
+
+    var svc = new AttendanceService(repo.Object /* ... */);
+
+    // Act
+    var result = await svc.MarkAsync(classId, date, new [] { new AttendanceEntry(studentId, true) });
+
+    // Assert
+    result.Success.Should().BeTrue();
+    repo.Verify(r => r.AddRangeAsync(It.IsAny<IEnumerable<Attendance>>()), Times.Never); // no duplicates
+}
+```
+
+---
+
+## Integration Testing (In-Memory Server)
+
+Use `WebApplicationFactory<Program>` with custom configuration for integration tests.
+
+`tests/IntegrationTests/CustomWebAppFactory.cs`:
+```csharp
+public class CustomWebAppFactory : WebApplicationFactory<SMSPrototype1.Program>
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Testing");
+        builder.ConfigureAppConfiguration((ctx, config) =>
+        {
+            var dict = new Dictionary<string,string?>
+            {
+                ["ConnectionStrings:PostgresSQLConnectionString"] = "Host=localhost;Database=SchoolSyncTest;Username=postgres;Password=test"
+            };
+            config.AddInMemoryCollection(dict!);
+        });
+
+        builder.ConfigureServices(services =>
+        {
+            // Optionally replace DataContext with InMemory or Testcontainers connection
+            // Example for EF InMemory (for controller wiring, not for SQL behavior)
+            // var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<DataContext>));
+            // if (descriptor != null) services.Remove(descriptor);
+            // services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("InMemDb"));
+        });
+    }
+}
+```
+
+Example test hitting a real controller:
+```csharp
+public class SchoolsControllerTests : IClassFixture<CustomWebAppFactory>
+{
+    private readonly HttpClient _client;
+
+    public SchoolsControllerTests(CustomWebAppFactory factory)
+    {
+        _client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+    }
+
+    [Fact]
+    public async Task Get_Schools_ReturnsOk()
+    {
+        var res = await _client.GetAsync("/api/v1/schools");
+        res.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+}
+```
+
+Add JWT/cookie handling for authenticated tests by seeding a test user and issuing a test token (or bypass with a test authentication handler in `Testing` environment).
+
+---
+
+## Database Integration Tests (Testcontainers + PostgreSQL)
+
+For realistic EF behavior (indices, constraints, SQL), use Testcontainers:
+
+`tests/IntegrationTests/PostgresFixture.cs`:
+```csharp
+public class PostgresFixture : IAsyncLifetime
+{
+    public PostgreSqlContainer Container { get; } =
+        new PostgreSqlBuilder()
+            .WithImage("postgres:16-alpine")
+            .WithUsername("postgres")
+            .WithPassword("postgres")
+            .WithDatabase("schoolsync_it")
+            .Build();
+
+    public string ConnectionString => Container.GetConnectionString();
+
+    public async Task InitializeAsync()
+    {
+        await Container.StartAsync();
+
+        // Apply migrations programmatically
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseNpgsql(ConnectionString)
+            .Options;
+
+        using var ctx = new DataContext(options);
+        await ctx.Database.MigrateAsync();
+    }
+
+    public async Task DisposeAsync() => await Container.DisposeAsync();
+}
+```
+
+Use it in tests:
+```csharp
+public class AttendanceQueriesTests : IClassFixture<PostgresFixture>
+{
+    private readonly string _conn;
+
+    public AttendanceQueriesTests(PostgresFixture fx) => _conn = fx.ConnectionString;
+
+    [Fact]
+    public async Task Query_ByClassAndDate_IsIndexedAndFast()
+    {
+        var opts = new DbContextOptionsBuilder<DataContext>().UseNpgsql(_conn).Options;
+        await using var ctx = new DataContext(opts);
+
+        // Seed test data, then measure query execution (simplified)
+        var date = new DateOnly(2025, 09, 10);
+        var list = await ctx.Attendance
+            .Where(a => a.ClassId == /* classId */ Guid.Empty && a.Date == date)
+            .AsNoTracking()
+            .ToListAsync();
+
+        list.Should().NotBeNull();
+    }
+}
+```
+
+---
+
+## AutoMapper Profile Tests
+
+Validate configuration once:
+```csharp
+[Fact]
+public void AutoMapper_Configuration_IsValid()
+{
+    var config = new MapperConfiguration(cfg =>
+    {
+        cfg.AddProfile<SchoolAutoMapper>();
+        cfg.AddProfile<SchoolClassAutoMapper>();
+        cfg.AddProfile<TeacherAutomapper>();
+        cfg.AddProfile<StudentAutomapper>();
+        cfg.AddProfile<AttendanceAutomapper>();
+    });
+    config.AssertConfigurationIsValid();
+}
+```
+
+---
+
+## ProblemDetails & Validation Tests
+
+Ensure consistent error shapes:
+```csharp
+[Fact]
+public async Task CreateSchool_InvalidPayload_ReturnsProblemDetails()
+{
+    var factory = new CustomWebAppFactory();
+    var client = factory.CreateClient();
+
+    var res = await client.PostAsJsonAsync("/api/v1/schools", new { name = "" });
+    res.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+    var prob = await res.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+    prob.Should().NotBeNull();
+    prob!.Errors.Should().ContainKey("name");
+}
+```
+
+---
+
+## Running Tests Locally
+
+```bash
+# From Backend/
+dotnet restore
+dotnet build -c Debug
+dotnet test -c Debug /p:CollectCoverage=true /p:CoverletOutput=./TestResults/coverage/ /p:CoverletOutputFormat=lcov
+```
+
+Open coverage report (lcov can be uploaded to codecov or inspected with local tools).
+
+---
+
+## CI Pipeline (GitHub Actions Example)
+
+`.github/workflows/backend-ci.yml`:
+```yaml
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'Backend/**'
+  pull_request:
+    paths:
+      - 'Backend/**'
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore Backend/SMSPrototype1.sln
+
+      - name: Build
+        run: dotnet build Backend/SMSPrototype1.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Backend/SMSPrototype1.sln -c Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: '**/TestResults/**/coverage.info'
+
+      - name: Verify formatting
+        run: dotnet tool restore && dotnet format --verify-no-changes
+```
+
+Optionally add Testcontainers service on CI (Docker must be available). For GitHub Actions, use `services.postgres` instead of Testcontainers, or enable Docker privileges.
+
+---
+
+## Analyzer Rules & Formatting
+
+Enable .NET analyzers and treat warnings as errors where possible (incrementally):
+`Directory.Build.props` example:
+```xml
+<Project>
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
+```
+
+Run formatter in CI:
+```bash
+dotnet format --verify-no-changes
+```
+
+---
+
+## Test Data and Builders
+
+- Use Builder/Factory pattern for entities:
+```csharp
+public static class StudentBuilder
+{
+    public static Student Create(Guid? classId = null, string first="First", string last="Last") =>
+        new() { Id = Guid.NewGuid(), ClassId = classId ?? Guid.NewGuid(), FirstName = first, LastName = last, Dob = new DateOnly(2010,1,1) };
+}
+```
+
+- Seed helpers for integration tests; ensure isolation per test (unique DB names or cleanups).
+
+---
+
+## Security-Focused Tests
+
+- AuthZ policy tests: Assert `[Authorize(Policy="RequireAdmin")]` endpoints return 403 for non-admins.
+- JWT validation: ensure invalid signature/issuer/audience is rejected.
+- CORS behavior: integration tests in `Testing` env verifying allowed origins (optional).
+
+---
+
+## Troubleshooting
+
+- Flaky integration tests: run `--filter FullyQualifiedName~` subsets; ensure deterministic data seeding and cleanup.
+- EF InMemory vs PostgreSQL: use InMemory for controller plumbing; use PostgreSQL container for SQL-specific behaviors (indices, constraints).
+- Testcontainers in CI: ensure Docker is available; otherwise rely on a workflow service container.
+
+---
+
+## Next actions
+- Create UnitTests and IntegrationTests projects and add basic smoke tests for `/api/v1/schools`.
+- Add AutoMapper configuration test and Attendance idempotency unit test.
+- Integrate CI workflow with coverage artifact and dotnet format verification.
